@@ -24,7 +24,79 @@ int main()
     //DeleteReg(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\MyProgram.exe", L"Path");
 
 
-    cout << IsAdmin();
+   /* cout << IsAdmin();*/
+
+    //double a[] = {7,5,2,4,2.1};
+	//int aa= DoublePointerRemoveValue(a,2);
+	//
+	////int ValueNumber = FindValueInList(2.1, a);
+	//
+	//a;
+
+
+
+    //for (int i = 0; i < 4; i++)
+    //    cout << a[i];
+
+
+	//int a[] = { 7,5,2,4 };
+	//int temp, j, mid;
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	temp = a[i];
+	//	int low = 0;
+	//	int high = i - 1;
+	//	while (low <= high)
+	//	{
+	//		mid = (low + high) / 2;
+	//		if (a[mid] > temp)
+	//			high = mid - 1;
+	//		else
+	//			low = mid + 1;
+	//	}
+	//	for (j = i - 1; j >= low; j--)
+	//	{
+	//		a[j + 1] = a[j];
+	//	}
+	//	a[low] = temp;
+	//}
+
+
+	//for (int i = 0; i < 4; i++)
+	//	cout << a[i];
+
+
+
+
+	//int a[] = { 0,1,2,3,4,5,6,7,8,9 }, k;
+	//int low = 0, high = 10 - 1, mid, find = 0;
+	//printf("请输入欲查找的值：\n");
+	//scanf_s("%d", &k);
+	//while (low <= high)
+	//{
+	//	mid = (low + high) / 2;
+	//	if (a[mid] == k)
+	//	{
+	//		printf("找到位置为：%d\n", mid + 1); find = 1;
+	//	}
+	//	if (a[mid] > k)
+	//		high = mid - 1;
+	//	else
+	//		low = mid + 1;
+	//}
+	//if (!find) printf(" % d未找到\n", k);
+
+
+
+
+	//int ddd =StartPrograme("cmd");
+
+
+
+
+
+
+
 
     system("pause");
 }

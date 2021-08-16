@@ -65,6 +65,21 @@ void MyTitleBar::initControl()
 	mylayout->addWidget(m_pButtonRestore);
 	mylayout->addWidget(m_pButtonMax);
 	mylayout->addWidget(m_pButtonClose);
+	m_pButtonMin->setStyleSheet("QPushButton{border: transparent; border-radius: none; background-color:none;}"
+		"QPushButton{border-image:url(image/Minimize.png) 0 84 0 0;}"
+		"QPushButton:hover{border-image:url(image/Minimize.png) 0 42 0 42;}"
+		"QPushButton:pressed{border-image:url(image/Minimize.png) 0 0 0 84;}");
+
+	m_pButtonRestore->setStyleSheet("QPushButton{border: transparent; border-radius: none; background-color:none;}"
+		"QPushButton{border-image:url(image/Restore.png) 0 84 0 0;}"
+		"QPushButton:hover{border-image:url(image/Restore.png) 0 42 0 42;}"
+		"QPushButton:pressed{border-image:url(image/Restore.png) 0 0 0 84;}");
+
+	m_pButtonMax->setStyleSheet("QPushButton{border: transparent; border-radius: none; background-color:none;}"
+		"QPushButton{border-image:url(image/Maximize.png) 0 84 0 0;}"
+		"QPushButton:hover{border-image:url(image/Maximize.png) 0 42 0 42;}"
+		"QPushButton:pressed{border-image:url(image/Maximize.png) 0 0 0 84;}");
+
 	m_pButtonClose->setStyleSheet("QPushButton{border: transparent; border-radius: none; background-color:none;}"
 		"QPushButton{border-image:url(image/Close.png) 0 84 0 0;}"
 		"QPushButton:hover{border-image:url(image/Close.png) 0 42 0 42;}"

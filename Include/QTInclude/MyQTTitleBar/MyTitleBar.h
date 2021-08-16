@@ -30,13 +30,13 @@ enum ButtonType
 //如何使用这个自定义标题栏?
 
 //首先需要在窗体中初始化自定义标题栏对象并重写某些函数
-/* protected:
+/* 
+protected:
 	MyTitleBar* m_titleBar;
+	
 private:
-
 	void initTitleBar();									//初始化标题
-	void paintEvent(QPaintEvent *event);					//重写绘图事件
-	void loadStyleSheet(const QString &sheetName);			//预留加载qss函数	
+	
 private slots:
 	void onButtonMinClicked();								//最小化槽函数
 	void onButtonRestoreClicked();							//还原键槽函数
@@ -44,32 +44,7 @@ private slots:
 	void onButtonCloseClicked();							//关闭按钮槽函数 */
 
 //然后重新实现以下函数
-/* void QAXSafeCheckerTrustDlg::paintEvent(QPaintEvent* event)
-{
-	//设置背景色;
-	QPainter painter(this);
-	QPainterPath pathBack;
-	pathBack.setFillRule(Qt::WindingFill);
-	pathBack.addRoundedRect(QRect(0, 0, this->width(), this->height()), 3, 3);
-	painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-	painter.fillPath(pathBack, QBrush(QColor(255, 255, 255)));
-
-	QWidget::paintEvent(event);                                                                                            
-}
-
-void QAXSafeCheckerTrustDlg::loadStyleSheet(const QString &sheetName)
-{
-	QFile file("image/" + sheetName + ".css");
-	file.open(QFile::ReadOnly);
-	if (file.isOpen())
-	{
-		QString styleSheet = this->styleSheet();
-		styleSheet += QLatin1String(file.readAll());
-		this->setStyleSheet(styleSheet);
-	}
-}
-
-void QAXSafeCheckerTrustDlg::onButtonMinClicked()
+/* void QAXSafeCheckerTrustDlg::onButtonMinClicked()
 {
 	showMinimized();
 }
@@ -93,12 +68,8 @@ void QAXSafeCheckerTrustDlg::onButtonMaxClicked()
 void QAXSafeCheckerTrustDlg::onButtonCloseClicked()
 {
 	close();
-} */
-
-
-
-
-
+} 
+*/
 
 
 

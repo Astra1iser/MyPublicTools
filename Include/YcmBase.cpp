@@ -6,7 +6,8 @@
 #include <MyOperFile.cpp>
 
 
-BOOL  Base::IsAdmin() {
+
+BOOL Base::IsAdmin() {
 	#define ACCESS_READ		1  
 	#define ACCESS_WRITE	2  
 	HANDLE		hToken;
@@ -97,4 +98,58 @@ BOOL  Base::IsAdmin() {
 	}
 
 	return   bReturn;
+}
+
+BOOL Base::StartPrograme(CString Path,CString Parameters, BOOL IsAdmin, BOOL IsWaitForSingle)
+{
+
+	//if (!PathIsDirectory(Path))
+	//	return FALSE;
+
+
+	SHELLEXECUTEINFO ShExecInfo = { 0 };
+
+	//这个是结构体大小，sizeof下SHELLEXECUTEINFO就行
+	ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+
+	//一个标志数组，用来设置其他成员的有效性
+	ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+
+	//调用这个ShellExecuteEx的窗口句柄
+	ShExecInfo.hwnd = NULL;
+
+	//设置成runas就可以以管理员身份运行了，其他的都是普通用户身份
+	//指定执行的动作，包括：edit ，explore ，find ，open，print， properties
+	if (IsAdmin == TRUE)
+	{
+		ShExecInfo.lpVerb = L"runas";
+	}
+	else
+		ShExecInfo.lpVerb = L"open";
+
+
+	//要运行的文件路径
+	//ShExecInfo.lpFile = L"cmd";
+	ShExecInfo.lpFile = Path;
+
+	//运行/打开程序的参数，如果打开的是一个文档，则该项无效
+	ShExecInfo.lpParameters = Parameters;
+
+	//指明工作目录的名字，成员没有说明，则默认为当前目录
+	ShExecInfo.lpDirectory = NULL;
+
+	//设置窗口显示(SW_SHOW)和不显示(SW_HIDE)，当然还有其他的
+	ShExecInfo.nShow = SW_SHOW;
+
+	//如果函数运行成功，该项的值将大于32，否则其他的值自己查
+	ShExecInfo.hInstApp = NULL;
+	if (ShellExecuteEx(&ShExecInfo))
+	{
+		//线程挂起,直到唤起的进程有相应 如:关闭
+		if (IsWaitForSingle == TRUE)
+			WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+		return TRUE;
+	}	
+	else
+		return FALSE;	
 }
