@@ -4,7 +4,7 @@
 #include <Pathmanager.cpp>
 #include <RegeditManager.cpp>
 #include <MyOperFile.cpp>
-
+#include <Thread.cpp>
 
 
 BOOL Base::IsAdmin() {

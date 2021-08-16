@@ -6,6 +6,20 @@
 
 
 
+//继承Thread;
+class Example : public Thread
+{
+public:
+	//重写Run;
+	void Run()
+	{
+		while (this->bRun)
+		{
+			printf("Hello thread1\n");
+			Sleep(1000);
+		}
+	}
+};
 
 
 
@@ -93,7 +107,12 @@ int main()
 
 
 
+	Example e;
+	//启动线程;
+	e.Start();
 
+	getchar();
+	return 0;
 
 
 
