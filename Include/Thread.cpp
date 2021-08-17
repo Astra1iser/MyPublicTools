@@ -62,7 +62,7 @@ void Thread::WaitExit()
 	WaitForSingleObject(hThread, INFINITE);
 }
 
-DWORD __stdcall Thread::WThreadFunctionLinek(LPVOID Param)
+DWORD __stdcall Thread::WThreadFunctionLinek(IN LPVOID Param)
 {
 	Thread* pThread = ((Thread*)Param);
 	pThread->Run();

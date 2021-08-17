@@ -13,9 +13,27 @@ public:
 	//重写Run;
 	void Run()
 	{
+		int i = 0;
 		while (this->bRun)
 		{
 			printf("Hello thread1\n");
+			Sleep(1000);
+			i++;
+			if (i == 10)
+				this->Stop();
+		}
+	}
+};
+
+class Example2 : public Thread
+{
+public:
+	//重写Run;
+	void Run()
+	{
+		while (this->bRun)
+		{
+			printf("Hello thread2\n");
 			Sleep(1000);
 		}
 	}
@@ -40,9 +58,9 @@ int main()
 
    /* cout << IsAdmin();*/
 
-    //double a[] = {7,5,2,4,2.1};
-	//int aa= DoublePointerRemoveValue(a,2);
-	//
+    double a[] = {7,5,2,4,2.1};
+	int aa= DoublePointerRemoveValue(a,2);
+	
 	////int ValueNumber = FindValueInList(2.1, a);
 	//
 	//a;
@@ -107,15 +125,31 @@ int main()
 
 
 
-	Example e;
-	//启动线程;
-	e.Start();
+	//Example e;
+	//Example2 e2;
 
-	getchar();
-	return 0;
+	////启动线程;
+	//e.Start();
+	//e.WaitExit();
+	//e2.Start();
+
+	//getchar();
+
+	//return 0;
 
 
 
+	CString abc;
+
+	GetIniValue(abc, L"module_state", L"360av", L"C:\\Users\\yuanchunming01\\Desktop\\module_config.ini");
+
+
+	abc;
+
+	int acd;
+	GetIniValue(acd, L"module_state", L"360av", L"C:\\Users\\yuanchunming01\\Desktop\\module_config.ini");
+
+	acd;
 
     system("pause");
 }

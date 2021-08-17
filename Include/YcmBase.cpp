@@ -153,3 +153,19 @@ BOOL Base::StartPrograme(CString Path,CString Parameters, BOOL IsAdmin, BOOL IsW
 	else
 		return FALSE;	
 }
+
+void Base::GetIniValue(int& Source, CString Node, CString Key, CString IniPath)
+{
+	//int类型
+	auto temp = GetPrivateProfileInt(Node, Key, NULL, IniPath);
+	Source = temp;
+}
+
+void Base::GetIniValue(CString& Source, CString Node, CString Key, CString IniPath)
+{
+	//CString类型
+	ULONG len = MAX_PATH;
+	WCHAR szValue[MAX_PATH] = { 0 };
+	GetPrivateProfileString(Node, Key, NULL, szValue, len, IniPath);
+	Source = szValue;
+}

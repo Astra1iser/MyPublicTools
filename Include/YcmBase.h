@@ -33,15 +33,18 @@ namespace Base
 	//判断当前登录的账户是普通用户还是管理员 返回值:1管理员 0非管理员
 	BOOL IsAdmin();
 
+
 	//一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
 	BOOL StartPrograme(CString Path, CString Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE);
 
+	
 	//获得数组的元素个数,参数为任意数组的引用
 	template <class Arr>
 	int getArrayLen(Arr& array)
 	{
 		return (sizeof(array) / sizeof(array[0]));
 	}
+
 
 	//数组中元素的二分排序(从小到大),参数为任意数组的引用,传入参数后原数组顺序改变,暂时没有做形参是数组指针的重载
 	template <class List>
@@ -70,6 +73,7 @@ namespace Base
 			list[low] = temp;
 		}
 	}
+
 
 	//二分查找,第一个参数为需要查找的值,第二个参数为数组的引用,返回这个数组中需要查找的值的从小到大排序的第一个下标
 /*	template <class Value, class List>
@@ -100,6 +104,7 @@ namespace Base
 	}
 */
 
+
 	//双指针原地去除元素,参数1为引用数组,参数2为需要去除的元素值,返回去除的个数,去除的元素排在数组的后 "返回值个数"个,详情见注释
 	//如    int a[] = {2,7,5,2,4,2};
 	//		int aa = DoublePointerRemoveValue(a, 2);
@@ -121,6 +126,16 @@ namespace Base
 		//	list[end] = 0;
 		return i;
 	}
+
+
+	//获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
+	void GetIniValue(int& Source, CString Node, CString Key, CString IniPath);
+	//获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
+	void GetIniValue(CString& Source, CString Node, CString Key, CString IniPath);
+
+
+
+
 
 
 
