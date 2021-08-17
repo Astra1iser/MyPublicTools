@@ -17,7 +17,7 @@
 #include <RegeditManager.h>//注册表操作相关函数
 #include <MyOperFile.h>//文件读写和文件信息相关函数
 #include <Thread.h>//简易线程类
-
+#include <tinyxml.h>
 
 using namespace std;
 using namespace PathManager;

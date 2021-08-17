@@ -5,151 +5,122 @@
 
 
 
-
-//继承Thread;
-class Example : public Thread
+int writeXmlFile()
 {
-public:
-	//重写Run;
-	void Run()
+	TiXmlDocument* writeDoc = new TiXmlDocument; //xml文档指针
+
+	//文档格式声明
+	TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", "yes");
+	writeDoc->LinkEndChild(decl); //写入文档
+
+	int n = 3;	//父节点个数
+
+	TiXmlElement* RootElement = new TiXmlElement("Info");//根元素
+	RootElement->SetAttribute("num", n); //属性
+	writeDoc->LinkEndChild(RootElement);
+
+	for (int i = 0; i < n; i++)//n个父节点
 	{
-		int i = 0;
-		while (this->bRun)
+		TiXmlElement* StuElement = new TiXmlElement("Stu");//Stu
+		//设置属性
+		StuElement->SetAttribute("class", "A");
+		if (2 == i)
 		{
-			printf("Hello thread1\n");
-			Sleep(1000);
-			i++;
-			if (i == 10)
-				this->Stop();
+			StuElement->SetAttribute("class", "B");
+		}
+
+		StuElement->SetAttribute("id", i + 1);
+		StuElement->SetAttribute("flag", (i + 1) * 10);
+		RootElement->LinkEndChild(StuElement);//父节点写入文档
+
+		//姓名
+		TiXmlElement* nameElement = new TiXmlElement("name");
+		StuElement->LinkEndChild(nameElement);
+
+		TiXmlText* nameContent = new TiXmlText("mike");
+		nameElement->LinkEndChild(nameContent);
+
+		//分数
+		TiXmlElement* scoreElement = new TiXmlElement("score");
+		StuElement->LinkEndChild(scoreElement);
+
+		TiXmlText* scoreContent = new TiXmlText("88");
+		scoreElement->LinkEndChild(scoreContent);
+
+		//城市
+		TiXmlElement* cityElement = new TiXmlElement("city");
+		StuElement->LinkEndChild(cityElement);
+
+		TiXmlText* cityContent = new TiXmlText("Shenzhen");
+		cityElement->LinkEndChild(cityContent);
+
+	}
+
+	writeDoc->SaveFile("stu_info.xml");
+	delete writeDoc;
+
+	return 1;
+}
+
+//解析xml文件
+int readXmlFile()
+{
+	TiXmlDocument mydoc("stu_info.xml");//xml文档对象
+	bool loadOk = mydoc.LoadFile();//加载文档
+	if (!loadOk)
+	{
+		cout << "could not load the test file.Error:" << mydoc.ErrorDesc() << endl;
+		exit(1);
+	}
+
+	TiXmlElement* RootElement = mydoc.RootElement();	//根元素, Info
+	cout << "[root name]" << RootElement->Value() << "\n";
+
+	TiXmlElement* pEle = RootElement;
+
+	//遍历该结点
+	for (TiXmlElement* StuElement = pEle->FirstChildElement();//第一个子元素
+		StuElement != NULL;
+		StuElement = StuElement->NextSiblingElement())//下一个兄弟元素
+	{
+		// StuElement->Value() 节点名称
+		cout << StuElement->Value() << " ";
+		TiXmlAttribute* pAttr = StuElement->FirstAttribute();//第一个属性
+
+		while (NULL != pAttr) //输出所有属性
+		{
+			cout << pAttr->Name() << ":" << pAttr->Value() << " ";
+			pAttr = pAttr->Next();
+		}
+		cout << endl;
+
+		//输出子元素的值
+		for (TiXmlElement* sonElement = StuElement->FirstChildElement();
+			sonElement;
+			sonElement = sonElement->NextSiblingElement())
+		{
+			cout << sonElement->FirstChild()->Value() << endl;
 		}
 	}
-};
 
-class Example2 : public Thread
-{
-public:
-	//重写Run;
-	void Run()
-	{
-		while (this->bRun)
-		{
-			printf("Hello thread2\n");
-			Sleep(1000);
-		}
-	}
-};
+	return 1;
+}
+
 
 
 
 int main()
 {   
-    //HMODULE  hDll = LoadLibrary(GetAnyRunPathFile(L"7z.dll"));
-
-    //wcout.imbue(std::locale("chs"));
-    //CString abc = L"";
-
-    //wcout << abc.GetString()<<endl;
-
-    //SetReg(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\MyProgram.exe", L"Path", L"1234",0);
-    //auto t = GetIntReg(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\MyProgram.exe", L"Path");
-    //wcout << get<1>(t) << endl;
-    //DeleteReg(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\MyProgram.exe", L"Path");
 
 
-   /* cout << IsAdmin();*/
+	//https://blog.csdn.net/weixin_42819452/article/details/96837922
+	writeXmlFile();
+	printf("\nafter write\n");
 
-    double a[] = {7,5,2,4,2.1};
-	int aa= DoublePointerRemoveValue(a,2);
-	
-	////int ValueNumber = FindValueInList(2.1, a);
-	//
-	//a;
+	readXmlFile();
 
 
 
-    //for (int i = 0; i < 4; i++)
-    //    cout << a[i];
-
-
-	//int a[] = { 7,5,2,4 };
-	//int temp, j, mid;
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	temp = a[i];
-	//	int low = 0;
-	//	int high = i - 1;
-	//	while (low <= high)
-	//	{
-	//		mid = (low + high) / 2;
-	//		if (a[mid] > temp)
-	//			high = mid - 1;
-	//		else
-	//			low = mid + 1;
-	//	}
-	//	for (j = i - 1; j >= low; j--)
-	//	{
-	//		a[j + 1] = a[j];
-	//	}
-	//	a[low] = temp;
-	//}
-
-
-	//for (int i = 0; i < 4; i++)
-	//	cout << a[i];
-
-
-
-
-	//int a[] = { 0,1,2,3,4,5,6,7,8,9 }, k;
-	//int low = 0, high = 10 - 1, mid, find = 0;
-	//printf("请输入欲查找的值：\n");
-	//scanf_s("%d", &k);
-	//while (low <= high)
-	//{
-	//	mid = (low + high) / 2;
-	//	if (a[mid] == k)
-	//	{
-	//		printf("找到位置为：%d\n", mid + 1); find = 1;
-	//	}
-	//	if (a[mid] > k)
-	//		high = mid - 1;
-	//	else
-	//		low = mid + 1;
-	//}
-	//if (!find) printf(" % d未找到\n", k);
-
-
-
-
-	//int ddd =StartPrograme("cmd");
-
-
-
-	//Example e;
-	//Example2 e2;
-
-	////启动线程;
-	//e.Start();
-	//e.WaitExit();
-	//e2.Start();
-
-	//getchar();
-
-	//return 0;
-
-
-
-	CString abc;
-
-	GetIniValue(abc, L"module_state", L"360av", L"C:\\Users\\yuanchunming01\\Desktop\\module_config.ini");
-
-
-	abc;
-
-	int acd;
-	GetIniValue(acd, L"module_state", L"360av", L"C:\\Users\\yuanchunming01\\Desktop\\module_config.ini");
-
-	acd;
 
     system("pause");
 }

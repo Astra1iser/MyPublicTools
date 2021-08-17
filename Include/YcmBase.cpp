@@ -5,7 +5,7 @@
 #include <RegeditManager.cpp>
 #include <MyOperFile.cpp>
 #include <Thread.cpp>
-
+#include <tinystr.cpp>
 
 BOOL Base::IsAdmin() {
 	#define ACCESS_READ		1  
