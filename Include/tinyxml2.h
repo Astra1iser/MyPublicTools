@@ -1725,8 +1725,30 @@ class TINYXML2_LIB XMLDocument : public XMLNode
     friend class XMLUnknown;
 public:
     /// constructor
-    XMLDocument( bool processEntities = true, Whitespace whitespaceMode = PRESERVE_WHITESPACE );
-    ~XMLDocument();
+    XMLDocument( bool processEntities = true, Whitespace whitespaceMode = PRESERVE_WHITESPACE ): 
+        XMLNode(0),
+        _writeBOM(false),
+        _processEntities(processEntities),
+        _errorID(XML_SUCCESS),
+        _whitespaceMode(whitespaceMode),
+        _errorStr(),
+        _errorLineNum(0),
+        _charBuffer(0),
+        _parseCurLineNum(0),
+        _parsingDepth(0),
+        _unlinked(),
+        _elementPool(),
+        _attributePool(),
+        _textPool(),
+        _commentPool()
+    {
+        // avoid VC++ C4355 warning about 'this' in initializer list (C4355 is off by default in VS2012+)
+        _document = this;
+    }
+    ~XMLDocument()
+    {
+        Clear();
+    }
 
     virtual XMLDocument* ToDocument()				{
         TIXMLASSERT( this == _document );

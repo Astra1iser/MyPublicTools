@@ -22,7 +22,9 @@
 using namespace std;
 using namespace PathManager;
 using namespace RegeditManager;
-
+using namespace tinyxml2;
+//这个宏是为了规避windows自带的XMLDocument类
+#define XMLDocument tinyxml2::XMLDocument
 
 #ifndef _YCMBASE_H
 #define _YCMBASE_H

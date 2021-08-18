@@ -2148,32 +2148,9 @@ const char* XMLDocument::_errorNames[XML_ERROR_COUNT] = {
 };
 
 
-XMLDocument::XMLDocument( bool processEntities, Whitespace whitespaceMode ) :
-    XMLNode( 0 ),
-    _writeBOM( false ),
-    _processEntities( processEntities ),
-    _errorID(XML_SUCCESS),
-    _whitespaceMode( whitespaceMode ),
-    _errorStr(),
-    _errorLineNum( 0 ),
-    _charBuffer( 0 ),
-    _parseCurLineNum( 0 ),
-	_parsingDepth(0),
-    _unlinked(),
-    _elementPool(),
-    _attributePool(),
-    _textPool(),
-    _commentPool()
-{
-    // avoid VC++ C4355 warning about 'this' in initializer list (C4355 is off by default in VS2012+)
-    _document = this;
-}
 
 
-XMLDocument::~XMLDocument()
-{
-    Clear();
-}
+
 
 
 void XMLDocument::MarkInUse(const XMLNode* const node)
