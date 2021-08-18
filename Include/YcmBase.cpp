@@ -5,7 +5,7 @@
 #include <RegeditManager.cpp>
 #include <MyOperFile.cpp>
 #include <Thread.cpp>
-#include <tinystr.cpp>
+#include <tinyxml2.cpp>
 
 BOOL Base::IsAdmin() {
 	#define ACCESS_READ		1  
@@ -169,3 +169,4 @@ void Base::GetIniValue(CString& Source, CString Node, CString Key, CString IniPa
 	GetPrivateProfileString(Node, Key, NULL, szValue, len, IniPath);
 	Source = szValue;
 }
+

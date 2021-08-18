@@ -17,7 +17,7 @@
 #include <RegeditManager.h>//注册表操作相关函数
 #include <MyOperFile.h>//文件读写和文件信息相关函数
 #include <Thread.h>//简易线程类
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 using namespace std;
 using namespace PathManager;
@@ -133,9 +133,31 @@ namespace Base
 	//获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
 	void GetIniValue(CString& Source, CString Node, CString Key, CString IniPath);
 
-
-
-
+	//xml的增删改查的帮助:
+	// 1.创建
+	//创建文档指针,一个xml文档被创建时必须有这个指针,这个指针控制xml文档的写入操作
+	//			TiXmlDocument* writeDoc = new TiXmlDocument; //xml文档指针
+	// 
+	//文档格式声明指针,一个文档必须声明一下子,不然写入会有错误: 
+	// 参数1:版本 
+	// 参数2:编码(一般保持UTF-8就行)
+	// 参数3:是否独立(一般保持yes)
+	//			TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", "yes"); 
+	// 
+	//创建节点指针
+	// 参数:节点名(可以是变量)
+	//			TiXmlElement* Element = new TiXmlElement("Info");//设置一个节点元素
+	// 
+	//创建当前节点指针的节点属性,节点指针的SetAttribute方法,一个节点可以设置多个节点属性,调用多次SetAttribute方法即可,最后使用节点指针的 Element->LinkEndChild(节点属性指针)写入
+	//参数1:属性名
+	//参数2:属性值
+	//			Element->SetAttribute("num", n); //属性,值
+	//
+	//创建节点内容指针,一个节点可写入多个内容,最后使用节点指针的 Element->LinkEndChild(节点属性指针)写入
+	//参数:文本内容
+	//TiXmlText* Text = new TiXmlText("88"); //创建节点内容指针,内容为123
+	//
+	//2.刪除
 
 
 
