@@ -26,6 +26,8 @@ using namespace tinyxml2;
 
 //这个宏是为了规避windows自带的XMLDocument类
 #define XMLDocument tinyxml2::XMLDocument
+//这个宏是为了防止tinyxml2的SetText()方法在写入xml时中文乱码的问题
+#define SetText(x) SetText(G2U(x))
 
 #ifndef _YCMBASE_H
 #define _YCMBASE_H
@@ -136,6 +138,13 @@ namespace Base
 	//获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
 	void GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPath);
 
+
+	//文本编码 UTF-8到GB2312的转换
+	char* U2G(const char* utf8);
+
+	//文本编码 GB2312到UTF-8的转换
+	char* G2U(const char* gb2312);
+
 	//将wstring转换为string
 	string wstring2string(wstring wstr);
 
@@ -148,8 +157,8 @@ namespace Base
 	//将俩个LPCTSRT拼接
 	//参数1:LPCTSRT变量1
 	//参数2:LPCTSRT变量2
-	template<class T>
-	LPCTSTR CombineLPCTSRT (T lpctstr1, T lpctstr2)
+	template<class T1, class T2>
+	LPCTSTR CombineLPCTSRT (T1 lpctstr1, T2 lpctstr2)
 	{
 		return CString(lpctstr1) + CString(lpctstr2);
 	}
@@ -159,42 +168,17 @@ namespace Base
 	//参数2:存放的本地路径和文件名
 	int EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath);
 
-	//这个方法适用于创建一个且只有根节点的xml文件,可自定义根节点名称
-	//参数1:要创建的xml的
+	//这个方法适用于创建一个且只有根节点的xml文件,可自定义根节点名称,返回创建的xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
+	//参数1:要创建的xml的路径
 	//参数2:根节点名称
-	int CreateEmptyXML(const char* xmlPath, const char* rootNodeName);
+	XMLDocument* CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName);
 
-
-
-
-	class XMLNode
-	{
-	public:
-		XMLNode() {
-			gender = 0;
-		};
-
-		XMLNode(const string& userName, const string& password, int gender, const string& mobile, const string& email) {
-			this->userName = userName;
-			this->password = password;
-			this->gender = gender;
-			this->mobile = mobile;
-			this->email = email;
-		};
-
-		string userName;
-		string password;
-		int gender;
-		string mobile;
-		string email;
-	};
-
-
-
-
-
-
-
+	//这个方法适用于载入xml文件,返回xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
+	//参数:要加载的xml的路径
+	XMLDocument* LoadXMLFile(const char* xmlPath);
+	
+	//保存xml内容,此方法不同于SaveFile()之处在于此处如果保存成功,则释放doc指针并返回TRUE,若保存失败,则返回FALSE但此时不释放doc指针
+	BOOL SaveXMLFile(XMLDocument* doc, const char* xmlPath);
 
 
 

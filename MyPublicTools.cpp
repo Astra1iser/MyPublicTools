@@ -6,21 +6,7 @@
 
 
 
-int createXML(const char* xmlPath)
-{
-    const char* declaration = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>";
-    XMLDocument doc;
-    doc.Parse(declaration);//会覆盖xml所有内容
 
-    //添加申明可以使用如下两行
-    //XMLDeclaration* declaration=doc.NewDeclaration();
-    //doc.InsertFirstChild(declaration);
-
-    //XMLElement* root = doc.NewElement("DBUSER");
-    //doc.InsertEndChild(root);
-
-    return doc.SaveFile(xmlPath);
-}
 
 
 
@@ -53,12 +39,20 @@ int main()
 
     //int a=DownLoadFile(L"https://baidu15641.com", L"123.bat");
 
-    LPCTSTR abc = L"123";
-    LPCTSTR abcd = L"456";
-    LPCTSTR abcde = CombineLPCTSRT(abc ,abcd);
+    //LPCTSTR abc = L"123";
+    //LPCTSTR abcd = L"456";
+    //LPCTSTR abcde = CombineLPCTSRT(abc ,abcd);
 
 
+    XMLDocument *doc = LoadXML("1111 - 副本.xml");
+    XMLElement* root = doc->RootElement();
+    XMLElement* userNode = doc->NewElement("User");
+    userNode->SetAttribute("dd", "qq");
+    userNode->SetText("我v操");
 
+    root->InsertEndChild(userNode);
+
+    doc->SaveFile("1111 - 副本.xml");
 
     system("pause");
 }

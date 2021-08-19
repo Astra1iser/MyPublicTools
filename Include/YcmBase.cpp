@@ -218,6 +218,34 @@ void Base::GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPa
 	Source = szValue;
 }
 
+char* Base::U2G(const char* utf8)
+{
+	int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
+	wchar_t* wstr = new wchar_t[len + 1];
+	memset(wstr, 0, len + 1);
+	MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wstr, len);
+	len = WideCharToMultiByte(CP_ACP, 0, wstr, -1, NULL, 0, NULL, NULL);
+	char* str = new char[len + 1];
+	memset(str, 0, len + 1);
+	WideCharToMultiByte(CP_ACP, 0, wstr, -1, str, len, NULL, NULL);
+	if (wstr) delete[] wstr;
+	return str;
+}
+
+char* Base::G2U(const char* gb2312)
+{
+	int len = MultiByteToWideChar(CP_ACP, 0, gb2312, -1, NULL, 0);
+	wchar_t* wstr = new wchar_t[len + 1];
+	memset(wstr, 0, len + 1);
+	MultiByteToWideChar(CP_ACP, 0, gb2312, -1, wstr, len);
+	len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
+	char* str = new char[len + 1];
+	memset(str, 0, len + 1);
+	WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, len, NULL, NULL);
+	if (wstr) delete[] wstr;
+	return str;
+}
+
 string Base::wstring2string(wstring wstr)
 {
 	string result;
@@ -275,7 +303,7 @@ int Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 
 
 	// 标准url的正则表达式
-	std::string pattern{ """^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}|[a-zA-Z]{1}))(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+))*$"""}; 
+	std::string pattern{ "^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}|[a-zA-Z]{1}))(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+))*$"}; 
 	std::regex re(pattern);
 
 	//std::vector<std::string> str{"http://www.baidu.com", "www.baidu.com"};
@@ -335,18 +363,55 @@ int Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 	return FALSE;
 }
 
-int Base::CreateEmptyXML(const char* xmlPath, const char* rootNodeName)
+XMLDocument* Base::CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
 {
 	const char* declaration = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-	XMLDocument doc;
-	doc.Parse(declaration);//会覆盖xml所有内容
+	XMLDocument* doc = new XMLDocument;
+	doc->Parse(declaration);//会覆盖xml所有内容
 
 	//添加申明可以使用如下两行
 	//XMLDeclaration* declaration=doc.NewDeclaration();
 	//doc.InsertFirstChild(declaration);
 
-	XMLElement* rootNode = doc.NewElement(rootNodeName);
-	doc.InsertEndChild(rootNode);
+	XMLElement* rootNode = doc->NewElement(rootNodeName);
+	doc->InsertEndChild(rootNode);
 
-	return doc.SaveFile(xmlPath);
+	if (!(doc->SaveFile(xmlPath)))
+	{
+		return NULL;
+	}
+
+	return doc;
 }
+
+XMLDocument* Base::LoadXMLFile(const char* xmlPath)
+{
+	XMLDocument* doc = new XMLDocument;
+	int res = doc->LoadFile(xmlPath);
+	if (res != 0)
+	{
+		return NULL;
+	}
+	return doc;
+}
+
+BOOL Base::SaveXMLFile(XMLDocument* doc, const char* xmlPath)
+{
+	if (!(doc->SaveFile(xmlPath)))
+	{
+		return FALSE;
+	}
+
+	delete doc;
+	return TRUE;
+}
+
+
+
+//BOOL Base::AddNodeElement(XMLDocument* doc, const char* NodeName = NULL, const char* AttributeName = NULL, const char* Text = NULL)
+//{
+//	XMLElement* fatherNode = doc->RootElement();
+//	XMLElement* childnode = doc->NewElement(NodeName);
+//	userNode->SetAttribute("Name", user.userName.c_str());
+//
+//}
