@@ -1,5 +1,28 @@
 #pragma once
-
+//例子,在主函数中实例化并重写run()方法
+//class Example : public Thread
+//{
+//public:
+//	//重写Run;
+//	void Run()
+//	{
+//		while (this->bRun)
+//		{
+//			printf("Hello thread1\n");
+//			Sleep(1000);
+//		}
+//	}
+//};
+//
+//int main()
+//{
+//	Example e;
+//	//启动线程;
+//	e.Start();
+//
+//	getchar();
+//	return 0;
+//}
 
 class Thread;
 typedef void (*WThreadFunction)(Thread* pobj);

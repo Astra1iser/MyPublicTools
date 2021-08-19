@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 #include <tuple>
- 
+#include <regex>
 
 #include <windows.h>
 #include <assert.h>
 #include <atlconv.h>
 #include <atlstr.h>
-
+#include <wininet.h>
 
 #include <ScopeLock.h>//互斥锁（临界区）封装类
 #include <PathManager.h>//路径相关函数
@@ -23,6 +23,7 @@ using namespace std;
 using namespace PathManager;
 using namespace RegeditManager;
 using namespace tinyxml2;
+
 //这个宏是为了规避windows自带的XMLDocument类
 #define XMLDocument tinyxml2::XMLDocument
 
@@ -37,7 +38,7 @@ namespace Base
 
 
 	//一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
-	BOOL StartPrograme(CString Path, CString Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE);
+	BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE);
 
 	
 	//获得数组的元素个数,参数为任意数组的引用
@@ -131,9 +132,73 @@ namespace Base
 
 
 	//获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
-	void GetIniValue(int& Source, CString Node, CString Key, CString IniPath);
+	void GetIniValue(int& Source, LPCTSTR  Node, LPCTSTR Key, LPCTSTR IniPath);
 	//获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
-	void GetIniValue(CString& Source, CString Node, CString Key, CString IniPath);
+	void GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPath);
+
+	//将wstring转换为string
+	string wstring2string(wstring wstr);
+
+	//将string转换为wstring
+	wstring string2wstring(string str);
+
+	//将LPCTSTR转换为string
+	string LPCTSTR2string(LPCTSTR lpctstr);
+
+	//将俩个LPCTSRT拼接
+	//参数1:LPCTSRT变量1
+	//参数2:LPCTSRT变量2
+	template<class T>
+	LPCTSTR CombineLPCTSRT (T lpctstr1, T lpctstr2)
+	{
+		return CString(lpctstr1) + CString(lpctstr2);
+	}
+
+	//一个简易的ftp下载方法 注意请尽可能的携带下载链接的协议(http:\\|https:\\|ftp:\\),不然本方法会按照https,ftp,http的顺序尝试下载(这可能造成下载的产物不同)
+	//参数1:下载的文件url
+	//参数2:存放的本地路径和文件名
+	int EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath);
+
+	//这个方法适用于创建一个且只有根节点的xml文件,可自定义根节点名称
+	//参数1:要创建的xml的
+	//参数2:根节点名称
+	int CreateEmptyXML(const char* xmlPath, const char* rootNodeName);
+
+
+
+
+	class XMLNode
+	{
+	public:
+		XMLNode() {
+			gender = 0;
+		};
+
+		XMLNode(const string& userName, const string& password, int gender, const string& mobile, const string& email) {
+			this->userName = userName;
+			this->password = password;
+			this->gender = gender;
+			this->mobile = mobile;
+			this->email = email;
+		};
+
+		string userName;
+		string password;
+		int gender;
+		string mobile;
+		string email;
+	};
+
+
+
+
+
+
+
+
+
+
+
 
 	//xml的增删改查的帮助:
 	// 1.创建
@@ -160,6 +225,18 @@ namespace Base
 	//TiXmlText* Text = new TiXmlText("88"); //创建节点内容指针,内容为123
 	//
 	//2.刪除
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

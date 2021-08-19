@@ -26,27 +26,39 @@ int createXML(const char* xmlPath)
 
 int main()
 {   //https://www.cnblogs.com/happykoukou/p/6307257.html
-    XMLDocument* doc = new XMLDocument();
-    int nReturnCode = doc->LoadFile("123.xml");
-    //XMLElement* pRoot = iXmlDoc->NewElement("Ewaybot");
+    //XMLDocument* doc = new XMLDocument();
+    //int nReturnCode = doc->LoadFile("123.xml");
+    ////XMLElement* pRoot = iXmlDoc->NewElement("Ewaybot");
 
 
-    //createXML("123.xml");
+    ////createXML("123.xml");
 
-    XMLElement* root = doc->RootElement();//设置根节点 每个xml只有一个根节点
+    //XMLElement* root = doc->RootElement();//设置根节点 每个xml只有一个根节点
 
-    XMLElement* userNode = doc->NewElement("User1");
-    userNode->SetAttribute("Name", "111");
-    userNode->SetAttribute("Password ", "1111");
-    root->InsertEndChild(userNode);
+    //XMLElement* userNode = doc->NewElement("User1");
+    //userNode->SetAttribute("Name", "111");
+    //userNode->SetAttribute("Password ", "1111");
+    //root->InsertEndChild(userNode);
 
-    XMLElement* userNode2 = doc->NewElement("User2");
-    userNode2->SetAttribute("Name", "222");
-    userNode2->SetAttribute("Password ", "2222");
-    root->InsertEndChild(userNode2);
+    //XMLElement* userNode2 = doc->NewElement("User2");
+    //userNode2->SetAttribute("Name", "222");
+    //userNode2->SetAttribute("Password ", "2222");
+    //root->InsertEndChild(userNode2);
 
-    doc->SaveFile("123.xml");
-    delete doc;
+    //doc->SaveFile("123.xml");
+    //delete doc;
+
+
+    
+
+    //int a=DownLoadFile(L"https://baidu15641.com", L"123.bat");
+
+    LPCTSTR abc = L"123";
+    LPCTSTR abcd = L"456";
+    LPCTSTR abcde = CombineLPCTSRT(abc ,abcd);
+
+
+
 
     system("pause");
 }
