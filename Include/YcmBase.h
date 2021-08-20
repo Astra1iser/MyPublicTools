@@ -26,8 +26,11 @@ using namespace tinyxml2;
 
 //这个宏是为了规避windows自带的XMLDocument类
 #define XMLDocument tinyxml2::XMLDocument
-//这个宏是为了防止tinyxml2的SetText()方法在写入xml时中文乱码的问题
-#define SetText(x) SetText(G2U(x))
+//这个宏是为了防止tinyxml2的写入方法在写入xml时中文乱码的问题 使用_s结尾的函数时写入的数据都是UTF-8编码的数据,解析时,请使用对应的编码解析
+#define SetText_s(x) SetText(G2U(x))
+#define NewElement_s(x) NewElement(G2U(x))
+#define SetAttribute_s(x) SetAttribute(G2U(x)) 
+
 
 #ifndef _YCMBASE_H
 #define _YCMBASE_H
@@ -35,9 +38,13 @@ using namespace tinyxml2;
 
 namespace Base
 {
+
+
 	//判断当前登录的账户是普通用户还是管理员 返回值:1管理员 0非管理员
 	BOOL IsAdmin();
 
+	//返回当前系统语言
+	LPCTSTR SetLangaueSyncOS();
 
 	//一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
 	BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE);

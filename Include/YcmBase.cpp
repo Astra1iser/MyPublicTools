@@ -7,6 +7,8 @@
 #include <Thread.cpp>
 #include <tinyxml2.cpp>
 
+
+
 BOOL Base::IsAdmin() {
 	#define ACCESS_READ		1  
 	#define ACCESS_WRITE	2  
@@ -100,37 +102,40 @@ BOOL Base::IsAdmin() {
 	return   bReturn;
 }
 
-//extern "C" __declspec(dllexport) int __stdcall SetLangaueSyncOS()	 //将本地语言写入注册表中
-//{
-//	CString strLanguage = L"zh_cn";
-//
-//	LANGID id = GetSystemDefaultLangID();
-//	switch(id)
-//	{
-//	case 0x0804:	//简体中文
-//	case 0x0404:	//台湾
-//	case 0x0c04:	//香港
-//		strLanguage = L"zh_cn";
-//		WRITE_LOG(L"显示文字：简体中文");
-//		break;
-//	case 0x0409:
-//		strLanguage = L"en_us";
-//		WRITE_LOG(L"显示文字：英文");
-//		break;
-//	default:
-//		strLanguage = L"en_us";
-//		WRITE_LOG(L"未知的语言环境，显示文字：英文");
-//	}
-//
-//	if (!strLanguage.IsEmpty())
-//	{
-//		REG_UTIL::setReg(kModuleBase, kLanguageServerName, strLanguage.GetString());
-//	}
-//
-//	return TRUE;
-//
-//}
 
+LPCTSTR Base::SetLangaueSyncOS()
+{
+	CString strLanguage = L"zh_cn";
+
+	LANGID id = GetSystemDefaultLangID();
+	switch(id)
+	{
+	case 0x0804:	//简体中文
+	case 0x0404:	//台湾
+	case 0x0c04:	//香港
+		strLanguage = L"zh_cn";
+		//WRITE_LOG(L"显示文字：简体中文");
+		break;
+	case 0x0409:
+		strLanguage = L"en_us";
+		//WRITE_LOG(L"显示文字：英文");
+		break;
+	default:
+		strLanguage = L"en_us";
+		//WRITE_LOG(L"未知的语言环境，显示文字：英文");
+	}
+
+	if (!strLanguage.IsEmpty())
+	{
+		//REG_UTIL::setReg(kModuleBase, kLanguageServerName, strLanguage.GetString());
+		return strLanguage;
+	}
+
+	return NULL;
+
+}
+
+//当前的系统是否是vista之后的版本
 //bool is_vista_or_later()
 //{
 //	OSVERSIONINFOEXW osvi = { sizeof(osvi) };
@@ -245,6 +250,8 @@ char* Base::G2U(const char* gb2312)
 	if (wstr) delete[] wstr;
 	return str;
 }
+
+
 
 string Base::wstring2string(wstring wstr)
 {
@@ -373,7 +380,7 @@ XMLDocument* Base::CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeN
 	//XMLDeclaration* declaration=doc.NewDeclaration();
 	//doc.InsertFirstChild(declaration);
 
-	XMLElement* rootNode = doc->NewElement(rootNodeName);
+	XMLElement* rootNode = doc->NewElement(G2U(rootNodeName));
 	doc->InsertEndChild(rootNode);
 
 	if (!(doc->SaveFile(xmlPath)))
