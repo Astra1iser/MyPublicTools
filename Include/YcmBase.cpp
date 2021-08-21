@@ -251,8 +251,6 @@ char* Base::G2U(const char* gb2312)
 	return str;
 }
 
-
-
 string Base::wstring2string(wstring wstr)
 {
 	string result;
@@ -295,7 +293,7 @@ string Base::LPCTSTR2string(LPCTSTR lpctstr)
 #endif // UNICODE	
 }
 
-int Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
+BOOL Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 {
 	BOOL iswhole = TRUE;
 	LPCTSTR lpszName = lpcszURL;
@@ -370,6 +368,8 @@ int Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 	return FALSE;
 }
 
+
+
 XMLDocument* Base::CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
 {
 	const char* declaration = "<?xml version=\"1.0\" encoding=\"GBK\" standalone=\"yes\"?>";
@@ -414,12 +414,53 @@ BOOL Base::SaveXMLFile(XMLDocument* doc, const char* xmlPath)
 	return TRUE;
 }
 
+BOOL Base::GetXMLDeclaration(XMLDocument* doc, string& strDecl)
+{
+	if (NULL == doc)
+		return FALSE;
+	XMLNode* decl = doc->FirstChild();
+	if (NULL != decl)
+	{
+		XMLDeclaration* declaration = decl->ToDeclaration();
+		if (NULL != declaration)
+		{
+			strDecl = declaration->Value();
+			return true;
+		}
+	}
+	strDecl = "";
+	return false;
+}
 
+BOOL Base::FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode ,const char* Attribute, const char* AttributeValue)
+{
+	const char* value = pRoot->Value();
+	if (strcmp(pRoot->Value(), nodeName.c_str()) == 0)
+	{
+		if (Attribute != NULL && AttributeValue != NULL)
+		{
+			string source = (pRoot->Attribute(Attribute));
+			string target = AttributeValue;
+			if (source == target)
+			{
+				pNode = pRoot;
+				return true;
+			}
+		}
+		else
+		{
+			pNode = pRoot;
+			return true;
+		}
+	}
 
-//BOOL Base::AddNodeElement(XMLDocument* doc, const char* NodeName = NULL, const char* AttributeName = NULL, const char* Text = NULL)
-//{
-//	XMLElement* fatherNode = doc->RootElement();
-//	XMLElement* childnode = doc->NewElement(NodeName);
-//	userNode->SetAttribute("Name", user.userName.c_str());
-//
-//}
+	XMLElement* p = pRoot;
+	for (p = p->FirstChildElement(); p != NULL; p = p->NextSiblingElement())
+	{
+		FindXMLNode(p, nodeName, pNode, Attribute, AttributeValue);
+		return true;
+	}
+
+	return false;
+}
+

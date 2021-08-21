@@ -24,9 +24,10 @@ using namespace PathManager;
 using namespace RegeditManager;
 using namespace tinyxml2;
 
-//这个宏是为了规避windows自带的XMLDocument类
+//这个宏是为了规避windows自带的XMLDocument类重定义
 #define XMLDocument tinyxml2::XMLDocument
-//这个宏是为了防止tinyxml2的写入方法在写入xml时中文乱码的问题 使用_s结尾的函数时写入的数据都是UTF-8编码的数据,解析时,请使用对应的编码解析
+
+//这个宏是为了防止tinyxml2的写入方法在写入xml时中文乱码的问题 使用_s结尾的函数时写入的数据都是UTF-8编码的数据,解析时,请使用对应的编码解析,本库没有使用utf-8解析的方法,所有xml解析均为ANSI格式
 #define SetText_UTF8(x) SetText(G2U(x))
 #define NewElement_UTF8(x) NewElement(G2U(x))
 #define SetAttribute_UTF8(x) SetAttribute(G2U(x))
@@ -36,21 +37,46 @@ using namespace tinyxml2;
 #define _YCMBASE_H
 
 
+/*
+公共库目录:
+1.判断当前登录的账户是普通用户还是管理员				BOOL IsAdmin()
+2.当前系统语言											LPCTSTR SetLangaueSyncOS()
+3.一个快捷启动进程的方法								BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE)
+4.获得数组的元素个数									int getArrayLen(Arr& array)
+5.数组中元素的二分排序									void BinaryInsertSort
+6.二分查找(或其他查找算法 正在施工中)
+7.双指针原地去除数组中的元素							int DoublePointerRemoveValue(List& list, Value value)
+8.获取IniPath的ini文件中Node节点下Key的值				void GetIniValue(int& Source, LPCTSTR  Node, LPCTSTR Key, LPCTSTR IniPath)
+														void GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPath)
+9.更新IniPath的ini文件中Node节点下Key的值(施工中)				
+10.文本编码 UTF-8到GB2312的转换							char* U2G(const char* utf8)
+11.文本编码 GB2312到UTF-8的转换							char* G2U(const char* gb2312)
+12.将wstring转换为string
+13.将string转换为wstring
+14.将LPCTSTR转换为string								string LPCTSTR2string(LPCTSTR lpctstr)
+15.将俩个LPCTSRT拼接									LPCTSTR CombineLPCTSRT (T1 lpctstr1, T2 lpctstr2)
+16.一个简易的ftp下载方法								BOOL EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
+17.创建一个且只有根节点的xml文件						XMLDocument* CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
+18.载入xml文件											XMLDocument* LoadXMLFile(const char* xmlPath)
+19.保存xml内容											BOOL SaveXMLFile(XMLDocument* doc, const char* xmlPath)
+20.读取XML声明											BOOL GetXMLDeclaration(XMLDocument* doc, string& strDecl)
+21.寻找XML中的某个节点									BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, const char* Attribute = NULL, const char* AttributeValue = NULL)
+														BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+*/
+
 namespace Base
 {
-
-
-	//判断当前登录的账户是普通用户还是管理员 返回值:1管理员 0非管理员
+	//1.判断当前登录的账户是普通用户还是管理员 返回值:1管理员 0非管理员
 	BOOL IsAdmin();
 
-	//返回当前系统语言
+	//2.返回当前系统语言
 	LPCTSTR SetLangaueSyncOS();
 
-	//一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
+	//3.一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
 	BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE);
 
 	
-	//获得数组的元素个数,参数为任意数组的引用
+	//4.获得数组的元素个数,参数为任意数组的引用
 	template <class Arr>
 	int getArrayLen(Arr& array)
 	{
@@ -58,7 +84,7 @@ namespace Base
 	}
 
 
-	//数组中元素的二分排序(从小到大),参数为任意数组的引用,传入参数后原数组顺序改变,暂时没有做形参是数组指针的重载
+	//5.数组中元素的二分排序(从小到大),参数为任意数组的引用,传入参数后原数组顺序改变,暂时没有做形参是数组指针的重载
 	template <class List>
 	void BinaryInsertSort(List& list)
 	{
@@ -87,7 +113,7 @@ namespace Base
 	}
 
 
-	//二分查找,第一个参数为需要查找的值,第二个参数为数组的引用,返回这个数组中需要查找的值的从小到大排序的第一个下标
+	//6.二分查找,第一个参数为需要查找的值,第二个参数为数组的引用,返回这个数组中需要查找的值的从小到大排序的第一个下标
 /*	template <class Value, class List>
 	int FindValueInList(Value value, List& list)
 	{
@@ -117,7 +143,7 @@ namespace Base
 */
 
 
-	//双指针原地去除元素,参数1为引用数组,参数2为需要去除的元素值,返回去除的个数,去除的元素排在数组的后 "返回值个数"个,详情见注释
+	//7.双指针原地去除数组中的元素,参数1为引用数组,参数2为需要去除的元素值,返回去除的个数,去除的元素排在数组的后 "返回值个数"个,详情见注释
 	//如    int a[] = {2,7,5,2,4,2};
 	//		int aa = DoublePointerRemoveValue(a, 2);
 	//执行后的数组a为{7,5,4,2,2} aa值为3
@@ -140,28 +166,28 @@ namespace Base
 	}
 
 
-	//获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
+	//8.1获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
 	void GetIniValue(int& Source, LPCTSTR  Node, LPCTSTR Key, LPCTSTR IniPath);
-	//获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
+	//8.2获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
 	void GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPath);
 
 
-	//文本编码 UTF-8到GB2312的转换
+	//10.文本编码 UTF-8到GB2312的转换
 	char* U2G(const char* utf8);
 
-	//文本编码 GB2312到UTF-8的转换
+	//11.文本编码 GB2312到UTF-8的转换
 	char* G2U(const char* gb2312);
 
-	//将wstring转换为string
+	//12.将wstring转换为string
 	string wstring2string(wstring wstr);
 
-	//将string转换为wstring
+	//13.将string转换为wstring
 	wstring string2wstring(string str);
 
-	//将LPCTSTR转换为string
+	//14.将LPCTSTR转换为string
 	string LPCTSTR2string(LPCTSTR lpctstr);
 
-	//将俩个LPCTSRT拼接
+	//15.将俩个LPCTSRT拼接
 	//参数1:LPCTSRT变量1
 	//参数2:LPCTSRT变量2
 	template<class T1, class T2>
@@ -170,24 +196,85 @@ namespace Base
 		return CString(lpctstr1) + CString(lpctstr2);
 	}
 
-	//一个简易的ftp下载方法 注意请尽可能的携带下载链接的协议(http:\\|https:\\|ftp:\\),不然本方法会按照https,ftp,http的顺序尝试下载(这可能造成下载的产物不同)
+	//16.一个简易的ftp下载方法 注意请尽可能的携带下载链接的协议(http:\\|https:\\|ftp:\\),不然本方法会按照https,ftp,http的顺序尝试下载(这可能造成下载的产物不同)
 	//参数1:下载的文件url
 	//参数2:存放的本地路径和文件名
-	int EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath);
+	BOOL EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath);
 
-	//这个方法适用于创建一个且只有根节点的xml文件,可自定义根节点名称,返回创建的xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
+	//17.创建一个且只有根节点的xml文件,可自定义根节点名称,返回创建的xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
 	//参数1:要创建的xml的路径
 	//参数2:根节点名称
 	XMLDocument* CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName);
 
-	//这个方法适用于载入xml文件,返回xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
+	//18.载入xml文件,返回xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
 	//参数:要加载的xml的路径
 	XMLDocument* LoadXMLFile(const char* xmlPath);
 	
-	//保存xml内容,此方法不同于SaveFile()之处在于此处如果保存成功,则释放doc指针并返回TRUE,若保存失败,则返回FALSE但此时不释放doc指针
+	//19.保存xml内容,此方法不同于SaveFile()之处在于此处如果保存成功,则释放doc指针并返回TRUE,若保存失败,则返回FALSE但此时不释放doc指针
 	BOOL SaveXMLFile(XMLDocument* doc, const char* xmlPath);
 
+	//20.读取XML声明
+	BOOL GetXMLDeclaration(XMLDocument* doc, string& strDecl);
 
+	//21.1根据"节点的名字"或者"节点的名字及其节点属性的值"来寻找节点
+	//参数1 需要查询的xml中某个节点(仅会遍历这个节点中的子节点)的指针
+	//参数2 需要查询的节点名字
+	//参数3 如果查询到了返回的节点的地址,没查到则原引用的地址不变
+	//参数4 要查询的节点的某个具体属性
+	//参数5 要查询的节点的某个具体属性的值
+	BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, const char* Attribute = NULL, const char* AttributeValue = NULL);
+
+	//21.2根据"节点的名字"或者"节点的名字及其节点属性的值"来寻找节点(此重载针对多属性的node进行精确定位,注意参数4和参数5有一一对应关系)
+	//参数1 需要查询的xml中某个节点(仅会遍历这个节点中的子节点)的指针
+	//参数2 需要查询的节点名字
+	//参数3 如果查询到了返回的节点的地址,没查到则原引用的地址不变
+	//参数4 要查询的节点的某些具体属性 例如:(const char* attributelist[] = { "class","user" };)
+	//参数5 要查询的节点的某些具体属性的值 例如:(const char* attributevaluelist[] = { "15班","原椿茗" };)
+	template <class AttributeList, class AttributeValueList>
+	BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+	{
+		string type = typeid(attributelist).name();
+		BOOL islist = type.find("char const * ");
+		
+		if (!(!islist && getArrayLen(attributelist) == getArrayLen(attributevaluelist)))
+			return FALSE;
+
+		const char* value = pRoot->Value();
+		if (strcmp(pRoot->Value(), nodeName.c_str()) == 0)
+		{
+			if (attributelist != NULL && attributevaluelist != NULL)
+			{
+				int j = 0;
+				for (int i = 0; i < getArrayLen(attributelist); i++)
+				{
+					string source = pRoot->Attribute(attributelist[i]);
+					string target = attributevaluelist[i];
+					if (source == target)
+					{
+						j++;
+						if (j == getArrayLen(attributelist))
+						{
+							pNode = pRoot;
+							return true;
+						}
+					}
+				}
+			}
+			else
+			{
+				pNode = pRoot;
+				return true;
+			}
+		}
+
+		XMLElement* p = pRoot;
+		for (p = p->FirstChildElement(); p != NULL; p = p->NextSiblingElement())
+		{
+			FindXMLNode(p, nodeName, pNode, attributelist, attributevaluelist);
+			return true;
+		}
+		return false;
+	}
 
 
 

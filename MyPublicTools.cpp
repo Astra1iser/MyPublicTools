@@ -6,27 +6,7 @@
 
 
 
-XMLElement* queryUserNodeByName(XMLElement* root, const string& userName)
-{
 
-    XMLElement* userNode = root->FirstChildElement();
-    while (userNode != NULL)
-    {
-        try
-        {
-            if (userNode->Attribute("T") == userName)
-                break;
-            throw "Unknown Exception";
-        }
-        catch(...)
-        {
-            cout << "异常了";
-        }
-        
-        userNode = userNode->NextSiblingElement();//下一个兄弟节点
-    }
-    return userNode;
-}
 
 
 
@@ -41,11 +21,25 @@ int main()
     //XMLElement* pRoot = iXmlDoc->NewElement("Ewaybot");
 
 
-    CreateEmptyXMLFile("卧槽.xml", "卧槽");
+    //CreateEmptyXMLFile("卧槽.xml", "卧槽");
 
     XMLDocument* abc = LoadXMLFile("卧槽.xml");
-    abc->Print();
+    XMLElement* root = abc->RootElement();
+    XMLElement* ddd=NULL;
+    //BOOL qwe= FindXMLNode(root, "std", ddd);
+    //BOOL qwe = FindXMLNode(root, "std", ddd, "qqq", "3211");
 
+
+    const char*  ab22[] = { "class","qqq" };
+    const char*  ab23[] = { "123","321" };
+
+
+    BOOL qwee = FindXMLNode(root, "std", ddd, "class", "123");
+    BOOL qweew = FindXMLNode(root, "std", ddd, ab22, ab23);
+
+    //abc->Print();
+
+    //LoadXMLFile("卧槽.xml");
 
 
     //添加申明可以使用如下两行
