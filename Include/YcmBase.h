@@ -27,9 +27,9 @@ using namespace tinyxml2;
 //这个宏是为了规避windows自带的XMLDocument类
 #define XMLDocument tinyxml2::XMLDocument
 //这个宏是为了防止tinyxml2的写入方法在写入xml时中文乱码的问题 使用_s结尾的函数时写入的数据都是UTF-8编码的数据,解析时,请使用对应的编码解析
-#define SetText_s(x) SetText(G2U(x))
-#define NewElement_s(x) NewElement(G2U(x))
-#define SetAttribute_s(x) SetAttribute(G2U(x)) 
+#define SetText_UTF8(x) SetText(G2U(x))
+#define NewElement_UTF8(x) NewElement(G2U(x))
+#define SetAttribute_UTF8(x) SetAttribute(G2U(x))
 
 
 #ifndef _YCMBASE_H

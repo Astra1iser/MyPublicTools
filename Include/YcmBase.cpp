@@ -372,7 +372,7 @@ int Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 
 XMLDocument* Base::CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
 {
-	const char* declaration = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+	const char* declaration = "<?xml version=\"1.0\" encoding=\"GBK\" standalone=\"yes\"?>";
 	XMLDocument* doc = new XMLDocument;
 	doc->Parse(declaration);//会覆盖xml所有内容
 
@@ -380,7 +380,8 @@ XMLDocument* Base::CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeN
 	//XMLDeclaration* declaration=doc.NewDeclaration();
 	//doc.InsertFirstChild(declaration);
 
-	XMLElement* rootNode = doc->NewElement(G2U(rootNodeName));
+	//XMLElement* rootNode = doc->NewElement(G2U(rootNodeName));
+	XMLElement* rootNode = doc->NewElement(rootNodeName);
 	doc->InsertEndChild(rootNode);
 
 	if (!(doc->SaveFile(xmlPath)))

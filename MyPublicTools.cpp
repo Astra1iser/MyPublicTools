@@ -43,9 +43,8 @@ int main()
 
     CreateEmptyXMLFile("卧槽.xml", "卧槽");
 
-    //XMLDocument* abc = LoadXMLFile("卧槽.xml");
-
-        //abc->Print();
+    XMLDocument* abc = LoadXMLFile("卧槽.xml");
+    abc->Print();
 
 
 
