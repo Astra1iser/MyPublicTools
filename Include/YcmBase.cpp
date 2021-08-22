@@ -403,9 +403,9 @@ XMLDocument* Base::LoadXMLFile(const char* xmlPath)
 	return doc;
 }
 
-BOOL Base::SaveXMLFile(XMLDocument* doc, const char* xmlPath)
+BOOL Base::SaveXMLFile(XMLDocument* doc, const char* xmlSavePath)
 {
-	if (!(doc->SaveFile(xmlPath)))
+	if (!(doc->SaveFile(xmlSavePath)))
 	{
 		return FALSE;
 	}
@@ -457,10 +457,97 @@ BOOL Base::FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pN
 	XMLElement* p = pRoot;
 	for (p = p->FirstChildElement(); p != NULL; p = p->NextSiblingElement())
 	{
-		FindXMLNode(p, nodeName, pNode, Attribute, AttributeValue);
-		return true;
+		if (FindXMLNode(p, nodeName, pNode, Attribute, AttributeValue))
+		{
+			return TRUE;
+		}
 	}
 
 	return false;
 }
 
+BOOL Base::GetXMLNodeText(XMLElement* pRoot, const string nodeName, const char*& text, const char* Attribute, const char* AttributeValue)
+{
+	if (!pRoot)
+	{
+		return FALSE;
+	}
+
+	XMLElement* pNode = NULL;
+	if (FindXMLNode(pRoot, nodeName, pNode))
+	{
+		if (NULL != pNode)
+		{
+			text = pNode->GetText();
+			return TRUE;
+		}
+		return FALSE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
+
+BOOL Base::GetNodeAttribute(XMLElement* pRoot, const string nodeName, map<string, string>& mapAttribute, const char* Attribute, const char* AttributeValue)
+{
+	map<string, string>mapAttribute_bak = mapAttribute;
+
+	if (!pRoot)
+	{
+		return FALSE;
+	}
+	XMLElement* pNode = NULL;
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	{
+		if (NULL != pNode)
+		{
+			const XMLAttribute* pAttr = NULL;
+			for (pAttr = pNode->FirstAttribute(); pAttr != NULL; pAttr = pAttr->Next())
+			{
+				string name = pAttr->Name();
+				string value = pAttr->Value();
+				mapAttribute.insert(make_pair(name, value));
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+BOOL Base::modifyText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName,  const char* Attribute, const char* AttributeValue)
+{
+	if (NULL == pRoot)
+	{
+		return FALSE;
+	}
+	XMLElement* pNode = NULL;
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	{
+		XMLNode* pText = pNode->FirstChild();
+		pText->SetValue(text.c_str());
+
+
+		/*XMLNode* pText = pNode->FirstChild();
+		if (NULL != pText)
+		{
+			pText->SetValue(text.c_str());
+		}
+		else*/
+		//{
+		//	XMLElement* pText = pNode->FirstChildElement();
+		//	pText->SetText(text.c_str());
+		//	pNode->LinkEndChild(pText);
+		//}
+		//if (SaveXMLFile(doc, xmlSavePath))
+		//{
+		//	return true;
+		//}
+
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return true;
+		}
+	}
+	return false;
+}

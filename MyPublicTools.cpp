@@ -34,8 +34,17 @@ int main()
     const char*  ab23[] = { "123","321" };
 
 
-    BOOL qwee = FindXMLNode(root, "std", ddd, "class", "123");
-    BOOL qweew = FindXMLNode(root, "std", ddd, ab22, ab23);
+    //BOOL qwee = FindXMLNode(root, "std", ddd, "class", "123");
+    //BOOL qweew = FindXMLNode(root, "std", ddd, ab22, ab23);
+
+    const char* test = NULL;
+    //GetXMLNodeText(root, "std", test, ab22, ab23);
+
+    //map<string, string> mapAttribute = {};
+
+    //GetNodeAttribute(root,"std", mapAttribute);
+
+    BOOL qwee = modifyText(abc, "卧槽.xml", root, "qqqqqqqqqqqqqqqqqq","name");
 
     //abc->Print();
 
