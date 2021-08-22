@@ -30,8 +30,8 @@ int main()
     //BOOL qwe = FindXMLNode(root, "std", ddd, "qqq", "3211");
 
 
-    const char*  ab22[] = { "class","qqq" };
-    const char*  ab23[] = { "123","321" };
+    //const char*  ab22[] = { "class","qqq" };
+    //const char*  ab23[] = { "123","321" };
 
 
     //BOOL qwee = FindXMLNode(root, "std", ddd, "class", "123");
@@ -40,11 +40,16 @@ int main()
     const char* test = NULL;
     //GetXMLNodeText(root, "std", test, ab22, ab23);
 
+    //BOOL qwee = FindXMLNode(root, "name", ddd);
+    //GetXMLNodeText(ddd, test);
     //map<string, string> mapAttribute = {};
 
-    //GetNodeAttribute(root,"std", mapAttribute);
+    //GetXMLNodeAttribute(ddd, mapAttribute);
 
-    BOOL qwee = modifyText(abc, "卧槽.xml", root, "qqqqqqqqqqqqqqqqqq","name");
+    const char* ab22[] = { "class","qqq" };
+    const char* ab23[] = { "123","321" };
+    BOOL qwed = SetXMLNodeText(abc, "卧槽.xml", root, "ee","name", ab22, ab23);
+    //BOOL qwed = SetXMLNodeText(abc, "卧槽.xml", root, "wwwwwwwwwwwwww","name");
 
     //abc->Print();
 

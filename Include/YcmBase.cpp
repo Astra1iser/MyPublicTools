@@ -466,11 +466,16 @@ BOOL Base::FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pN
 	return false;
 }
 
-BOOL Base::GetXMLNodeText(XMLElement* pRoot, const string nodeName, const char*& text, const char* Attribute, const char* AttributeValue)
+BOOL Base::GetXMLNodeText(XMLElement* pRoot,  const char*& text, const string nodeName, const char* Attribute, const char* AttributeValue)
 {
 	if (!pRoot)
 	{
 		return FALSE;
+	}
+	if ("" == nodeName)
+	{
+		text = pRoot->GetText();
+		return TRUE;
 	}
 
 	XMLElement* pNode = NULL;
@@ -489,14 +494,25 @@ BOOL Base::GetXMLNodeText(XMLElement* pRoot, const string nodeName, const char*&
 	}
 }
 
-BOOL Base::GetNodeAttribute(XMLElement* pRoot, const string nodeName, map<string, string>& mapAttribute, const char* Attribute, const char* AttributeValue)
+BOOL Base::GetXMLNodeAttribute(XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName, const char* Attribute, const char* AttributeValue)
 {
-	map<string, string>mapAttribute_bak = mapAttribute;
-
 	if (!pRoot)
 	{
 		return FALSE;
 	}
+
+	if ("" == nodeName)
+	{
+		const XMLAttribute* pAttr = NULL;
+		for (pAttr = pRoot->FirstAttribute(); pAttr != NULL; pAttr = pAttr->Next())
+		{
+			string name = pAttr->Name();
+			string value = pAttr->Value();
+			mapAttribute.insert(make_pair(name, value));
+		}
+		return TRUE;
+	}
+
 	XMLElement* pNode = NULL;
 	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
 	{
@@ -510,44 +526,76 @@ BOOL Base::GetNodeAttribute(XMLElement* pRoot, const string nodeName, map<string
 				mapAttribute.insert(make_pair(name, value));
 			}
 		}
-		return true;
+		return TRUE;;
 	}
-	return false;
+	return FALSE;
 }
 
-BOOL Base::modifyText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName,  const char* Attribute, const char* AttributeValue)
+BOOL Base::SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName, const char* Attribute, const char* AttributeValue)
 {
 	if (NULL == pRoot)
 	{
 		return FALSE;
 	}
+
+	if ("" == nodeName)
+	{
+		try
+		{
+			
+			XMLNode* pText = pRoot->LastChild();
+			if (NULL != pText)
+			{
+				pText->SetValue(text.c_str());
+			}
+			else
+			{
+				//XMLText* pText = doc->NewText(text.c_str());
+				//pRoot->InsertFirstChild(pText);
+				pRoot->InsertNewText(text.c_str());
+			}
+		}
+		catch (...)
+		{
+			//XMLText* pText = doc->NewText(text.c_str());
+			//pRoot->InsertFirstChild(pText);
+			pRoot->InsertNewText(text.c_str());
+		}
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+		return FALSE;
+	}
+
 	XMLElement* pNode = NULL;
 	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
 	{
-		XMLNode* pText = pNode->FirstChild();
-		pText->SetValue(text.c_str());
-
-
-		/*XMLNode* pText = pNode->FirstChild();
-		if (NULL != pText)
+		try
 		{
-			pText->SetValue(text.c_str());
+			XMLNode* pText = pNode->LastChild();
+			if (NULL != pText)
+			{
+				pText->SetValue(text.c_str());
+				//pNode->InsertAfterChild(pText, pText);
+			}
+			else
+			{
+				//XMLText* pText = doc->NewText(text.c_str());
+				//pNode->InsertEndChild(pText);
+				pNode->InsertNewText(text.c_str());
+			}
 		}
-		else*/
-		//{
-		//	XMLElement* pText = pNode->FirstChildElement();
-		//	pText->SetText(text.c_str());
-		//	pNode->LinkEndChild(pText);
-		//}
-		//if (SaveXMLFile(doc, xmlSavePath))
-		//{
-		//	return true;
-		//}
-
+		catch (...)
+		{
+			/*XMLText* pText = doc->NewText(text.c_str());
+			pNode->InsertFirstChild(pText);*/
+			pNode->InsertNewText(text.c_str());
+		}
 		if (SaveXMLFile(doc, xmlSavePath))
 		{
-			return true;
+			return TRUE;
 		}
 	}
-	return false;
+	return FALSE;
 }

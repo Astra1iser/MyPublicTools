@@ -40,31 +40,31 @@ using namespace tinyxml2;
 
 /*
 公共库目录:
-1.判断当前登录的账户是普通用户还是管理员											BOOL IsAdmin()
-2.当前系统语言																		LPCTSTR SetLangaueSyncOS()
-3.一个快捷启动进程的方法															BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE)
-4.获得数组的元素个数																int getArrayLen(Arr& array)
-5.数组中元素的二分排序																void BinaryInsertSort
+1.判断当前登录的账户是普通用户还是管理员																				BOOL IsAdmin()
+2.当前系统语言																											LPCTSTR SetLangaueSyncOS()
+3.一个快捷启动进程的方法																								BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE)
+4.获得数组的元素个数																									int getArrayLen(Arr& array)
+5.数组中元素的二分排序																									void BinaryInsertSort
 6.二分查找(或其他查找算法 正在施工中)
-7.双指针原地去除数组中的元素														int DoublePointerRemoveValue(List& list, Value value)
-8.获取IniPath的ini文件中Node节点下Key的值											void GetIniValue(int& Source, LPCTSTR  Node, LPCTSTR Key, LPCTSTR IniPath)
-																					void GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPath)
-9.更新IniPath的ini文件中Node节点下Key的值(施工中)											
-10.文本编码 UTF-8到GB2312的转换														char* U2G(const char* utf8)
-11.文本编码 GB2312到UTF-8的转换														char* G2U(const char* gb2312)
+7.双指针原地去除数组中的元素																							int DoublePointerRemoveValue(List& list, Value value)
+8.获取IniPath的ini文件中Node节点下Key的值																				void GetIniValue(int& Source, LPCTSTR  Node, LPCTSTR Key, LPCTSTR IniPath)
+																														void GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPath)
+9.更新IniPath的ini文件中Node节点下Key的值(施工中)																				
+10.文本编码 UTF-8到GB2312的转换																							char* U2G(const char* utf8)
+11.文本编码 GB2312到UTF-8的转换																							char* G2U(const char* gb2312)
 12.将wstring转换为string
 13.将string转换为wstring
-14.将LPCTSTR转换为string															string LPCTSTR2string(LPCTSTR lpctstr)
-15.将俩个LPCTSRT拼接																LPCTSTR CombineLPCTSRT (T1 lpctstr1, T2 lpctstr2)
-16.一个简易的ftp下载方法															BOOL EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
-17.创建一个且只有根节点的xml文件													XMLDocument* CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
-18.载入xml文件																		XMLDocument* LoadXMLFile(const char* xmlPath)
-19.保存xml内容																		BOOL SaveXMLFile(XMLDocument* doc, const char* xmlPath)
-20.读取XML声明																		BOOL GetXMLDeclaration(XMLDocument* doc, string& strDecl)
-21.寻找XML中的某个节点																BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, const char* Attribute = NULL, const char* AttributeValue = NULL)
-																					BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
-22.1根据"节点名"或者"节点的名字及其节点某个(某些)属性的值"，获取该节点文本			BOOL GetXMLNodeText(XMLElement* pRoot, const string nodeName, const char*& text, const char* Attribute = NULL, const char* AttributeValue = NULL);
-																					BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+14.将LPCTSTR转换为string																								string LPCTSTR2string(LPCTSTR lpctstr)
+15.将俩个LPCTSRT拼接																									LPCTSTR CombineLPCTSRT (T1 lpctstr1, T2 lpctstr2)
+16.一个简易的ftp下载方法																								BOOL EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
+17.创建一个且只有根节点的xml文件																						XMLDocument* CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
+18.载入xml文件																											XMLDocument* LoadXMLFile(const char* xmlPath)
+19.保存xml内容																											BOOL SaveXMLFile(XMLDocument* doc, const char* xmlPath)
+20.读取XML声明																											BOOL GetXMLDeclaration(XMLDocument* doc, string& strDecl)
+21.寻找XML中的某个节点																									BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, const char* Attribute = NULL, const char* AttributeValue = NULL)
+																														BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+22.1根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某个(某些)属性的值"，获取该节点文本			BOOL GetXMLNodeText(XMLElement* pRoot, const char*& text, const string nodeName = "", const char* Attribute = NULL, const char* AttributeValue = NULL)
+																														BOOL GetXMLNodeText(XMLElement* pRoot, const char*& text, const string nodeName = "", AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
 
 23.
 */
@@ -298,27 +298,33 @@ namespace Base
 	}
 
 
-	//22.1根据"节点名"或者"节点的名字及其节点某个属性的值"，获取该节点文本(这个函数有重载)
+	//22.1根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某个属性的值"，获取该节点文本(这个函数有重载)
 	//参数1 需要查询的xml中某个节点(仅会遍历这个节点和兄弟节点中的子节点)的指针(如果实在不确定,可以填xml根节点的指针,但是此时请填写参数4和参数5以便精确查找)
-	//参数2 需要查询的节点名字
-	//参数3 如果查询到了返回的文字的const char* 指针,没查到则原引用的地址不变
+	//参数2 如果查询到了返回的文字的const char* 指针,没查到则原引用的地址不变
+	//参数3 需要查询的节点名字(如果为空则只查询参数1的节点的文本)
 	//参数4 要查询的节点的某个具体属性 (此参数可不填)
 	//参数5 要查询的节点的某个具体属性的值 (此参数可不填)
-	BOOL GetXMLNodeText(XMLElement* pRoot, const string nodeName, const char*& text, const char* Attribute = NULL, const char* AttributeValue = NULL);
+	BOOL GetXMLNodeText(XMLElement* pRoot, const char*& text, const string nodeName = "", const char* Attribute = NULL, const char* AttributeValue = NULL);
 
 
-	//22.2根据"节点名"或者"节点的名字及其节点某些属性的值"，获取该节点文本(此重载针对多属性的node进行精确定位,注意参数4和参数5有一一对应关系)(这个函数有重载)
+	//22.2根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值"，获取该节点文本(此重载针对多属性的node进行精确定位,注意参数4和参数5有一一对应关系)(这个函数有重载)
 	//参数1 需要查询的xml中某个节点(仅会遍历这个节点和兄弟节点中的子节点)的指针(如果实在不确定,可以填xml根节点的指针,但是此时请填写参数4和参数5以便精确查找)
-	//参数2 需要查询的节点名字
-	//参数3 如果查询到了返回的文字的const char* 指针,没查到则原引用的地址不变
+	//参数2 如果查询到了返回的文字的const char* 指针,没查到则原引用的地址不变
+	//参数3 需要查询的节点名字(如果为空则只查询参数1的节点的文本)
 	//参数4 要查询的节点的某些具体属性 例如:(const char* attributelist[] = { "class","user" };) (此参数可不填)
 	//参数5 要查询的节点的某些具体属性的值 例如:(const char* attributevaluelist[] = { "15班","原椿茗" };) (此参数可不填)
 	template <class AttributeList, class AttributeValueList>
-	BOOL GetXMLNodeText(XMLElement* pRoot, const string nodeName, const char*& text, AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+	BOOL GetXMLNodeText(XMLElement* pRoot, const char*& text, const string nodeName = "", AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
 	{
 		if (!pRoot)
 		{
 			return FALSE;
+		}
+
+		if ("" == nodeName)
+		{
+			text = pRoot->GetText();
+			return TRUE;
 		}
 
 		XMLElement* pNode = NULL;
@@ -338,30 +344,41 @@ namespace Base
 	}
 
 
-	//23.1根据"节点名"或者"节点的名字及其节点某个属性的值"，获取节点属性(这个函数有重载)
+	//23.1根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某个属性的值"，获取节点属性(这个函数有重载)
 	//参数1 需要查询的xml中某个节点(仅会遍历这个节点和兄弟节点中的子节点)的指针(如果实在不确定,可以填xml根节点的指针,但是此时请填写参数4和参数5以便精确查找)
-	//参数2 需要查询的节点名字(请务必遵循一个xml中同名节点的属性名都相同的结构来构造xml,因为此方法只会返回查找到的第一个同名节点的属性名和值,如果你想获取某些同名节点的属性构成的话)
-	//参数3 如果查询到了返回属性的map<string, string>,没查到则原引用的内容不变
+	//参数2 如果查询到了返回属性的map<string, string>,没查到则原引用的内容不变
+	//参数3 需要查询的节点名字(如果为空则只查询参数1的节点的属性)(请务必遵循一个xml中同名节点的属性名都相同的结构来构造xml,因为此方法只会返回查找到的第一个同名节点的属性名和值,如果你想获取某些同名节点的属性构成的话)
 	//参数4 要查询的节点的某个具体属性 ((如果一个属性都不知道则此参数可不填))
 	//参数5 要查询的节点的某个具体属性的值 (如果一个属性都不知道则此参数可不填)
-	BOOL GetNodeAttribute(XMLElement* pRoot, const string nodeName, map<string, string>& mapAttribute, const char* Attribute = NULL, const char* AttributeValue = NULL);
+	BOOL GetXMLNodeAttribute(XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName = "", const char* Attribute = NULL, const char* AttributeValue = NULL);
 	
 
-	//23.1根据"节点名"或者"节点的名字及其节点某个属性的值"，获取节点属性(这个函数有重载)
+	//23.1根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值"，获取节点属性(这个函数有重载)
 	//参数1 需要查询的xml中某个节点(仅会遍历这个节点和兄弟节点中的子节点)的指针(如果实在不确定,可以填xml根节点的指针,但是此时请填写参数4和参数5以便精确查找)
-	//参数2 需要查询的节点名字(请务必遵循一个xml中同名节点的属性名都相同的结构来构造xml,因为此方法只会返回查找到的第一个同名节点的属性名和值,如果你想获取某些同名节点的属性构成的话)
-	//参数3 如果查询到了返回属性的map<string, string>,没查到则原引用的内容不变
+	//参数2 如果查询到了返回属性的map<string, string>,没查到则原引用的内容不变
+	//参数3 需要查询的节点名字(如果为空则只查询参数1的节点的属性)(请务必遵循一个xml中同名节点的属性名都相同的结构来构造xml,因为此方法只会返回查找到的第一个同名节点的属性名和值,如果你想获取某些同名节点的属性构成的话)
 	//参数4 要查询的节点的某些具体属性 例如:(const char* attributelist[] = { "class","user" };) (如果一个属性都不知道则此参数可不填)
 	//参数5 要查询的节点的某些具体属性的值 例如:(const char* attributevaluelist[] = { "15班","原椿茗" };) (如果一个属性都不知道则此参数可不填)
 	template <class AttributeList, class AttributeValueList>
-	BOOL GetNodeAttribute(XMLElement* pRoot, const string nodeName, map<string, string>& mapAttribute, AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+	BOOL GetXMLNodeAttribute(XMLElement* pRoot,  map<string, string>& mapAttribute, const string nodeName = "", AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
 	{
-		map<string, string>mapAttribute_bak = mapAttribute;
-
 		if (!pRoot)
 		{
 			return FALSE;
 		}
+
+		if ("" == nodeName)
+		{
+			const XMLAttribute* pAttr = NULL;
+			for (pAttr = pRoot->FirstAttribute(); pAttr != NULL; pAttr = pAttr->Next())
+			{
+				string name = pAttr->Name();
+				string value = pAttr->Value();
+				mapAttribute.insert(make_pair(name, value));
+			}
+			return TRUE;
+		}
+
 		XMLElement* pNode = NULL;
 		if (FindXMLNode(pRoot, nodeName, pNode, attributelist, attributevaluelist))
 		{
@@ -381,10 +398,80 @@ namespace Base
 	}
 
 
-	//修改节点文本
-	BOOL modifyText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName, const char* Attribute = NULL, const char* AttributeValue = NULL);
+	//24.1修改节点文本
+	BOOL SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName="", const char* Attribute = NULL, const char* AttributeValue = NULL);
 
 
+	//24.2
+	template <class AttributeList, class AttributeValueList>
+	BOOL SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName = "", AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+	{
+		if (NULL == pRoot)
+		{
+			return FALSE;
+		}
+
+		if ("" == nodeName)
+		{
+			try
+			{
+
+				XMLNode* pText = pRoot->LastChild();
+				if (NULL != pText)
+				{
+					pText->SetValue(text.c_str());
+				}
+				else
+				{
+					//XMLText* pText = doc->NewText(text.c_str());
+					//pRoot->InsertFirstChild(pText);
+					pRoot->InsertNewText(text.c_str());
+				}
+			}
+			catch (...)
+			{
+				//XMLText* pText = doc->NewText(text.c_str());
+				//pRoot->InsertFirstChild(pText);
+				pRoot->InsertNewText(text.c_str());
+			}
+			if (SaveXMLFile(doc, xmlSavePath))
+			{
+				return TRUE;
+			}
+			return FALSE;
+		}
+
+		XMLElement* pNode = NULL;
+		if (FindXMLNode(pRoot, nodeName, pNode, attributelist, attributevaluelist))
+		{
+			try
+			{
+				XMLNode* pText = pNode->LastChild();
+				if (NULL != pText)
+				{
+					pText->SetValue(text.c_str());
+					//pNode->InsertAfterChild(pText, pText);
+				}
+				else
+				{
+					//XMLText* pText = doc->NewText(text.c_str());
+					//pNode->InsertEndChild(pText);
+					pNode->InsertNewText(text.c_str());
+				}
+			}
+			catch (...)
+			{
+				/*XMLText* pText = doc->NewText(text.c_str());
+				pNode->InsertFirstChild(pText);*/
+				pNode->InsertNewText(text.c_str());
+			}
+			if (SaveXMLFile(doc, xmlSavePath))
+			{
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
 
 
 	//xml的增删改查的帮助:
