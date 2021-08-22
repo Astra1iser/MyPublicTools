@@ -15,7 +15,11 @@
 
 
 int main()
-{   //https://www.cnblogs.com/happykoukou/p/6307257.html
+{   //https://blog.csdn.net/qq_40945965/article/details/86831178
+    //https://www.cnblogs.com/happykoukou/p/6307257.html
+    //LockFile
+
+
     //XMLDocument* doc = new XMLDocument();
     //int nReturnCode = doc->LoadFile("123.xml");
     //XMLElement* pRoot = iXmlDoc->NewElement("Ewaybot");

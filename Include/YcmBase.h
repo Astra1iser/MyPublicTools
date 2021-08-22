@@ -12,6 +12,8 @@
 #include <atlconv.h>
 #include <atlstr.h>
 #include <wininet.h>
+#include <atlfile.h>
+
 
 #include <ScopeLock.h>//互斥锁（临界区）封装类
 #include <PathManager.h>//路径相关函数
@@ -398,7 +400,7 @@ namespace Base
 	}
 
 
-	//24.1修改节点文本
+	//24.1修改(包含更新或创建不包含追加,若想追加请先获取后自己追加然后更新)节点文本
 	BOOL SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName="", const char* Attribute = NULL, const char* AttributeValue = NULL);
 
 
