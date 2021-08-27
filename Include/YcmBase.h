@@ -14,13 +14,12 @@
 #include <wininet.h>
 #include <atlfile.h>
 
-
 #include <ScopeLock.h>//互斥锁（临界区）封装类
 #include <PathManager.h>//路径相关函数
 #include <RegeditManager.h>//注册表操作相关函数
 #include <MyOperFile.h>//文件读写和文件信息相关函数
 #include <Thread.h>//简易线程类
-#include <tinyxml2.h>
+#include <tinyxml2.h>//XML操作一次封装
 
 using namespace std;
 using namespace PathManager;
@@ -38,6 +37,8 @@ using namespace tinyxml2;
 
 #ifndef _YCMBASE_H
 #define _YCMBASE_H
+
+//字符串用 LPCSTR           LPCWSTR
 
 
 /*
@@ -400,7 +401,7 @@ namespace Base
 	}
 
 
-	//24.1修改(包含更新或创建不包含追加,若想追加请先获取后自己追加然后更新)节点文本
+	//24.1修改(包含更新或创建,不包含追加,若想追加请先获取后自己追加然后更新)节点文本
 	BOOL SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName="", const char* Attribute = NULL, const char* AttributeValue = NULL);
 
 
@@ -476,6 +477,8 @@ namespace Base
 	}
 
 
+	BOOL SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName = "", const char* Attribute = NULL, const char* AttributeValue = NULL);
+
 	//xml的增删改查的帮助:
 	// 1.创建
 	//创建文档指针,一个xml文档被创建时必须有这个指针,这个指针控制xml文档的写入操作
@@ -506,6 +509,66 @@ namespace Base
 
 
 
+	//这里本身是要做一个疯转xml的互斥量锁  暂时先放着 后边再完善
+
+	//class XMLManager
+	//{
+	//	public:
+
+	//		XMLManager(const char* xmlPath)
+	//		{
+	//			InitializeSRWLock(&g_srwLock);//初始化文件锁
+	//			InitializeCriticalSection(&g_cs);//初始化临界区
+	//			m_xmlPath = xmlPath;
+	//		}
+
+	//		~XMLManager()
+	//		{
+
+	//			DeleteCriticalSection(&g_cs);//删除临界区
+	//			ReleaseSRWLockExclusive(&g_srwLock);//释放写文件锁
+	//			ReleaseSRWLockShared(&g_srwLock);//释放读文件锁
+	//			delete this;
+	//		}
+
+	//		void ReadLock()
+	//		{
+	//			//读者申请读取文件
+	//			AcquireSRWLockShared(&g_srwLock);//请求读文件锁
+	//			EnterCriticalSection(&g_cs);//创建临界区
+	//		}
+	//		void ReadUnlock()
+	//		{
+	//			//读者结束读取文件
+	//			ReleaseSRWLockShared(&g_srwLock);//释放读文件锁
+	//			LeaveCriticalSection(&g_cs);//释放临界区
+	//		}
+	//		void WriteLock()
+	//		{
+	//			AcquireSRWLockExclusive(&g_srwLock);//请求写文件锁
+	//			EnterCriticalSection(&g_cs);//创建临界区
+	//		}
+	//		void WriteUnlock()
+	//		{
+	//			ReleaseSRWLockExclusive(&g_srwLock);//释放写文件锁
+	//			LeaveCriticalSection(&g_cs);//释放临界区
+	//		}
+
+
+	//		XMLDocument* LoadXMLFile(const char* xmlPath);
+
+
+
+
+
+	//	private:
+
+	//		CRITICAL_SECTION g_cs;
+	//		SRWLOCK          g_srwLock;
+	//		const char*		m_xmlPath;
+	//};
+	//
+	
 
 
 
@@ -514,8 +577,7 @@ namespace Base
 
 
 
-
-
+	
 }
 
 #endif

@@ -288,7 +288,7 @@ string Base::LPCTSTR2string(LPCTSTR lpctstr)
 	string str = wstring2string(strName);
 	return str;
 #else
-	string strName(lpszName);
+	string strName(lpctstr);
 	return strName;
 #endif // UNICODE	
 }
@@ -405,7 +405,7 @@ XMLDocument* Base::LoadXMLFile(const char* xmlPath)
 
 BOOL Base::SaveXMLFile(XMLDocument* doc, const char* xmlSavePath)
 {
-	if (!(doc->SaveFile(xmlSavePath)))
+	if ((doc->SaveFile(xmlSavePath)))
 	{
 		return FALSE;
 	}
@@ -596,6 +596,137 @@ BOOL Base::SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement*
 		{
 			return TRUE;
 		}
+	}
+	return FALSE;
+}
+
+BOOL Base:: SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName, const char* Attribute, const char* AttributeValue)
+{
+
+	if (NULL == pRoot)
+	{
+		return FALSE;
+	}
+
+	if ("" == nodeName)
+	{
+		const XMLAttribute* pAttr = pRoot->FirstAttribute();
+		char* strName = NULL;
+		for (; pAttr != NULL; pAttr = pAttr->Next())
+		{
+			strName = const_cast<char*>(pAttr->Name());
+			map<string, string> isnofind = {};
+			for (auto it = mapAttribute.begin(); it != mapAttribute.end(); ++it)
+			{
+				if (strName == it->first)
+				{
+					if ("" != it->second.c_str())
+					{
+						pRoot->SetAttribute(strName, it->second.c_str());
+					}
+					else
+					{
+						pRoot->DeleteAttribute(strName);
+					}
+				}
+				else
+				{
+					auto pr = std::make_pair(it->first, it->second);
+					isnofind.insert(pr);
+				}
+
+			}
+
+			if (0 != isnofind.size())
+			{
+				for (auto it = isnofind.begin(); it != isnofind.end(); ++it)
+				{
+
+					if ("" != it->first.c_str())
+					{
+						if ("" != it->second.c_str())
+						{
+							pRoot->SetAttribute(it->first.c_str(), it->second.c_str());
+						}
+						else
+						{
+							return FALSE;
+						}
+					}
+					else
+					{
+						return FALSE;
+					}
+				}
+			}
+		}
+
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	XMLElement* pNode = NULL;
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	{
+		const XMLAttribute* pAttr = pNode->FirstAttribute();
+		char* strName = NULL;
+		for (; pAttr != NULL; pAttr = pAttr->Next())
+		{
+			strName = const_cast<char*>(pAttr->Name());
+			map<string, string> isnofind = {};
+			for (auto it = mapAttribute.begin(); it != mapAttribute.end(); ++it)
+			{
+				if (strName == it->first)
+				{
+					if ("" != it->second.c_str())
+					{
+						pNode->SetAttribute(strName, it->second.c_str());
+					}
+					else
+					{
+						pNode->DeleteAttribute(strName);
+					}
+				}
+				else
+				{
+					auto pr = std::make_pair(it->first, it->second);
+					isnofind.insert(pr);
+				}
+
+			}
+
+			if (0 != isnofind.size())
+			{
+				for (auto it = isnofind.begin(); it != isnofind.end(); ++it)
+				{
+
+					if ("" != it->first.c_str())
+					{
+						if ("" != it->second.c_str())
+						{
+							pNode->SetAttribute(it->first.c_str(), it->second.c_str());
+						}
+						else
+						{
+							return FALSE;
+						}
+					}
+					else
+					{
+						return FALSE;
+					}
+				}
+			}
+		}
+
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+		return FALSE;
 	}
 	return FALSE;
 }

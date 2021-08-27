@@ -53,13 +53,22 @@ void Thread::Stop()
 	hThread = NULL;
 }
 
-void Thread::WaitExit()
+BOOL Thread::WaitExit()
 {
 	if (bRun == false)
-		return;
+		return TRUE;
 	if (hThread == NULL)
-		return;
+		return TRUE;
 	WaitForSingleObject(hThread, INFINITE);
+}
+
+BOOL Thread::WaitAnotherThreadExit(Thread* anotherthread)
+{
+	while(TRUE)
+	{
+		if(anotherthread->WaitExit())
+			return TRUE;
+	}
 }
 
 DWORD __stdcall Thread::WThreadFunctionLinek(IN LPVOID Param)
