@@ -301,6 +301,94 @@ namespace Base
 	}
 
 
+	//test
+	BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, map<const char*, const char*> Attribution = {})
+	{
+		string type = typeid(attributelist).name();
+		BOOL islist = type.find("char const * ");
+
+		if (!(!islist && getArrayLen(attributelist) == getArrayLen(attributevaluelist)))
+			return FALSE;
+
+		const char* value = pRoot->Value();
+		if (strcmp(pRoot->Value(), nodeName.c_str()) == 0)
+		{
+			if (attributelist != NULL && attributevaluelist != NULL)
+			{
+				int j = 0;
+				for (int i = 0; i < getArrayLen(attributelist); i++)
+				{
+					string source = pRoot->Attribute(attributelist[i]);
+					string target = attributevaluelist[i];
+					if (source == target)
+					{
+						j++;
+						if (j == getArrayLen(attributelist))
+						{
+							pNode = pRoot;
+							return TRUE;
+						}
+					}
+				}
+			}
+			else
+			{
+				pNode = pRoot;
+				return TRUE;
+			}
+		}
+
+		XMLElement* p = pRoot;
+		for (p = p->FirstChildElement(); p != NULL; p = p->NextSiblingElement())
+		{
+			if (FindXMLNode(p, nodeName, pNode, attributelist, attributevaluelist))
+			{
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	//22.1根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某个属性的值"，获取该节点文本(这个函数有重载)
 	//参数1 需要查询的xml中某个节点(仅会遍历这个节点和兄弟节点中的子节点)的指针(如果实在不确定,可以填xml根节点的指针,但是此时请填写参数4和参数5以便精确查找)
 	//参数2 如果查询到了返回的文字的const char* 指针,没查到则原引用的地址不变
@@ -476,40 +564,292 @@ namespace Base
 		return FALSE;
 	}
 
-
+	//25.1 修改(包含更新或创建)节点属性
 	BOOL SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName = "", const char* Attribute = NULL, const char* AttributeValue = NULL);
 
-	//xml的增删改查的帮助:
-	// 1.创建
-	//创建文档指针,一个xml文档被创建时必须有这个指针,这个指针控制xml文档的写入操作
-	//			TiXmlDocument* writeDoc = new TiXmlDocument; //xml文档指针
-	// 
-	//文档格式声明指针,一个文档必须声明一下子,不然写入会有错误: 
-	// 参数1:版本 
-	// 参数2:编码(一般保持UTF-8就行)
-	// 参数3:是否独立(一般保持yes)
-	//			TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", "yes"); 
-	// 
-	//创建节点指针
-	// 参数:节点名(可以是变量)
-	//			TiXmlElement* Element = new TiXmlElement("Info");//设置一个节点元素
-	// 
-	//创建当前节点指针的节点属性,节点指针的SetAttribute方法,一个节点可以设置多个节点属性,调用多次SetAttribute方法即可,最后使用节点指针的 Element->LinkEndChild(节点属性指针)写入
-	//参数1:属性名
-	//参数2:属性值
-	//			Element->SetAttribute("num", n); //属性,值
-	//
-	//创建节点内容指针,一个节点可写入多个内容,最后使用节点指针的 Element->LinkEndChild(节点属性指针)写入
-	//参数:文本内容
-	//TiXmlText* Text = new TiXmlText("88"); //创建节点内容指针,内容为123
-	//
-	//2.刪除
+	//25.2
+	template <class AttributeList, class AttributeValueList>
+	BOOL SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName = "", AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+	{
+		if (NULL == pRoot)
+		{
+			return FALSE;
+		}
+
+		if ("" == nodeName)
+		{
+			const XMLAttribute* pAttr = pRoot->FirstAttribute();
+
+			if (NULL == pAttr)
+			{
+				for (auto it = mapAttribute.begin(); it != mapAttribute.end(); ++it)
+				{
+					if ("" != it->first.c_str())
+					{
+						if ("" != it->second.c_str())
+						{
+							pRoot->SetAttribute(it->first.c_str(), it->second.c_str());
+						}
+						else
+						{
+							return FALSE;
+						}
+					}
+					else
+					{
+						return FALSE;
+					}
+				}
+			}
+
+			char* strName = NULL;
+			for (; pAttr != NULL; pAttr = pAttr->Next())
+			{
+				strName = const_cast<char*>(pAttr->Name());
+				map<string, string> isnofind = {};
+				for (auto it = mapAttribute.begin(); it != mapAttribute.end(); ++it)
+				{
+					if (strName == it->first)
+					{
+						if ("" != it->second.c_str())
+						{
+							pRoot->SetAttribute(strName, it->second.c_str());
+						}
+						else
+						{
+							pRoot->DeleteAttribute(strName);
+						}
+					}
+					else
+					{
+						auto pr = std::make_pair(it->first, it->second);
+						isnofind.insert(pr);
+					}
+
+				}
+
+				if (0 != isnofind.size())
+				{
+					for (auto it = isnofind.begin(); it != isnofind.end(); ++it)
+					{
+
+						if ("" != it->first.c_str())
+						{
+							if ("" != it->second.c_str())
+							{
+								pRoot->SetAttribute(it->first.c_str(), it->second.c_str());
+							}
+							else
+							{
+								return FALSE;
+							}
+						}
+						else
+						{
+							return FALSE;
+						}
+					}
+				}
+			}
+
+			if (SaveXMLFile(doc, xmlSavePath))
+			{
+				return TRUE;
+			}
+			return FALSE;
+		}
+
+		XMLElement* pNode = NULL;
+		if (FindXMLNode(pRoot, nodeName, pNode, attributelist, attributevaluelist))
+		{
+			const XMLAttribute* pAttr = pNode->FirstAttribute();
+
+			if (NULL == pAttr)
+			{
+				for (auto it = mapAttribute.begin(); it != mapAttribute.end(); ++it)
+				{
+					if ("" != it->first.c_str())
+					{
+						if ("" != it->second.c_str())
+						{
+							pNode->SetAttribute(it->first.c_str(), it->second.c_str());
+						}
+						else
+						{
+							return FALSE;
+						}
+					}
+					else
+					{
+						return FALSE;
+					}
+				}
+			}
+
+			char* strName = NULL;
+			for (; pAttr != NULL; pAttr = pAttr->Next())
+			{
+				strName = const_cast<char*>(pAttr->Name());
+				map<string, string> isnofind = {};
+				for (auto it = mapAttribute.begin(); it != mapAttribute.end(); ++it)
+				{
+					if (strName == it->first)
+					{
+						if ("" != it->second.c_str())
+						{
+							pNode->SetAttribute(strName, it->second.c_str());
+						}
+						else
+						{
+							pNode->DeleteAttribute(strName);
+						}
+					}
+					else
+					{
+						auto pr = std::make_pair(it->first, it->second);
+						isnofind.insert(pr);
+					}
+
+				}
+
+				if (0 != isnofind.size())
+				{
+					for (auto it = isnofind.begin(); it != isnofind.end(); ++it)
+					{
+
+						if ("" != it->first.c_str())
+						{
+							if ("" != it->second.c_str())
+							{
+								pNode->SetAttribute(it->first.c_str(), it->second.c_str());
+							}
+							else
+							{
+								return FALSE;
+							}
+						}
+						else
+						{
+							return FALSE;
+						}
+					}
+				}
+			}
+
+			if (SaveXMLFile(doc, xmlSavePath))
+			{
+				return TRUE;
+			}
+			return FALSE;
+		}
+		return FALSE;
+	}
+
+	//26.1在节点下插入子节点
+	BOOL SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* newNodeName, map<string, string>newMapAttribute = {}, const char* newText = "", const string nodeName = "", const char* Attribute = NULL, const char* AttributeValue = NULL);
+
+	//26.2
+	template <class AttributeList, class AttributeValueList>
+	BOOL SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* newNodeName, map<string, string>newMapAttribute = {}, const char* newText = "", const string nodeName = "", AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+	{
+		if (NULL == pRoot)
+		{
+			return FALSE;
+		}
+		if ("" == nodeName)
+		{
+			if ("" != newNodeName)
+			{
+				XMLElement* pNewNode = pRoot->InsertNewChildElement(newNodeName);
+				if (0 != newMapAttribute.size())
+				{
+					SetXMLNodeAttribution(doc, xmlSavePath, pNewNode, newMapAttribute);
+				}
+				if ("" != newText)
+				{
+					SetXMLNodeText(doc, xmlSavePath, pNewNode, newText);
+				}
+
+				if (SaveXMLFile(doc, xmlSavePath))
+				{
+					return TRUE;
+				}
+			}
+			return FALSE;
+		}
+
+		XMLElement* pNode = NULL;
+		if (FindXMLNode(pRoot, nodeName, pNode, attributelist, attributevaluelist))
+		{
+			if ("" != newNodeName)
+			{
+				XMLElement* pNewNode = pNode->InsertNewChildElement(newNodeName);
+				if (0 != newMapAttribute.size())
+				{
+					SetXMLNodeAttribution(doc, xmlSavePath, pNewNode, newMapAttribute);
+				}
+				if ("" != newText)
+				{
+					SetXMLNodeText(doc, xmlSavePath, pNewNode, newText);
+				}
+
+				if (SaveXMLFile(doc, xmlSavePath))
+				{
+					return TRUE;
+				}
+			}
+			else
+			{
+				return FALSE;
+			}
+		}
+		return FALSE;
+	}
+
+	//27.1删除节点
+	BOOL DeleteXMLNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string nodeName = "", const char* Attribute = NULL, const char* AttributeValue = NULL);
+	
+	//27.2
+	template <class AttributeList, class AttributeValueList>
+	BOOL DeleteXMLNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* delNodeName, const string nodeName = "", AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
+	{
+		if (NULL == pRoot)
+		{
+			return FALSE;
+		}
+		if ("" == nodeName)
+		{
+			//pRoot->DeleteChild(NodeName); //删除指定节点
+			pRoot->DeleteChildren();//删除节点的所有孩子节点
 
 
+			if (SaveXMLFile(doc, xmlSavePath))
+			{
+				return TRUE;
+			}
+			return FALSE;
+		}
+		XMLElement* pNode = NULL;
+		if (FindXMLNode(pRoot, nodeName, pNode, attributelist, attributevaluelist))
+		{
+
+			//pRoot->DeleteChild(NodeName); //删除指定节点
+			pNode->DeleteChildren();//删除节点的所有孩子节点
 
 
+			if (SaveXMLFile(doc, xmlSavePath))
+			{
+				return TRUE;
+			}
+			return FALSE;
+		}
+		return FALSE;
+	}
 
-	//这里本身是要做一个疯转xml的互斥量锁  暂时先放着 后边再完善
+	//27.3
+	BOOL DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode);
+
+	//这里本身是要做一个封装xml的互斥量锁  暂时先放着 后边再完善
 
 	//class XMLManager
 	//{
@@ -567,12 +907,43 @@ namespace Base
 	//		SRWLOCK          g_srwLock;
 	//		const char*		m_xmlPath;
 	//};
-	//
+	
 	
 
 
+	////这是一个内核锁
+	//HANDLE g_hMutex = NULL;
+	//#define MUTEX_NAME	_T("Global//Q360LeakRepairMutex")
+	//#define	WINDOW_CLASS			L"360EntNoticeMainClass"
+
+	//BOOL IsInstanceExist()
+	//{
+	//	g_hMutex = CreateMutex(NULL, TRUE, MUTEX_NAME);
+	//	WaitForSingleObject(g_hMutex, INFINITE);
 
 
+
+
+
+
+
+
+	//	if (NULL != g_hMutex)
+	//	{
+	//		if (GetLastError() == ERROR_ALREADY_EXISTS)
+	//		{
+	//			HWND hWnd = ::FindWindow(WINDOW_CLASS, NULL);
+	//			if (hWnd)
+	//			{
+	//				::ShowWindow(hWnd, SW_RESTORE);
+	//				::SetForegroundWindow(hWnd);
+	//			}
+	//			return TRUE;
+	//		}
+	//	}
+
+	//	return FALSE;
+	//}
 
 
 

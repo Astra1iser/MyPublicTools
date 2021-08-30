@@ -2,12 +2,149 @@
 //
 
 #include "stdafx.h"
+#include <iostream>
+#include <fstream>
+
+class XMLManager
+{
+public:
+
+	XMLManager(const char* xmlPath)
+	{
+		InitializeSRWLock(&g_srwLock);//初始化文件锁
+		InitializeCriticalSection(&g_cs);//初始化临界区
+		m_xmlPath = xmlPath;
+        //ofstream outfile;
+        //outfile.open(m_xmlPath);
+	}
+
+	~XMLManager()
+	{
+
+		DeleteCriticalSection(&g_cs);//删除临界区
+		ReleaseSRWLockExclusive(&g_srwLock);//释放写文件锁
+		ReleaseSRWLockShared(&g_srwLock);//释放读文件锁
+		delete this;
+	}
+
+	void ReadLock()
+	{
+		//读者申请读取文件
+		AcquireSRWLockShared(&g_srwLock);//请求读文件锁
+		EnterCriticalSection(&g_cs);//创建临界区
+	}
+	void ReadUnlock()
+	{
+		//读者结束读取文件
+		ReleaseSRWLockShared(&g_srwLock);//释放读文件锁
+		LeaveCriticalSection(&g_cs);//释放临界区
+	}
+	void WriteLock()
+	{
+		AcquireSRWLockExclusive(&g_srwLock);//请求写文件锁
+		EnterCriticalSection(&g_cs);//创建临界区
+	}
+	void WriteUnlock()
+	{
+		ReleaseSRWLockExclusive(&g_srwLock);//释放写文件锁
+		LeaveCriticalSection(&g_cs);//释放临界区
+	}
+
+
+	//XMLDocument* LoadXMLFile(const char* xmlPath);
 
 
 
 
+private:
+
+	CRITICAL_SECTION g_cs;
+	SRWLOCK          g_srwLock;
+	const char* m_xmlPath;
+};
 
 
+
+//class xiancheng1 : public Thread
+//{
+//public:
+//    XMLManager* suo;
+//    //重写Run;
+//    void Run()
+//    {
+//        while (this->bRun)
+//        {
+//            suo = new XMLManager("卧槽.xml");
+//            suo->ReadLock();
+//            cout << "线程1" << endl;
+//            XMLDocument* abc = LoadXMLFile("卧槽.xml");
+//            XMLElement* root = abc->RootElement();
+//            XMLElement* ddd = NULL;
+//            SaveXMLFile(abc, "卧槽.xml");
+//            Sleep(5000);
+//        }
+//    }
+//};
+//
+//class xiancheng2 : public Thread
+//{
+//public:
+//    XMLManager *suo;
+//	//重写Run;
+//	void Run()
+//	{
+//		while (this->bRun)
+//		{
+//            suo = new XMLManager("卧槽.xml");
+//            suo->ReadLock();
+//            cout << "线程2" << endl;
+//            XMLDocument* abc = LoadXMLFile("卧槽.xml");
+//            XMLElement* root = abc->RootElement();
+//            XMLElement* ddd=NULL;
+//            SaveXMLFile(abc, "卧槽.xml");
+//            Sleep(5000);
+//		}
+//	}
+//};
+
+//例子,在主函数中实例化并重写run()方法
+class xiancheng1 : public Thread
+{
+public:
+    Thread* thread;
+	//重写Run;
+    xiancheng1(Thread* thread)
+    {
+        this->thread = thread;
+    }
+	void Run()
+	{
+		while (this->bRun)
+		{
+            WaitAnotherThreadExit(thread);
+			printf("Hello thread1\n");
+			Sleep(1000);
+
+		}
+	}
+};
+
+//例子,在主函数中实例化并重写run()方法
+class xiancheng2 : public Thread
+{
+public:
+	//重写Run;
+	void Run()
+	{
+		int i = 0;
+		while (i<10)
+		{
+			printf("Hello thread2\n");
+			Sleep(1000);
+			i++;
+		}
+	}
+};
 
 
 
@@ -17,6 +154,8 @@
 int main()
 {   //https://blog.csdn.net/qq_40945965/article/details/86831178
     //https://www.cnblogs.com/happykoukou/p/6307257.html
+    //https://www.cnblogs.com/whwywzhj/p/8478628.html
+    // 
     //LockFile
 
 
@@ -27,9 +166,9 @@ int main()
 
     //CreateEmptyXMLFile("卧槽.xml", "卧槽");
 
-    XMLDocument* abc = LoadXMLFile("卧槽.xml");
-    XMLElement* root = abc->RootElement();
-    XMLElement* ddd=NULL;
+    //XMLDocument* abc = LoadXMLFile("卧槽.xml");
+    //XMLElement* root = abc->RootElement();
+    //XMLElement* ddd=NULL;
     //BOOL qwe= FindXMLNode(root, "std", ddd);
     //BOOL qwe = FindXMLNode(root, "std", ddd, "qqq", "3211");
 
@@ -41,7 +180,7 @@ int main()
     //BOOL qwee = FindXMLNode(root, "std", ddd, "class", "123");
     //BOOL qweew = FindXMLNode(root, "std", ddd, ab22, ab23);
 
-    const char* test = NULL;
+    //const char* test = NULL;
     //GetXMLNodeText(root, "std", test, ab22, ab23);
 
     //BOOL qwee = FindXMLNode(root, "name", ddd);
@@ -50,9 +189,9 @@ int main()
 
     //GetXMLNodeAttribute(ddd, mapAttribute);
 
-    const char* ab22[] = { "class","qqq" };
-    const char* ab23[] = { "123","321" };
-    BOOL qwed = SetXMLNodeText(abc, "卧槽.xml", root, "ee","name", ab22, ab23);
+    //const char* ab22[] = { "class","qqq" };
+    //const char* ab23[] = { "123","321" };
+    //BOOL qwed = SetXMLNodeText(abc, "卧槽.xml", root, "ee","name", ab22, ab23);
     //BOOL qwed = SetXMLNodeText(abc, "卧槽.xml", root, "wwwwwwwwwwwwww","name");
 
     //abc->Print();
@@ -63,12 +202,6 @@ int main()
     //添加申明可以使用如下两行
     //XMLDeclaration* declaration=doc.NewDeclaration();
     //doc.InsertFirstChild(declaration);
-
- 
-
-
-
-
 
 
 
@@ -104,7 +237,7 @@ int main()
     //XMLElement* root = doc->RootElement();
     //XMLElement* userNode = doc->NewElement("User");
     //userNode->SetAttribute("dd", "qq");
-    //userNode->SetText("我v操");
+    //userNode->SetText("我v");
 
     //root->InsertEndChild(userNode);
 
@@ -114,6 +247,37 @@ int main()
 
     //XMLElement* abc = queryUserNodeByName(root, "111");
     //const char* aaa=abc->GetText();
+
+
+
+
+    //Thread* ww = new xiancheng2();;
+    //xiancheng1 e(ww);
+    //e.Start();
+    //ww->Start();
+
+
+
+    //XMLDocument *doc = LoadXMLFile("卧槽.xml");
+    //XMLElement* root = doc->RootElement();
+    ////XMLElement* userNode = doc->NewElement("User");
+
+    //XMLElement* ddd=NULL;
+    //BOOL qwe= FindXMLNode(root, "lib1", ddd);
+
+
+    //map<string, string> abc = {};
+    //auto pr = std::make_pair("TT", "");
+    //abc.insert(pr);
+    //SetXMLNodeAttribution(doc, "卧槽.xml", ddd, abc);
+
+    //SetXMLNewNode(doc, "卧槽.xml", ddd, "我干", abc, "这是个新节点");
+
+
+
+    map<const char*, const char*> adc = { {"www","qwedd"}};
+   auto pr = std::make_pair("TT", "");
+   adc.insert(pr);
 
 
 

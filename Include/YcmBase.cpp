@@ -410,7 +410,7 @@ BOOL Base::SaveXMLFile(XMLDocument* doc, const char* xmlSavePath)
 		return FALSE;
 	}
 
-	delete doc;
+	//delete doc;
 	return TRUE;
 }
 
@@ -526,7 +526,7 @@ BOOL Base::GetXMLNodeAttribute(XMLElement* pRoot, map<string, string>& mapAttrib
 				mapAttribute.insert(make_pair(name, value));
 			}
 		}
-		return TRUE;;
+		return TRUE;
 	}
 	return FALSE;
 }
@@ -611,6 +611,29 @@ BOOL Base:: SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XML
 	if ("" == nodeName)
 	{
 		const XMLAttribute* pAttr = pRoot->FirstAttribute();
+
+		if (NULL == pAttr)
+		{
+			for (auto it = mapAttribute.begin(); it != mapAttribute.end(); ++it)
+			{
+				if ("" != it->first.c_str())
+				{
+					if ("" != it->second.c_str())
+					{
+						pRoot->SetAttribute(it->first.c_str(), it->second.c_str());
+					}
+					else
+					{
+						return FALSE;
+					}
+				}
+				else
+				{
+					return FALSE;
+				}
+			}
+		}
+
 		char* strName = NULL;
 		for (; pAttr != NULL; pAttr = pAttr->Next())
 		{
@@ -672,6 +695,29 @@ BOOL Base:: SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XML
 	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
 	{
 		const XMLAttribute* pAttr = pNode->FirstAttribute();
+
+		if (NULL == pAttr)
+		{
+			for (auto it = mapAttribute.begin(); it != mapAttribute.end(); ++it)
+			{
+				if ("" != it->first.c_str())
+				{
+					if ("" != it->second.c_str())
+					{
+						pNode->SetAttribute(it->first.c_str(), it->second.c_str());
+					}
+					else
+					{
+						return FALSE;
+					}
+				}
+				else
+				{
+					return FALSE;
+				}
+			}
+		}
+
 		char* strName = NULL;
 		for (; pAttr != NULL; pAttr = pAttr->Next())
 		{
@@ -729,4 +775,104 @@ BOOL Base:: SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XML
 		return FALSE;
 	}
 	return FALSE;
+}
+
+
+BOOL Base::SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* newNodeName, map<string, string>newMapAttribute, const char* newText, const string nodeName, const char* Attribute, const char* AttributeValue)
+{
+	if (NULL == pRoot)
+	{
+		return FALSE;
+	}
+	if ("" == nodeName)
+	{
+		if ("" != newNodeName)
+		{
+			XMLElement* pNewNode = pRoot->InsertNewChildElement(newNodeName);
+			if (0 != newMapAttribute.size())
+			{
+				SetXMLNodeAttribution(doc, xmlSavePath, pNewNode, newMapAttribute);
+			}
+			if ("" != newText)
+			{
+				SetXMLNodeText(doc, xmlSavePath, pNewNode, newText);
+			}
+
+			if (SaveXMLFile(doc, xmlSavePath))
+			{
+				return TRUE;
+			}
+			return FALSE;
+		}	
+	}
+
+	XMLElement* pNode = NULL;
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	{
+		if ("" != newNodeName)
+		{
+			XMLElement* pNewNode = pNode->InsertNewChildElement(newNodeName);
+			if (0 != newMapAttribute.size())
+			{
+				SetXMLNodeAttribution(doc, xmlSavePath, pNewNode, newMapAttribute);
+			}
+			if ("" != newText)
+			{
+				SetXMLNodeText(doc, xmlSavePath, pNewNode, newText);
+			}
+
+			if (SaveXMLFile(doc, xmlSavePath))
+			{
+				return TRUE;
+			}
+			return FALSE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+	return FALSE;
+}
+
+BOOL Base::DeleteXMLNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string nodeName, const char* Attribute, const char* AttributeValue)
+{
+	if (NULL == pRoot)
+	{
+		return FALSE;
+	}
+	if ("" == nodeName)
+	{
+		//pRoot->DeleteChild(NodeName); //删除指定节点
+		pRoot->DeleteChildren();//删除节点的所有孩子节点
+
+
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+		return FALSE;
+	}
+	XMLElement* pNode = NULL;
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	{
+
+		//pRoot->DeleteChild(NodeName); //删除指定节点
+		pNode->DeleteChildren();//删除节点的所有孩子节点
+
+
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+		return FALSE;
+	}
+	return FALSE;
+}
+
+
+BOOL Base::DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode)
+{
+	fatherNode->DeleteChild(childrenNode); //删除指定节点
+	return TRUE;
 }
