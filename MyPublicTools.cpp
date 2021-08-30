@@ -258,12 +258,13 @@ int main()
 
 
 
-    //XMLDocument *doc = LoadXMLFile("卧槽.xml");
-    //XMLElement* root = doc->RootElement();
+    XMLDocument *doc = LoadXMLFile("卧槽.xml");
+    XMLElement* root = doc->RootElement();
     ////XMLElement* userNode = doc->NewElement("User");
 
-    //XMLElement* ddd=NULL;
-    //BOOL qwe= FindXMLNode(root, "lib1", ddd);
+    XMLElement* ddd=NULL;
+    XMLElement* eee = NULL;
+    BOOL qwe= FindXMLNode(root, "std", eee);
 
 
     //map<string, string> abc = {};
@@ -275,9 +276,14 @@ int main()
 
 
 
-    map<const char*, const char*> adc = { {"www","qwedd"}};
-   auto pr = std::make_pair("TT", "");
+    map<const char*, const char*> adc = { {"class","123"}};
+   auto pr = std::make_pair("qqq", "321");
    adc.insert(pr);
+
+   FindXMLNode1(root, "std",ddd,adc);
+   ddd;
+
+
 
 
 

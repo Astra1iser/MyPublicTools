@@ -466,6 +466,79 @@ BOOL Base::FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pN
 	return false;
 }
 
+
+
+
+BOOL Base::FindXMLNode1(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, map<const char*, const char*> Attribution)
+{
+
+	const char* value = pRoot->Value();
+	if (strcmp(pRoot->Value(), nodeName.c_str()) == 0)
+	{
+		if (0 != Attribution.size())
+		{
+			int j = 0;
+			for (auto it = Attribution.begin(); it != Attribution.end(); ++it)
+			{
+				string source = pRoot->Attribute(it->first);
+				string target = it->second;
+				if (source == target)
+				{
+					j++;
+					if (j == Attribution.size())
+					{
+						pNode = pRoot;
+						return TRUE;
+					}
+				}
+			}
+		}
+		else
+		{
+			pNode = pRoot;
+			return TRUE;
+		}
+	}
+
+	XMLElement* p = pRoot;
+	for (p = p->FirstChildElement(); p != NULL; p = p->NextSiblingElement())
+	{
+		if (FindXMLNode1(p, nodeName, pNode, Attribution))
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 BOOL Base::GetXMLNodeText(XMLElement* pRoot,  const char*& text, const string nodeName, const char* Attribute, const char* AttributeValue)
 {
 	if (!pRoot)

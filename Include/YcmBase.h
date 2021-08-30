@@ -302,52 +302,7 @@ namespace Base
 
 
 	//test
-	BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, map<const char*, const char*> Attribution = {})
-	{
-		string type = typeid(attributelist).name();
-		BOOL islist = type.find("char const * ");
-
-		if (!(!islist && getArrayLen(attributelist) == getArrayLen(attributevaluelist)))
-			return FALSE;
-
-		const char* value = pRoot->Value();
-		if (strcmp(pRoot->Value(), nodeName.c_str()) == 0)
-		{
-			if (attributelist != NULL && attributevaluelist != NULL)
-			{
-				int j = 0;
-				for (int i = 0; i < getArrayLen(attributelist); i++)
-				{
-					string source = pRoot->Attribute(attributelist[i]);
-					string target = attributevaluelist[i];
-					if (source == target)
-					{
-						j++;
-						if (j == getArrayLen(attributelist))
-						{
-							pNode = pRoot;
-							return TRUE;
-						}
-					}
-				}
-			}
-			else
-			{
-				pNode = pRoot;
-				return TRUE;
-			}
-		}
-
-		XMLElement* p = pRoot;
-		for (p = p->FirstChildElement(); p != NULL; p = p->NextSiblingElement())
-		{
-			if (FindXMLNode(p, nodeName, pNode, attributelist, attributevaluelist))
-			{
-				return TRUE;
-			}
-		}
-		return FALSE;
-	}
+	BOOL FindXMLNode1(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, map<const char*, const char*> Attribution = {});
 
 
 
