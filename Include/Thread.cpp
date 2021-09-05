@@ -62,14 +62,6 @@ BOOL Thread::WaitExit()
 	WaitForSingleObject(hThread, INFINITE);
 }
 
-BOOL Thread::WaitAnotherThreadExit(Thread* anotherthread)
-{
-	while(TRUE)
-	{
-		if(anotherthread->WaitExit())
-			return TRUE;
-	}
-}
 
 DWORD __stdcall Thread::WThreadFunctionLinek(IN LPVOID Param)
 {

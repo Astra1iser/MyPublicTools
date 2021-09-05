@@ -6,6 +6,7 @@
 #include <MyOperFile.cpp>
 #include <Thread.cpp>
 #include <tinyxml2.cpp>
+#include <Mutex.cpp>
 
 
 
@@ -135,6 +136,7 @@ LPCTSTR Base::SetLangaueSyncOS()
 
 }
 
+
 //当前的系统是否是vista之后的版本
 //bool is_vista_or_later()
 //{
@@ -152,6 +154,7 @@ LPCTSTR Base::SetLangaueSyncOS()
 //
 //	return false;
 //}
+
 
 BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL IsWaitForSingle)
 {
@@ -207,12 +210,14 @@ BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL Is
 		return FALSE;	
 }
 
+
 void Base::GetIniValue(int& Source, LPCTSTR  Node, LPCTSTR Key, LPCTSTR IniPath)
 {
 	//int类型
 	auto temp = GetPrivateProfileInt(Node, Key, NULL, IniPath);
 	Source = temp;
 }
+
 
 void Base::GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPath)
 {
@@ -222,6 +227,7 @@ void Base::GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPa
 	GetPrivateProfileString(Node, Key, NULL, szValue, len, IniPath);
 	Source = szValue;
 }
+
 
 char* Base::U2G(const char* utf8)
 {
@@ -237,6 +243,7 @@ char* Base::U2G(const char* utf8)
 	return str;
 }
 
+
 char* Base::G2U(const char* gb2312)
 {
 	int len = MultiByteToWideChar(CP_ACP, 0, gb2312, -1, NULL, 0);
@@ -250,6 +257,7 @@ char* Base::G2U(const char* gb2312)
 	if (wstr) delete[] wstr;
 	return str;
 }
+
 
 string Base::wstring2string(wstring wstr)
 {
@@ -266,6 +274,7 @@ string Base::wstring2string(wstring wstr)
 	return result;
 }
 
+
 wstring Base::string2wstring(string str)
 {
 	wstring result;
@@ -281,6 +290,7 @@ wstring Base::string2wstring(string str)
 	return result;
 }
 
+
 string Base::LPCTSTR2string(LPCTSTR lpctstr)
 {
 #ifdef UNICODE
@@ -292,6 +302,7 @@ string Base::LPCTSTR2string(LPCTSTR lpctstr)
 	return strName;
 #endif // UNICODE	
 }
+
 
 BOOL Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 {
@@ -369,7 +380,6 @@ BOOL Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 }
 
 
-
 XMLDocument* Base::CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
 {
 	const char* declaration = "<?xml version=\"1.0\" encoding=\"GBK\" standalone=\"yes\"?>";
@@ -392,6 +402,7 @@ XMLDocument* Base::CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeN
 	return doc;
 }
 
+
 XMLDocument* Base::LoadXMLFile(const char* xmlPath)
 {
 	XMLDocument* doc = new XMLDocument;
@@ -403,6 +414,7 @@ XMLDocument* Base::LoadXMLFile(const char* xmlPath)
 	return doc;
 }
 
+
 BOOL Base::SaveXMLFile(XMLDocument* doc, const char* xmlSavePath)
 {
 	if ((doc->SaveFile(xmlSavePath)))
@@ -413,6 +425,7 @@ BOOL Base::SaveXMLFile(XMLDocument* doc, const char* xmlSavePath)
 	//delete doc;
 	return TRUE;
 }
+
 
 BOOL Base::GetXMLDeclaration(XMLDocument* doc, string& strDecl)
 {
@@ -432,44 +445,8 @@ BOOL Base::GetXMLDeclaration(XMLDocument* doc, string& strDecl)
 	return false;
 }
 
-BOOL Base::FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode ,const char* Attribute, const char* AttributeValue)
-{
-	const char* value = pRoot->Value();
-	if (strcmp(pRoot->Value(), nodeName.c_str()) == 0)
-	{
-		if (Attribute != NULL && AttributeValue != NULL)
-		{
-			string source = (pRoot->Attribute(Attribute));
-			string target = AttributeValue;
-			if (source == target)
-			{
-				pNode = pRoot;
-				return true;
-			}
-		}
-		else
-		{
-			pNode = pRoot;
-			return true;
-		}
-	}
 
-	XMLElement* p = pRoot;
-	for (p = p->FirstChildElement(); p != NULL; p = p->NextSiblingElement())
-	{
-		if (FindXMLNode(p, nodeName, pNode, Attribute, AttributeValue))
-		{
-			return TRUE;
-		}
-	}
-
-	return false;
-}
-
-
-
-
-BOOL Base::FindXMLNode1(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, map<const char*, const char*> Attribution)
+BOOL Base::FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, map<const char*, const char*> Attribution)
 {
 
 	const char* value = pRoot->Value();
@@ -503,7 +480,7 @@ BOOL Base::FindXMLNode1(XMLElement* pRoot, const string nodeName, XMLElement*& p
 	XMLElement* p = pRoot;
 	for (p = p->FirstChildElement(); p != NULL; p = p->NextSiblingElement())
 	{
-		if (FindXMLNode1(p, nodeName, pNode, Attribution))
+		if (FindXMLNode(p, nodeName, pNode, Attribution))
 		{
 			return TRUE;
 		}
@@ -512,39 +489,13 @@ BOOL Base::FindXMLNode1(XMLElement* pRoot, const string nodeName, XMLElement*& p
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-BOOL Base::GetXMLNodeText(XMLElement* pRoot,  const char*& text, const string nodeName, const char* Attribute, const char* AttributeValue)
+BOOL Base::GetXMLNodeText(XMLElement* pRoot, const char*& text, const string nodeName, map<const char*, const char*> Attribution)
 {
 	if (!pRoot)
 	{
 		return FALSE;
 	}
+
 	if ("" == nodeName)
 	{
 		text = pRoot->GetText();
@@ -552,7 +503,7 @@ BOOL Base::GetXMLNodeText(XMLElement* pRoot,  const char*& text, const string no
 	}
 
 	XMLElement* pNode = NULL;
-	if (FindXMLNode(pRoot, nodeName, pNode))
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribution))
 	{
 		if (NULL != pNode)
 		{
@@ -567,7 +518,8 @@ BOOL Base::GetXMLNodeText(XMLElement* pRoot,  const char*& text, const string no
 	}
 }
 
-BOOL Base::GetXMLNodeAttribute(XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName, const char* Attribute, const char* AttributeValue)
+
+BOOL Base::GetXMLNodeAttribute(XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName, map<const char*, const char*> Attribution)
 {
 	if (!pRoot)
 	{
@@ -587,7 +539,7 @@ BOOL Base::GetXMLNodeAttribute(XMLElement* pRoot, map<string, string>& mapAttrib
 	}
 
 	XMLElement* pNode = NULL;
-	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribution))
 	{
 		if (NULL != pNode)
 		{
@@ -599,12 +551,13 @@ BOOL Base::GetXMLNodeAttribute(XMLElement* pRoot, map<string, string>& mapAttrib
 				mapAttribute.insert(make_pair(name, value));
 			}
 		}
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
 
-BOOL Base::SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName, const char* Attribute, const char* AttributeValue)
+
+BOOL Base::SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName, map<const char*, const char*> Attribution)
 {
 	if (NULL == pRoot)
 	{
@@ -615,7 +568,7 @@ BOOL Base::SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement*
 	{
 		try
 		{
-			
+
 			XMLNode* pText = pRoot->LastChild();
 			if (NULL != pText)
 			{
@@ -642,7 +595,7 @@ BOOL Base::SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement*
 	}
 
 	XMLElement* pNode = NULL;
-	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribution))
 	{
 		try
 		{
@@ -673,9 +626,9 @@ BOOL Base::SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement*
 	return FALSE;
 }
 
-BOOL Base:: SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName, const char* Attribute, const char* AttributeValue)
-{
 
+BOOL Base::SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName, map<const char*, const char*> Attribution)
+{
 	if (NULL == pRoot)
 	{
 		return FALSE;
@@ -765,7 +718,7 @@ BOOL Base:: SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XML
 	}
 
 	XMLElement* pNode = NULL;
-	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribution))
 	{
 		const XMLAttribute* pAttr = pNode->FirstAttribute();
 
@@ -851,7 +804,7 @@ BOOL Base:: SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XML
 }
 
 
-BOOL Base::SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* newNodeName, map<string, string>newMapAttribute, const char* newText, const string nodeName, const char* Attribute, const char* AttributeValue)
+BOOL Base::SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* newNodeName, map<string, string>newMapAttribute, const char* newText, const string nodeName, map<const char*, const char*> Attribution)
 {
 	if (NULL == pRoot)
 	{
@@ -875,12 +828,12 @@ BOOL Base::SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* 
 			{
 				return TRUE;
 			}
-			return FALSE;
-		}	
+		}
+		return FALSE;
 	}
 
 	XMLElement* pNode = NULL;
-	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribution))
 	{
 		if ("" != newNodeName)
 		{
@@ -898,7 +851,6 @@ BOOL Base::SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* 
 			{
 				return TRUE;
 			}
-			return FALSE;
 		}
 		else
 		{
@@ -908,7 +860,8 @@ BOOL Base::SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* 
 	return FALSE;
 }
 
-BOOL Base::DeleteXMLNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string nodeName, const char* Attribute, const char* AttributeValue)
+
+BOOL Base::DeleteXMLNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* delNodeName, const string nodeName, map<const char*, const char*> Attribution)
 {
 	if (NULL == pRoot)
 	{
@@ -927,7 +880,7 @@ BOOL Base::DeleteXMLNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* 
 		return FALSE;
 	}
 	XMLElement* pNode = NULL;
-	if (FindXMLNode(pRoot, nodeName, pNode, Attribute, AttributeValue))
+	if (FindXMLNode(pRoot, nodeName, pNode, Attribution))
 	{
 
 		//pRoot->DeleteChild(NodeName); //删除指定节点

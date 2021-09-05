@@ -42,5 +42,4 @@ public:
 	void Start();		//运行;
 	void Stop();		//停止;
 	BOOL WaitExit();	//等待线程退出;
-	BOOL WaitAnotherThreadExit(Thread* anotherthread);
 };
