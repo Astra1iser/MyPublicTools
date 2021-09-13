@@ -6,7 +6,8 @@
 #include <MyOperFile.cpp>
 #include <Thread.cpp>
 #include <tinyxml2.cpp>
-#include <Mutex.cpp>
+#include <httpdown.cpp>
+//#include <Mutex.cpp>
 
 
 
@@ -226,6 +227,13 @@ void Base::GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPa
 	WCHAR szValue[MAX_PATH] = { 0 };
 	GetPrivateProfileString(Node, Key, NULL, szValue, len, IniPath);
 	Source = szValue;
+}
+
+
+void Base::SetIniValue(LPCTSTR Node, LPCTSTR Key, LPCTSTR Value, LPCTSTR IniPath)
+{
+	WCHAR szValue[MAX_PATH] = { 0 };
+	WritePrivateProfileString(Node, Key, Value, IniPath);
 }
 
 

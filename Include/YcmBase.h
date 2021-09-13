@@ -20,7 +20,9 @@
 #include <MyOperFile.h>//文件读写和文件信息相关函数
 #include <Thread.h>//简易线程类
 #include <tinyxml2.h>//XML操作一次封装
-#include <Mutex.h>
+#include <JsonHelper.h>//json解析库
+#include <httpdown.h>
+//#include <Mutex.h>
 
 using namespace std;
 using namespace PathManager;
@@ -182,6 +184,7 @@ namespace Base
 	//8.2获取IniPath的ini文件中Node节点下Key的值,传入需要赋值的引用成员 此函数为重载函数,只会识别int和CString类型的引用
 	void GetIniValue(LPCTSTR& Source, LPCTSTR Node, LPCTSTR Key, LPCTSTR IniPath);
 
+	void SetIniValue(LPCTSTR Node, LPCTSTR Key, LPCTSTR Value, LPCTSTR IniPath);
 
 	//10.文本编码 UTF-8到GB2312的转换
 	char* U2G(const char* utf8);
