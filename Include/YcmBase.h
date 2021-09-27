@@ -9,6 +9,8 @@
 #include <regex>
 #include <map>
 
+
+
 #include <windows.h>
 #include <assert.h>
 #include <atlconv.h>
@@ -223,7 +225,7 @@ namespace Base
 	BOOL EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath);
 
 
-
+	//输出CString字符串,最后带个换行
 	void Wcout(CString string);
 
 

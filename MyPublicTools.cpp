@@ -2,11 +2,11 @@
 //
 
 #include "stdafx.h"
-#include <iostream>
 
 MyMutex m_writeLock;
 MyMutex m_writeLock2;
 
+Semaphore sam(0);
 int abcc = 0;
 
 class Example1 : public Thread
@@ -22,11 +22,12 @@ public:
 		
 		while (this->bRun)
 		{
-			
+			//sam.signal();
 			printf("Hello thread1\n");
 			//Sleep(1000);
 			a++;
-			m_writeLock.Lock();
+			
+			//m_writeLock.Lock();
 			//MySystemMutex.CreateInstanceMutex();
 			//int ddd = abcc;
 			//ddd++;
@@ -35,9 +36,13 @@ public:
 			abcc++;
 			cout << abcc << endl;
 			//MySystemMutex.DeleteInstanceMutex();
-			m_writeLock.Unlock();
+			//m_writeLock.Unlock();
 			if (a == 100)
-			break;
+			{
+				
+				break;
+			}
+			
 		}
 	}
 };
@@ -50,20 +55,22 @@ public:
 	{
 		int a = 0;
 
-
+		sam.wait();
 		while (this->bRun)
 		{
 
 			printf("Hello thread2\n");
 			//Sleep(1000);
 			a++;
-			m_writeLock2.Lock();
+			
+			//m_writeLock2.Lock();
 			//m_writeLock.Lock();
 			Sleep(30);
 			abcc++;
 			cout << abcc << endl;
-			m_writeLock2.Unlock();
+			//m_writeLock2.Unlock();
 			//m_writeLock.Unlock();
+			
 			if (a == 100)
 				break;
 		}
@@ -79,8 +86,9 @@ int main()
     //CHttpDownload abc;
     //abc.DownloadToFile(L"https://tools.skylarqa.com/test/yuanchunming/csv数据处理.zip?download=true",L"C:\\Users\\yuanchunming01\\Desktop\\MyPublicTools\\123.html");
 
-	Wcout(GetFileNameFromPath(L"C:\\Users\\yuanchunming01\\Desktop\\MyPublicTools\\新建文件夹\\999.txt.111", true));
-
+	//Wcout(GetFileNameFromPath(L"C:\\Users\\yuanchunming01\\Desktop\\MyPublicTools\\新建文件夹\\999.txt.111", true));
+	CString abc;
+	GetIniValue(abc, L"XshellOptions", L"MouseRightButton", L"C:\\Users\\yuanchunming01\\Desktop\\MyPublicTools\\Xshell.ini");
 
 	//Example1 e1,e3,e4;
 	//Example2 e2;
