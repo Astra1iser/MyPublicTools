@@ -7,8 +7,7 @@
 #include <Thread.cpp>
 #include <tinyxml2.cpp>
 #include <httpdown.cpp>
-//#include <Mutex.cpp>
-
+#include <Mutex.cpp>
 
 
 BOOL Base::IsAdmin() {
@@ -325,7 +324,6 @@ BOOL Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 	std::vector<std::string> str{ strName };
 #endif // UNICODE
 
-
 	// 标准url的正则表达式
 	std::string pattern{ "^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}|[a-zA-Z]{1}))(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+))*$"}; 
 	std::regex re(pattern);
@@ -385,6 +383,13 @@ BOOL Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 		Sleep(100);
 	}
 	return FALSE;
+}
+
+
+void Base::Wcout(CString cstring)
+{
+	wcout.imbue(std::locale("chs"));
+	wcout << cstring.GetBuffer()<<endl;
 }
 
 

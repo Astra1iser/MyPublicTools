@@ -1,5 +1,7 @@
 //Base公共库
 #pragma once
+#pragma warning(disable:4129)//屏蔽不可转义的警告
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -21,8 +23,8 @@
 #include <Thread.h>//简易线程类
 #include <tinyxml2.h>//XML操作一次封装
 #include <JsonHelper.h>//json解析库
+#include <Mutex.h>//系统全局锁 Mutex(可作为线程锁和文件锁)
 #include <httpdown.h>
-//#include <Mutex.h>
 
 using namespace std;
 using namespace PathManager;
@@ -36,7 +38,6 @@ using namespace tinyxml2;
 #define SetText_UTF8(x) SetText(G2U(x))
 #define NewElement_UTF8(x) NewElement(G2U(x))
 #define SetAttribute_UTF8(x) SetAttribute(G2U(x))
-
 
 #ifndef _YCMBASE_H
 #define _YCMBASE_H
@@ -222,6 +223,13 @@ namespace Base
 	BOOL EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath);
 
 
+
+	void Wcout(CString string);
+
+
+
+
+
 	//17.创建一个且只有根节点的xml文件,可自定义根节点名称,返回创建的xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
 	//参数1:要创建的xml的路径
 	//参数2:根节点名称
@@ -379,8 +387,6 @@ namespace Base
 
 	//	return FALSE;
 	//}
-
-
 
 
 	

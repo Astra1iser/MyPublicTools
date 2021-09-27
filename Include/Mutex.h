@@ -1,31 +1,64 @@
-//ä½¿ç”¨æ–¹æ³•ï¼š
-//åŠ é”:
+//Ê¹ÓÃ·½·¨£º
+//¼ÓËø:
 //CMutexSingle::GetInstance().Lock();
-//è§£é”:
+//½âËø:
 //CMutexSingle::GetInstance().UnLock();
 
 #pragma once
-#include "stdafx.h"
 
-class CMutexSingle
+//class CMutexSingle
+//{
+//public:
+//	static CMutexSingle& GetInstance();
+//
+//public:
+//	BOOL Lock(CString MutexName);
+//	void UnLock();
+//
+//	void Init(CString MutexName);
+//	void Uninit();
+//
+//private:
+//	CMutexSingle();
+//	virtual ~CMutexSingle();
+//
+//	//CMutexSingle(const CMutexSingle& );
+//	//CMutexSingle & operator= (const CMutexSingle &);
+//
+//private:
+//	HANDLE m_hLockShareFileMap;//±£»¤¹²ÏíÇøÊı¾İ
+//};
+
+
+
+
+/*
+´´½¨ÏµÍ³»¥³âÌå ÏàÍ¬Ãû³ÆµÄ»¥³âÌå²»¹²´æ, µ±²ÎÊı2ÎªFALSEÊ±, ´´½¨ÏàÍ¬µÄ»¥³âÌåÊ±»á·µ»ØFALSE,
+µ±²ÎÊı2ÎªTRUEÊ±, ´´½¨ÏàÍ¬µÄ»¥³âÌåºó, »áµÈ´ıÉÏÒ»¸ö»¥³âÌåÊÍ·Å(´Ë·½·¨¿É×÷ÎªÏß³ÌÍ¬²½ËøÊ¹ÓÃ, µ«Ğ§ÂÊ½ÏµÍ, Ò»°ã×÷Îª²»Í¬½ø³Ì¼äµÄÎÄ¼ş¶ÁĞ´ËøÊ¹ÓÃ)
+Ê¹ÓÃ·½·¨:
+
+	MutexLock MySystemMutex(L"MutexName",TRUE)//´´½¨ÏµÍ³»¥³âÌå(×¢ÒâÖ»ÓĞÃû³ÆÏàÍ¬µÄËø²ÅÎªÍ¬Ò»¸öËø,·ñÔòÎª²»Í¬µÄËø,²»Í¬µÄËøÖ®¼ä»¥²»¸ÉÈÅ)
+	MySystemMutex.Lock();
+	......¶ÁĞ´ÎÄ¼ş / ²Ù×÷ÎÄ¼ş / Ïß³ÌÍ¬²½......
+	MySystemMutex.Unlock(); //ÊÍ·Å»¥³âÌå
+*/
+class MutexLock
 {
 public:
-	static CMutexSingle& GetInstance();
+	MutexLock(CString MutexName, BOOL NeedWait = FALSE) :MutexName(L"Global//" + MutexName), NeedWait(NeedWait), g_hMutex(NULL), MutexReleased(TRUE)
+	{
 
-public:
-	BOOL Lock(CString MutexName);
-	void UnLock();
+	}
 
-	void Init(CString MutexName);
-	void Uninit();
+	BOOL Lock(BOOL Waitting = FALSE);
+	
+	BOOL Unlock();
 
-private:
-	CMutexSingle();
-	virtual ~CMutexSingle();
-
-	//CMutexSingle(const CMutexSingle& );
-	//CMutexSingle & operator= (const CMutexSingle &);
+	~MutexLock();
 
 private:
-	HANDLE m_hLockShareFileMap;//ä¿æŠ¤å…±äº«åŒºæ•°æ®
+	CString MutexName;
+	BOOL NeedWait;
+	HANDLE g_hMutex;
+	BOOL MutexReleased;
 };
