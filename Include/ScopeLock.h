@@ -65,26 +65,26 @@ public:
 */
 class MyScopeLock
 {
-	public:
-		MyScopeLock(CRITICAL_SECTION *pcs)
-		{
-			m_pcs = pcs;
-			EnterCriticalSection(m_pcs);
-		};
+public:
+	MyScopeLock(CRITICAL_SECTION *pcs)
+	{
+		m_pcs = pcs;
+		EnterCriticalSection(m_pcs);
+	};
 
-		MyScopeLock(MyMutex &mutex)
-		{
-			m_pcs = &mutex.m_section;
-			EnterCriticalSection(m_pcs);
-		};
+	MyScopeLock(MyMutex &mutex)
+	{
+		m_pcs = &mutex.m_section;
+		EnterCriticalSection(m_pcs);
+	};
 
-		~MyScopeLock()
-		{
-			LeaveCriticalSection(m_pcs);
-		};
+	~MyScopeLock()
+	{
+		LeaveCriticalSection(m_pcs);
+	};
 
-	private:
-		CRITICAL_SECTION *m_pcs;
+private:
+	CRITICAL_SECTION *m_pcs;
 };
 
 
@@ -94,7 +94,7 @@ Semaphore sem;
 
 sem.signal() //唤醒
 
-sem.wait(); //上锁等待,此时阻塞,只有其他地方进行signal()时才进行操作,注意等待会计数,等待多少次 就需要
+sem.wait(); //上锁等待,此时阻塞,只有其他地方进行signal()时才进行操作,注意等待会计数,等待多少次 就需要唤醒多少次
 
 */
 

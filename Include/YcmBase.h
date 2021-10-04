@@ -22,7 +22,7 @@
 #include <PathManager.h>//路径相关函数
 #include <RegeditManager.h>//注册表操作相关函数
 #include <MyOperFile.h>//文件读写和文件信息相关函数
-#include <Thread.h>//简易线程类
+#include <Thread.h>//线程类/线程池
 #include <tinyxml2.h>//XML操作一次封装
 #include <JsonHelper.h>//json解析库
 #include <Mutex.h>//系统全局锁 Mutex(可作为线程锁和文件锁)
@@ -293,6 +293,50 @@ namespace Base
 
 	//27.2删除父节点下的指定子节点
 	BOOL DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode);
+
+	// 这是一个返回值后置的例子
+	template<class T, class Y>
+	auto funcExample(T& t, Y& y) -> decltype(t + y)
+	{
+		return t + y;
+	}
+
+
+	//decltype在类内自动推导的例子
+	template<class T>
+	class classExample
+	{
+	private:
+		decltype(T().begin()) m_it; //这里 T()的意思是传入的是一个T类型的对象,而最后decltype也会推导出 m_it是一个迭代器类型
+
+	public:
+		void print(T& t)
+		{
+			for (m_it = t.begin(); m_it != t.end(); m_it++)
+				cout << *m_it << endl;
+		}
+
+	};
+
+	//typedef int(*func) (double, string); //定义一个func的函数指针  函数的返回值是int 参数1类型是double参数2类型是string
+	//using func1 = int(*) (double, string); //使用using定义函数指针 意义和上边那条一样
+
+	//int mytest(double a, string b)
+	//{
+	//	return a;
+	//}
+	//对于上面的例子 我们可以使用 func f = mytest;  f(10.1,"L");来使用函数 
+
+
+
+
+
+
+
+
+
+
+
 
 	//这里本身是要做一个封装xml的互斥量锁  暂时先放着 后边再完善
 
