@@ -308,7 +308,6 @@ namespace Base
 	{
 	private:
 		decltype(T().begin()) m_it; //这里 T()的意思是传入的是一个T类型的对象,而最后decltype也会推导出 m_it是一个迭代器类型
-
 	public:
 		void print(T& t)
 		{

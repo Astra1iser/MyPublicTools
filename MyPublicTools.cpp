@@ -116,13 +116,30 @@
 class abc
 {
 public:
-    void taskFunc(void* arg)
+     virtual void taskFunc(void* arg)
     {
         int num = *(int*)arg;
         cout << "thread: " << "number=" << num << endl;
         Sleep(1000);
     }
 };
+
+
+
+
+class abd :public abc
+{
+public:
+    void taskFunc(void* arg)
+    {
+        int num = *(int*)arg;
+        cout << "thread: " << "number=" << num+1 << endl;
+        Sleep(1000);
+    }
+};
+
+
+
 
 void taskFunc2(void* arg)
 {
@@ -131,23 +148,48 @@ void taskFunc2(void* arg)
     Sleep(1000);
 }
 
+
+int func(int x)
+{
+    int countx = 0;
+    while (x)
+    {
+        countx++;
+        x = x & (x - 1);
+    }
+    return countx;
+
+
+
+        
+}
 int main()
 {
+    /*int* num = new int(100);
+    abc* ddd = new abd();
+    ddd->taskFunc(num);*/
+
+
     //abc* aaa = new abc();
 
-    ThreadPool pool(1, 2);
-    int i;
-    for (i = 0; i < 100; ++i)
-    {
-        int* num = new int(i + 100);
-        pool.AddTask(taskFunc2, (void*)num);
-    }
+    //ThreadPool pool(1, 2);
+    //int i;
+    //for (i = 0; i < 100; ++i)
+    //{
+    //    int* num = new int(i + 100);
+    //    pool.AddTask(taskFunc2, (void*)num);
+    //}
     //for (; i < 200; ++i)
     //{
     //    Sleep(1);
     //    int* num = new int(i + 100);
     //    pool.AddTask(taskFunc2, (void*)num);
     //}
+
+
+    int abc = func(9999);
+
+
 
     getchar();
     return 0;
