@@ -134,7 +134,7 @@ public:
     {
         int num = *(int*)arg;
         cout << "thread: " << "number=" << num+1 << endl;
-        Sleep(1000);
+        Sleep(2000);
     }
 };
 
@@ -144,8 +144,9 @@ public:
 void taskFunc2(void* arg)
 {
     int num = *(int*)arg;
+
+    Sleep(3000);
     cout << "thread: " << "number=" << num << endl;
-    Sleep(1000);
 }
 
 
@@ -169,16 +170,34 @@ int main()
     abc* ddd = new abd();
     ddd->taskFunc(num);*/
 
+    abc* aaa = new abc();
 
-    //abc* aaa = new abc();
+    ThreadPool pool(0,2);
+    int i;
+    for (i = 0; i < 10; ++i)
+    {
+        int* num = new int(i + 100);
+        pool.addTask(taskFunc2, (void*)num);
+        Sleep(1000);
+    }
 
-    //ThreadPool pool(1, 2);
-    //int i;
-    //for (i = 0; i < 100; ++i)
+
+    //int* num = new int(100);
+    //pool.AddTask(taskFunc2, (void*)num);
+
+
+    //while (true)
     //{
-    //    int* num = new int(i + 100);
-    //    pool.AddTask(taskFunc2, (void*)num);
+    //    int i = 0;
+    //    int a = 0;
+    //    cin >> a;
+    //    if (a == 1)
+    //    {
+    //        int* num = new int(i + 100);
+    //        pool.addTask(taskFunc2, (void*)num);
+    //    }
     //}
+
     //for (; i < 200; ++i)
     //{
     //    Sleep(1);
@@ -187,9 +206,7 @@ int main()
     //}
 
 
-    int abc = func(9999);
-
-
+    //int abc = func(9999);
 
     getchar();
     return 0;
