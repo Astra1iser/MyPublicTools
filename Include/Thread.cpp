@@ -391,7 +391,7 @@ ThreadPool::~ThreadPool()
 	isShutdown = true;
 
 	//唤醒阻塞的消费者线程
-	isEmpty.notify_all();
+	inWaitting.notify_all();
 	for (int i = 0; i < maxNum; ++i)
 	{
 		if (threadIDs[i].joinable())
@@ -417,7 +417,7 @@ void ThreadPool::AddTask(Task t)
 	}
 	//添加任务
 	taskQ.push(t);
-	isEmpty.notify_all();
+	inWaitting.notify_all();
 }
 
 void ThreadPool::AddTask(callback f, void* a)
@@ -429,7 +429,7 @@ void ThreadPool::AddTask(callback f, void* a)
 	}
 	//添加任务
 	taskQ.push(Task(f, a));
-	isEmpty.notify_all();
+	inWaitting.notify_all();
 }
 
 int ThreadPool::GetBusyNum()
@@ -463,8 +463,7 @@ void ThreadPool::worker(void* arg)
 		while (pool->threadpool->taskQ.empty() && !pool->threadpool->isShutdown)
 		{
 			//阻塞工作线程
-
-			pool->threadpool->isEmpty.wait(lk);
+			pool->threadpool->inWaitting.wait(lk);
 			if (pool->threadpool->needDestoryNum > 0)
 			{
 				cout << "thread" <<"["<<id<<"]" <<"id: " << this_thread::get_id() << " waitting......" << endl;
@@ -594,7 +593,7 @@ void ThreadPool::manager(void* arg)
 			//for (int i = 0; i < pool->NUMBER; ++i) 
 			for (int i = 0; i < pool->needDestoryNum; ++i)
 			{
-				pool->isEmpty.notify_one();
+				pool->inWaitting.notify_one();
 			} 
 			//pool->isEmpty.notify_all();
 		}

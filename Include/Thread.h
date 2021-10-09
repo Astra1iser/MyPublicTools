@@ -219,12 +219,12 @@ private:
     int minNum;   //最小线程数
     int maxNum;   //最大线程数
     int busyNum;   //忙的线程数(工作中)
-    int liveNum;    //存活的线程数(创建的总线程数)
+    int liveNum;    //存活的线程数(创建了但是未释放的线程)
     int needDestoryNum;    //要销毁的线程数
     int NUMBER;
 
     mutex mutexPool;    //整个线程池的锁
-    condition_variable isEmpty;     //任务队列是否为空(条件变量)
+    condition_variable inWaitting;     //任务队列是否为空(条件变量,使用.wait(lock)方法时获得后边的锁,当条件变量被唤醒时,释放后边的锁)
     bool isShutdown;    //是否销毁线程池，销毁为1，不销毁为0
     static void manager(void* arg);   //管理者线程
     static void worker(void* arg);   //工作线程
