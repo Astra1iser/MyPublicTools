@@ -224,6 +224,11 @@ private:
     int NUMBER;
 
     mutex mutexPool;    //整个线程池的锁
+    /*
+    当前线程调用wait()后将被阻塞并且函数会解锁互斥量，如果使用lock_guard则不能调用unlock函数，
+    所以这里只能使用unique_lock对象，直到另外某个线程调用notify_one或者notify_all唤醒当前线程;
+    一旦当前线程获得通知(notify)，wait()函数也是自动调用lock()，同理不能使用lock_guard对象。
+    */
     condition_variable inWaitting;     //任务队列是否为空(条件变量,使用.wait(lock)方法时获得后边的锁,当条件变量被唤醒时,释放后边的锁)
     bool isShutdown;    //是否销毁线程池，销毁为1，不销毁为0
     static void manager(void* arg);   //管理者线程
