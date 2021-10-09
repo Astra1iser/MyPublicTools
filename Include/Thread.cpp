@@ -438,6 +438,9 @@ void ThreadPool::worker(void* arg)
 	//ThreadPool* pool = static_cast<ThreadPool*>(arg);
 	threadd* pool = static_cast<threadd*>(arg);
 	int id = pool->id;
+	for (int i = 0; i < pool->threadpool->maxNum; i++)
+		if (i == id)
+			pool->threadpool->state[i] = TRUE;
 	while (true)
 	{
 		unique_lock<mutex> lk(pool->threadpool->mutexPool);
@@ -449,24 +452,14 @@ void ThreadPool::worker(void* arg)
 			pool->threadpool->isEmpty.wait(lk);
 			if (pool->threadpool->needDestoryNum > 0)
 			{
-				cout << "threadid: " << this_thread::get_id() << " waitting......" << endl;
+				cout << "thread" <<"["<<id<<"]" <<"id: " << this_thread::get_id() << " waitting......" << endl;
 				pool->threadpool->needDestoryNum--;
 				if (pool->threadpool->liveNum > pool->threadpool->minNum)
 				{
 					pool->threadpool->liveNum--;
 					//cout << "threadid: " << pthread_self() << " exit......" << endl;
 					
-					//for (int i = 0; i < pool->threadpool->maxNum; i++)
-					//{
-					//	if (i == id)
-					//	{
-					//		pool->threadpool->state[i] = FALSE;
-					//		break;
-					//	}	
-					//}
-					lk.unlock();
-					cout << "threadid: " << this_thread::get_id() << " exit......" << endl;
-										for (int i = 0; i < pool->threadpool->maxNum; i++)
+					for (int i = 0; i < pool->threadpool->maxNum; i++)
 					{
 						if (i == id)
 						{
@@ -474,6 +467,8 @@ void ThreadPool::worker(void* arg)
 							break;
 						}	
 					}
+					cout << "thread" << "[" << id << "]" << "id: " << this_thread::get_id() << " exit......" << endl;
+					lk.unlock();
 					return ;
 				}
 			}
@@ -483,7 +478,15 @@ void ThreadPool::worker(void* arg)
 		if (pool->threadpool->isShutdown)
 		{
 			//cout << "threadid: " << pthread_self() << "exit......" << endl;
-			cout << "threadid: " << this_thread::get_id() << "exit......" << endl;
+			for (int i = 0; i < pool->threadpool->maxNum; i++)
+			{
+				if (i == id)
+				{
+					pool->threadpool->state[i] = FALSE;
+					break;
+				}
+			}
+			cout << "thread" << "[" << id << "]" << "id: " << this_thread::get_id() << "exit......" << endl;
 			return ;
 		}
 
@@ -492,21 +495,18 @@ void ThreadPool::worker(void* arg)
 		pool->threadpool->taskQ.pop();	//将列头元素弹出来
 		pool->threadpool->busyNum++;
 
-		for (int i = 0; i < pool->threadpool->maxNum; i++)
-			if (i == id)
-				pool->threadpool->state[i] = TRUE;
 		//解锁
 		lk.unlock();
 
 		//cout << "thread: " << pthread_self() << " start working..." << endl;
-		cout << "thread: " << this_thread::get_id() << " start working..." << endl;
+		cout << "thread: " <<"["<<id<<"]" <<"id:" << this_thread::get_id() << " start working..." << endl;
 		task.function(task.arg);
 		//(*task.function)(task.arg);
 		free(task.arg);
 		task.arg = nullptr;
 
 		//cout << "thread: " << pthread_self() << " end working..." << endl;
-		cout << "thread: " << this_thread::get_id() << " end working..." << endl;
+		cout << "thread: " << "[" << id << "]" << "id:" << this_thread::get_id() << " end working..." << endl;
 		lk.lock();
 		pool->threadpool->busyNum--;
 		lk.unlock();
@@ -548,23 +548,14 @@ void ThreadPool::manager(void* arg)
 			{
 				threadd pooll{ i,pool };
 
+				//thread::id id = pool->threadIDs[i].get_id();
 
-
-				thread::id id = pool->threadIDs[i].get_id();
-
-
-
-				//if (FALSE == pool->state[i])
-				//{
-				//	pool->threadIDs[i].join();
-				//}
-
-				id = pool->threadIDs[i].get_id();
+				//id = pool->threadIDs[i].get_id();
 
 				if (pool->threadIDs[i].get_id() == thread::id())
 				{
 					pool->threadIDs[i] = thread(worker, &pooll);
-					cout << "Create a new thread..." << "id = " << pool->threadIDs[i].get_id() << endl;
+					cout << "Create a new thread"<<"["<<i<<"]" << "id = " << pool->threadIDs[i].get_id() << endl;
 					count++;
 					pool->liveNum++;
 				}
@@ -574,7 +565,7 @@ void ThreadPool::manager(void* arg)
 
 		//销毁线程
 		//忙的线程*2 < 存活的线程数 && 存活的线程数 >  最小的线程数
-		if (busynum /** 2*/ < livenum && livenum > pool->minNum)
+		if (busynum /** 2*/ < livenum && livenum >= pool->minNum)
 		{
 			lk.lock();
 			//pool->needDestoryNum = pool->NUMBER;
