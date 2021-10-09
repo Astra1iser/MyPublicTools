@@ -172,13 +172,13 @@ int main()
 
     abc* aaa = new abc();
 
-    ThreadPool pool(0,2);
+    ThreadPool pool(3);
     int i;
-    for (i = 0; i < 10; ++i)
+    for (i = 0; i < 100; ++i)
     {
         int* num = new int(i + 100);
-        pool.addTask(taskFunc2, (void*)num);
-        Sleep(1000);
+        pool.AddTask(taskFunc2, (void*)num);
+        Sleep(10000);
     }
 
 
@@ -193,8 +193,8 @@ int main()
     //    cin >> a;
     //    if (a == 1)
     //    {
-    //        int* num = new int(i + 100);
-    //        pool.addTask(taskFunc2, (void*)num);
+    //        int* num = new int(i);
+    //        pool.AddTask(taskFunc2, (void*)num);
     //    }
     //}
 

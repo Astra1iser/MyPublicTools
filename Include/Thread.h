@@ -1,8 +1,8 @@
 #pragma once
 #include <ScopeLock.h>
-#include <pthread/include/pthread.h>
+//#include <pthread/include/pthread.h>
 
-//#include <thread>
+#include <thread>
 //#include <mutex>
 #include <queue>
 #include <vector>
@@ -62,86 +62,86 @@ public:
 
 //以下是线程池的相关类
 
-// 定义任务结构体
-using callback = void(*)(void*);
-struct Task
-{
-    Task()
-    {
-        function = nullptr;
-        arg = nullptr;
-    }
-    Task(callback f, void* arg)
-    {
-        function = f;
-        this->arg = arg;
-    }
-    callback function;
-    void* arg;
-};
-
-// 任务队列
-class TaskQueue
-{
-public:
-    TaskQueue();
-    ~TaskQueue();
-
-    // 添加任务
-    void addTask(Task& task);
-    void addTask(callback func, void* arg);
-
-    // 取出一个任务
-    Task takeTask();
-
-    // 获取当前队列中任务个数
-    inline int taskNumber()
-    {
-        return m_queue.size();
-    }
-
-private:
-    pthread_mutex_t m_mutex;    // 互斥锁
-    std::queue<Task> m_queue;   // 任务队列
-};
-
-
-//定义线程池
-class ThreadPool
-{
-public:
-    ThreadPool(int min, int max);
-    ~ThreadPool();
-
-    // 添加任务
-    void addTask(Task task);
-    void addTask(callback f, void* a);
-    // 获取忙线程的个数
-    int getBusyNumber();
-    // 获取活着的线程个数
-    int getAliveNumber();
-
-private:
-    // 工作的线程的任务函数
-    static void* worker(void* arg);
-    // 管理者线程的任务函数
-    static void* manager(void* arg);
-    //线程退出函数
-    void threadExit();
-
-private:
-    pthread_mutex_t m_lock;     //线程池中的锁
-    pthread_cond_t m_notEmpty;  //线程是否为空(条件变量)
-    pthread_t* m_threadIDs;     //工作线程ID
-    pthread_t m_managerID;      //管理者线程ID
-    TaskQueue* m_taskQ;         //线程池中的任务队列
-    int m_minNum;               //最小线程数量
-    int m_maxNum;               //最大线程数量
-    int m_busyNum;              //工作的线程个数
-    int m_aliveNum;             //存活的线程个数
-    int m_exitNum;              //已退出的线程个数
-    bool m_shutdown = false;    //是否销毁线程池
-};
+//// 定义任务结构体
+//using callback = void(*)(void*);
+//struct Task
+//{
+//    Task()
+//    {
+//        function = nullptr;
+//        arg = nullptr;
+//    }
+//    Task(callback f, void* arg)
+//    {
+//        function = f;
+//        this->arg = arg;
+//    }
+//    callback function;
+//    void* arg;
+//};
+//
+//// 任务队列
+//class TaskQueue
+//{
+//public:
+//    TaskQueue();
+//    ~TaskQueue();
+//
+//    // 添加任务
+//    void addTask(Task& task);
+//    void addTask(callback func, void* arg);
+//
+//    // 取出一个任务
+//    Task takeTask();
+//
+//    // 获取当前队列中任务个数
+//    inline int taskNumber()
+//    {
+//        return m_queue.size();
+//    }
+//
+//private:
+//    pthread_mutex_t m_mutex;    // 互斥锁
+//    std::queue<Task> m_queue;   // 任务队列
+//};
+//
+//
+////定义线程池
+//class ThreadPool
+//{
+//public:
+//    ThreadPool(int min, int max);
+//    ~ThreadPool();
+//
+//    // 添加任务
+//    void addTask(Task task);
+//    void addTask(callback f, void* a);
+//    // 获取忙线程的个数
+//    int getBusyNumber();
+//    // 获取活着的线程个数
+//    int getAliveNumber();
+//
+//private:
+//    // 工作的线程的任务函数
+//    static void* worker(void* arg);
+//    // 管理者线程的任务函数
+//    static void* manager(void* arg);
+//    //线程退出函数
+//    void threadExit();
+//
+//private:
+//    pthread_mutex_t m_lock;     //线程池中的锁
+//    pthread_cond_t m_notEmpty;  //线程是否为空(条件变量)
+//    pthread_t* m_threadIDs;     //工作线程ID
+//    pthread_t m_managerID;      //管理者线程ID
+//    TaskQueue* m_taskQ;         //线程池中的任务队列
+//    int m_minNum;               //最小线程数量
+//    int m_maxNum;               //最大线程数量
+//    int m_busyNum;              //工作的线程个数
+//    int m_aliveNum;             //存活的线程个数
+//    int m_exitNum;              //已退出的线程个数
+//    bool m_shutdown = false;    //是否销毁线程池
+//};
 
 
 
@@ -178,53 +178,53 @@ int main()
 
 */
 
-//using callback = void(*)(void*);    //定义void fun(void* pl)函数指针callback
-//
-////定义任务队列的结构体
-//struct Task
-//{
-//public:
-//	callback function;
-//	void* arg;
-//public:
-//	Task(callback f, void* arg)
-//	{
-//		function = f;
-//		this->arg = arg;
-//	}
-//};
-//
-////定义线程池类
-//class ThreadPool
-//{
-//public:
-//    ThreadPool(/*int min,*/ int max);
-//    ~ThreadPool();
-//    void AddTask(callback f, void* arg);
-//    void AddTask(Task task);
-//    int GetBusyNum();
-//    int GetAliveNum();
-//    vector<BOOL> state;
-//    struct threadd
-//    {
-//        int id;
-//        ThreadPool* threadpool;
-//    };
-//
-//private:
-//    queue<Task> taskQ;
-//    thread managerID;   //管理者线程ID
-//    vector<thread> threadIDs;   //存储线程的ID的顺序容器(LTS)
-//    int minNum;   //最小线程数
-//    int maxNum;   //最大线程数
-//    int busyNum;   //忙的线程数(工作中)
-//    int liveNum;    //存活的线程数(创建的总线程数)
-//    int needDestoryNum;    //要销毁的线程数
-//    int NUMBER;
-//
-//    mutex mutexPool;    //整个线程池的锁
-//    condition_variable isEmpty;     //任务队列是否为空(条件变量)
-//    bool isShutdown;    //是否销毁线程池，销毁为1，不销毁为0
-//    static void manager(void* arg);   //管理者线程
-//    static void worker(void* arg);   //工作线程
-//};
+using callback = void(*)(void*);    //定义void fun(void* pl)函数指针callback
+
+//定义任务队列的结构体
+struct Task
+{
+public:
+	callback function;
+	void* arg;
+public:
+	Task(callback f, void* arg)
+	{
+		function = f;
+		this->arg = arg;
+	}
+};
+
+//定义线程池类
+class ThreadPool
+{
+public:
+    ThreadPool(/*int min,*/ int max);
+    ~ThreadPool();
+    void AddTask(callback f, void* arg);
+    void AddTask(Task task);
+    int GetBusyNum();
+    int GetAliveNum();
+    vector<BOOL> state;
+    struct threadd
+    {
+        int id;
+        ThreadPool* threadpool;
+    };
+
+private:
+    queue<Task> taskQ;
+    thread managerID;   //管理者线程ID
+    vector<thread> threadIDs;   //存储线程的ID的顺序容器(LTS)
+    int minNum;   //最小线程数
+    int maxNum;   //最大线程数
+    int busyNum;   //忙的线程数(工作中)
+    int liveNum;    //存活的线程数(创建的总线程数)
+    int needDestoryNum;    //要销毁的线程数
+    int NUMBER;
+
+    mutex mutexPool;    //整个线程池的锁
+    condition_variable isEmpty;     //任务队列是否为空(条件变量)
+    bool isShutdown;    //是否销毁线程池，销毁为1，不销毁为0
+    static void manager(void* arg);   //管理者线程
+    static void worker(void* arg);   //工作线程
+};
