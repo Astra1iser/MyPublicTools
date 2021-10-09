@@ -2,50 +2,52 @@
 //
 
 #include "stdafx.h"
-
 //MyMutex m_writeLock;
 //MyMutex m_writeLock2;
 //
 //Semaphore sam(0);
-//int abcc = 0;
+int abcc = 0;
 //
-//class Example1 : public Thread
-//{
-//public:
-//	//重写Run;
-//	
-//	void Run() override
-//	{
-//		//InstanceMutex MySystemMutex(L"mylock",TRUE);
-//		int a = 0;
-//
-//		
-//		while (this->bRun)
-//		{
-//			//sam.signal();
-//			printf("Hello thread1\n");
-//			//Sleep(1000);
-//			a++;
-//			
-//			//m_writeLock.Lock();
-//			//MySystemMutex.CreateInstanceMutex();
-//			//int ddd = abcc;
-//			//ddd++;
-//			Sleep(30);
-//			//abcc=ddd;
-//			abcc++;
-//			cout << abcc << endl;
-//			//MySystemMutex.DeleteInstanceMutex();
-//			//m_writeLock.Unlock();
-//			if (a == 100)
-//			{
-//				
-//				break;
-//			}
-//			
-//		}
-//	}
-//};
+class Example1 : public Thread
+{
+public:
+	//重写Run;
+	
+	void Run() override
+	{
+		//InstanceMutex MySystemMutex(L"mylock",TRUE);
+		int a = 0;
+
+		
+		while (this->bRun)
+		{
+			//sam.signal();
+			printf("Hello thread1\n");
+			//Sleep(1000);
+			a++;
+			
+			//m_writeLock.Lock();
+			//MySystemMutex.CreateInstanceMutex();
+			//int ddd = abcc;
+			//ddd++;
+			Sleep(30);
+			//abcc=ddd;
+			abcc++;
+			cout << abcc << endl;
+			//MySystemMutex.DeleteInstanceMutex();
+			//m_writeLock.Unlock();
+            cout << this_thread::get_id();
+			if (a == 100)
+			{
+				
+				break;
+			}
+			
+		}
+        return;
+	}
+
+};
 //
 //class Example2 : public Thread
 //{
@@ -145,7 +147,7 @@ void taskFunc2(void* arg)
 {
     int num = *(int*)arg;
 
-    Sleep(4000);
+    //Sleep(4000);
     cout << "thread: " << "number=" << num << endl;
 }
 
@@ -170,9 +172,9 @@ int main()
     abc* ddd = new abd();
     ddd->taskFunc(num);*/
 
-    abc* aaa = new abc();
+    //abc* aaa = new abc();
 
-    ThreadPool pool(3);
+    ThreadPool* pool = new ThreadPool(3);
     //int i;
     //for (i = 0; i < 30; ++i)
     //{
@@ -186,7 +188,7 @@ int main()
     //pool.AddTask(taskFunc2, (void*)num);
 
 
-    while (true)
+    //while ()
     {
         //int i = 0;
         int a = 0;
@@ -197,11 +199,15 @@ int main()
             for (int i = 0; i < 5; i++)
             {
                 int* num = new int(i);
-                pool.AddTask(taskFunc2, (void*)num);
+                pool->AddTask(taskFunc2, (void*)num);
             }
 
         }
     }
+
+    int a;
+    cin >>a ;
+    delete pool;
 
     //for (; i < 200; ++i)
     //{
@@ -212,6 +218,12 @@ int main()
 
 
     //int abc = func(9999);
+
+
+
+    while (true)
+    {
+    }
 
     getchar();
     return 0;

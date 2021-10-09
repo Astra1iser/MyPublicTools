@@ -39,6 +39,7 @@ void Thread::Start()
 		return;
 	bRun = true;
 	hThread = CreateThread(NULL, 0, Thread::WThreadFunctionLinek, (LPVOID)this, 0, &nthreadID);
+
 	if (hThread == NULL)
 	{
 		return;
@@ -50,9 +51,7 @@ void Thread::Stop()
 		return;
 	bRun = false;
 	TerminateThread(hThread, EXIT_FAILURE);
-	WaitForSingleObject(hThread, INFINITE);
-	CloseHandle(hThread);
-	hThread = NULL;
+
 }
 
 BOOL Thread::WaitExit()
@@ -73,6 +72,13 @@ DWORD __stdcall Thread::WThreadFunctionLinek(IN LPVOID Param)
 	return 0;
 }
 
+Thread::~Thread()
+{
+	Stop();
+	WaitForSingleObject(hThread, INFINITE);
+	CloseHandle(hThread);
+	hThread = NULL;
+}
 
 
 //TaskQueue::TaskQueue()
@@ -383,12 +389,6 @@ ThreadPool::ThreadPool(/*int min,*/ int max)
 ThreadPool::~ThreadPool()
 {
 	isShutdown = true;
-	//阻塞回收管理者线程
-	if (managerID.joinable())
-	{
-		managerID.join();
-		cout << "managerthread" << "id: " << managerID.get_id() << " exit......" << endl;
-	}
 
 	//唤醒阻塞的消费者线程
 	isEmpty.notify_all();
@@ -398,6 +398,13 @@ ThreadPool::~ThreadPool()
 		{
 			threadIDs[i].join();
 		}
+	}
+
+	//阻塞回收管理者线程
+	if (managerID.joinable())
+	{
+		cout << "managerthread" << "id: " << managerID.get_id() << " exit......" << endl;
+		managerID.join();
 	}
 }
 

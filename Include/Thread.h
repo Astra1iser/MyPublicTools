@@ -51,6 +51,7 @@ protected:
 	virtual void Run() = 0;			//继承并重写;
 public:
 	Thread();
+    virtual ~Thread();
 	void Start();		//运行;
 	void Stop();		//停止;
 	BOOL WaitExit();	//等待线程退出;
