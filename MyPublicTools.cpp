@@ -145,7 +145,7 @@ void taskFunc2(void* arg)
 {
     int num = *(int*)arg;
 
-    Sleep(3000);
+    Sleep(4000);
     cout << "thread: " << "number=" << num << endl;
 }
 
@@ -173,30 +173,35 @@ int main()
     abc* aaa = new abc();
 
     ThreadPool pool(3);
-    int i;
-    for (i = 0; i < 100; ++i)
-    {
-        int* num = new int(i + 100);
-        pool.AddTask(taskFunc2, (void*)num);
-        Sleep(10000);
-    }
+    //int i;
+    //for (i = 0; i < 30; ++i)
+    //{
+    //    int* num = new int(i + 100);
+    //    pool.AddTask(taskFunc2, (void*)num);
+    //    Sleep(1000);
+    //}
 
 
     //int* num = new int(100);
     //pool.AddTask(taskFunc2, (void*)num);
 
 
-    //while (true)
-    //{
-    //    int i = 0;
-    //    int a = 0;
-    //    cin >> a;
-    //    if (a == 1)
-    //    {
-    //        int* num = new int(i);
-    //        pool.AddTask(taskFunc2, (void*)num);
-    //    }
-    //}
+    while (true)
+    {
+        //int i = 0;
+        int a = 0;
+        cin >> a;
+        if (a == 1)
+        {
+            
+            for (int i = 0; i < 5; i++)
+            {
+                int* num = new int(i);
+                pool.AddTask(taskFunc2, (void*)num);
+            }
+
+        }
+    }
 
     //for (; i < 200; ++i)
     //{

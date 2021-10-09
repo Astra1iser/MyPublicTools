@@ -384,12 +384,20 @@ ThreadPool::~ThreadPool()
 {
 	isShutdown = true;
 	//阻塞回收管理者线程
-	if (managerID.joinable()) managerID.join();
+	if (managerID.joinable())
+	{
+		managerID.join();
+		cout << "managerthread" << "id: " << managerID.get_id() << " exit......" << endl;
+	}
+
 	//唤醒阻塞的消费者线程
 	isEmpty.notify_all();
 	for (int i = 0; i < maxNum; ++i)
 	{
-		if (threadIDs[i].joinable()) threadIDs[i].join();
+		if (threadIDs[i].joinable())
+		{
+			threadIDs[i].join();
+		}
 	}
 }
 
