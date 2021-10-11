@@ -223,29 +223,94 @@ int func(int x)
 //    return 0;
 //}
 
-int main()
+//int main()
+//{
+//	char buff[256];
+//
+//	HANDLE h_Pipe = CreateFIFO(L"mypipe");
+//
+//	ConnectFIFO(h_Pipe);
+//	
+//
+//	while (true)
+//	{
+//
+//		if (ReadFIFO(h_Pipe, buff) == FALSE)
+//			break;
+//		else
+//		{
+//			char d[256] = "i am server ,hello client";
+//			WriteFIFO(h_Pipe, d);
+//			Sleep(1000);
+//		}
+//	}
+//
+//	CloseHandle(h_Pipe);										//关闭管道释放资源
+//
+//	system("pause");
+//}
+
+
+
+
+#include<iostream>
+#include<windows.h>
+#include<tchar.h>
+using namespace std;
+
+HANDLE hShipFileMapping = NULL;
+LPVOID lpShipMem = NULL;
+HANDLE hServerWriteOver = NULL;
+HANDLE hClientReadOver = NULL;
+
+int main(int argc, char const* argv[])
 {
-	char buff[256];
+    while (!hShipFileMapping)
+    {
+        hShipFileMapping = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0,
+            sizeof(int), _T("ShipMem"));
+    }
 
-	HANDLE h_Pipe = CreateFIFO(L"mypipe");
+    lpShipMem = MapViewOfFile(hShipFileMapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 
-	ConnectFIFO(h_Pipe);
-	
+    if (!lpShipMem)
+    {
+        cout << "MapView Of File failed : " << GetLastError() << endl;
 
-	while (true)
-	{
+        return -1;
+    }
+    hServerWriteOver = CreateEvent(NULL, TRUE, FALSE, _T("ServerWriteOver"));
+    hClientReadOver = CreateEvent(NULL, TRUE, FALSE, _T("ClientReadOver"));
+    if (hServerWriteOver == NULL || hClientReadOver == NULL)
+    {
+        cout << "CreateEvent : " << GetLastError() << endl;
+    }
+    int* lp = (int*)lpShipMem;
+    int i;
+    //do
+    //{
+    //    cin >> i;
+    //    WaitForSingleObject(hClientReadOver, INFINITE);
+    //    *lp = i;
+    //    ResetEvent(hClientReadOver);
+    //    SetEvent(hServerWriteOver);
+    //} while (i != 0);
 
-		if (ReadFIFO(h_Pipe, buff) == FALSE)
-			break;
-		else
-		{
-			char d[256] = "i am server ,hello client";
-			WriteFIFO(h_Pipe, d);
-			Sleep(1000);
-		}
-	}
+    do {
+        SetEvent(hClientReadOver);
+        WaitForSingleObject(hServerWriteOver, INFINITE);
+        i = *lp;
+        cout << i << endl;
+        ResetEvent(hServerWriteOver);
+    } while (1);
 
-	CloseHandle(h_Pipe);										//关闭管道释放资源
+    if (hShipFileMapping != NULL)
+        CloseHandle(hShipFileMapping);
+    if (hServerWriteOver != NULL)
+        CloseHandle(hServerWriteOver);
+    if (hClientReadOver != NULL)
+        CloseHandle(hClientReadOver);
 
-	system("pause");
+    return 0;
+
 }
