@@ -147,7 +147,7 @@ void taskFunc2(void* arg)
 {
     int num = *(int*)arg;
 
-    //Sleep(4000);
+    Sleep(4000);
     cout << "thread: " << "number=" << num << endl;
 }
 
@@ -166,65 +166,86 @@ int func(int x)
 
         
 }
+//int main()
+//{
+//    /*int* num = new int(100);
+//    abc* ddd = new abd();
+//    ddd->taskFunc(num);*/
+//
+//    //abc* aaa = new abc();
+//
+//    ThreadPool pool(3);
+//    int i;
+//    for (i = 0; i < 30; ++i)
+//    {
+//        int* num = new int(i + 100);
+//        pool.AddTask(taskFunc2, (void*)num);
+//        Sleep(1000);
+//    }
+//
+//
+//    //int* num = new int(100);
+//    //pool.AddTask(taskFunc2, (void*)num);
+//
+//
+//    //while (true)
+//    //{
+//    //    //int i = 0;
+//    //    int a = 0;
+//    //    cin >> a;
+//    //    if (a == 1)
+//    //    {
+//    //        
+//    //        for (int i = 0; i < 5; i++)
+//    //        {
+//    //            int* num = new int(i);
+//    //            pool->AddTask(taskFunc2, (void*)num);
+//    //        }
+//
+//    //    }
+//    //}
+//
+//
+//    //for (; i < 200; ++i)
+//    //{
+//    //    Sleep(1);
+//    //    int* num = new int(i + 100);
+//    //    pool.AddTask(taskFunc2, (void*)num);
+//    //}
+//
+//
+//    //int abc = func(9999);
+//
+//
+//
+//
+//    getchar();
+//    return 0;
+//}
+
 int main()
 {
-    /*int* num = new int(100);
-    abc* ddd = new abd();
-    ddd->taskFunc(num);*/
+	char buff[256];
 
-    //abc* aaa = new abc();
+	HANDLE h_Pipe = CreateFIFO(L"mypipe");
 
-    ThreadPool* pool = new ThreadPool(3);
-    //int i;
-    //for (i = 0; i < 30; ++i)
-    //{
-    //    int* num = new int(i + 100);
-    //    pool.AddTask(taskFunc2, (void*)num);
-    //    Sleep(1000);
-    //}
+	ConnectFIFO(h_Pipe);
+	
 
+	while (true)
+	{
 
-    //int* num = new int(100);
-    //pool.AddTask(taskFunc2, (void*)num);
+		if (ReadFIFO(h_Pipe, buff) == FALSE)
+			break;
+		else
+		{
+			char d[256] = "i am server ,hello client";
+			WriteFIFO(h_Pipe, d);
+			Sleep(1000);
+		}
+	}
 
+	CloseHandle(h_Pipe);										//关闭管道释放资源
 
-    //while ()
-    {
-        //int i = 0;
-        int a = 0;
-        cin >> a;
-        if (a == 1)
-        {
-            
-            for (int i = 0; i < 5; i++)
-            {
-                int* num = new int(i);
-                pool->AddTask(taskFunc2, (void*)num);
-            }
-
-        }
-    }
-
-    int a;
-    cin >>a ;
-    delete pool;
-
-    //for (; i < 200; ++i)
-    //{
-    //    Sleep(1);
-    //    int* num = new int(i + 100);
-    //    pool.AddTask(taskFunc2, (void*)num);
-    //}
-
-
-    //int abc = func(9999);
-
-
-
-    while (true)
-    {
-    }
-
-    getchar();
-    return 0;
+	system("pause");
 }
