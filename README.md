@@ -7,4 +7,4 @@
 
   (1)在预编译文件stdafx.h中 #include <YcmBase.h>,并打开Base空间 using namespace Base;
   
-  (2)在预编译文件stdafx.cpp中 #include <YCcmBase.cpp>
+  (2)在预编译文件stdafx.cpp中 #include <YcmBase.cpp>
