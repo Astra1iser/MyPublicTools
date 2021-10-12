@@ -383,9 +383,141 @@ namespace Base
 
 
 
-	class SharedMemory;
+
+	/*
+	如何使用共享内存
+	如果是两个进程 请创建相同的类 其中 建立链接端初始化CreateSHareMemory()函数,连接端初始化OpenSharedMemory()
+	初始化后的lpShipMemCreator和lpShipMemVisitor指针 就是
+	*/
 
 
+
+
+
+
+	class SharedMemory
+	{
+	private:
+		HANDLE hShipFileMappingCreator;
+		HANDLE hShipFileMappingVisitor;
+		//LPVOID lpShipMemCreator;
+		//LPVOID lpShipMemVisitor;
+		//HANDLE hServerWriteOver;
+		//HANDLE hClientReadOver;
+		CString SharedMemoryName;
+
+	public:
+		LPVOID lpShipMemCreator;
+		LPVOID lpShipMemVisitor;
+		HANDLE hServerWriteOver;
+		HANDLE hClientReadOver;
+
+		SharedMemory(CString SharedMemoryName)
+		{
+			hShipFileMappingCreator = NULL;
+			hShipFileMappingVisitor = NULL;
+			lpShipMemCreator = NULL;
+			lpShipMemVisitor = NULL;
+			hServerWriteOver = NULL;
+			hClientReadOver = NULL;
+			this->SharedMemoryName = SharedMemoryName;
+		}
+
+		BOOL CreateSharedMemory(unsigned long DataSize, CString ServerWriteOverName, CString ClientReadOverName)
+		{
+			while (!hShipFileMappingCreator)
+			{
+				hShipFileMappingCreator = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, DataSize, SharedMemoryName);
+			}
+
+			lpShipMemCreator = MapViewOfFile(hShipFileMappingCreator, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+
+			if (!lpShipMemCreator)
+			{
+				cout << "MapView Of File failed : " << GetLastError() << endl;
+				return FALSE;
+			}
+			hServerWriteOver = CreateEvent(NULL, TRUE, FALSE, ServerWriteOverName);
+			hClientReadOver = CreateEvent(NULL, TRUE, FALSE, ClientReadOverName);
+			if (hServerWriteOver == NULL || hClientReadOver == NULL)
+			{
+				cout << "CreateEvent : " << GetLastError() << endl;
+				return FALSE;
+			}
+			return TRUE;
+		}
+
+		BOOL OpenSharedMemory(CString ServerWriteOverName, CString ClientReadOverName)
+		{
+			while (!hShipFileMappingVisitor)
+			{
+				hShipFileMappingVisitor = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, SharedMemoryName);
+			}
+			if (!hShipFileMappingVisitor)
+			{
+				cout << "open HLAObject FileMapping failed : " << GetLastError() << endl;
+				return FALSE;
+			}
+				
+
+			lpShipMemVisitor = MapViewOfFile(hShipFileMappingVisitor, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+
+			if (!lpShipMemVisitor)
+			{
+				cout << "MapViewOfFile failed :  " << GetLastError() << endl;
+				return FALSE;
+			}
+				
+
+			hServerWriteOver = CreateEvent(NULL, TRUE, FALSE, _T("ServerWriteOver"));
+			hClientReadOver = CreateEvent(NULL, TRUE, FALSE, _T("ClientReadOver"));
+			if (NULL == hServerWriteOver || NULL == hClientReadOver)
+			{
+				cout << "CreateEvent" << GetLastError() << endl;
+				return FALSE;
+			}
+			return TRUE;
+		}
+
+		template<class T>
+		void SetSharedMemory(_In_ const T& Data)
+		{
+			WaitForSingleObject(hClientReadOver, INFINITE);
+			T* lp =(T*)lpShipMemCreator;
+			//*lp = Data;
+			memcpy(lp, &Data, sizeof(Data));
+			ResetEvent(hClientReadOver);
+			SetEvent(hServerWriteOver);
+		}
+
+		template<class T>
+		void GetSharedMemory(_Out_ T& Data)
+		{
+			SetEvent(hClientReadOver);
+			WaitForSingleObject(hServerWriteOver, INFINITE);
+			T* lp = (T*)lpShipMemCreator;
+			Data = *lp;
+			ResetEvent(hServerWriteOver);
+
+		}
+
+
+		~SharedMemory()
+		{
+			if (hShipFileMappingCreator != NULL)
+				CloseHandle(hShipFileMappingCreator);
+			if (hShipFileMappingVisitor != NULL)
+				CloseHandle(hShipFileMappingVisitor);
+			if (hServerWriteOver != NULL)
+				CloseHandle(hServerWriteOver);
+			if (hClientReadOver != NULL)
+				CloseHandle(hClientReadOver);
+			if (lpShipMemCreator != NULL)
+				delete lpShipMemCreator;
+			if (lpShipMemVisitor != NULL)
+				delete lpShipMemVisitor;
+		}
+	};
 
 
 

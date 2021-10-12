@@ -258,58 +258,40 @@ int func(int x)
 #include<tchar.h>
 using namespace std;
 
-HANDLE hShipFileMapping = NULL;
-LPVOID lpShipMem = NULL;
-HANDLE hServerWriteOver = NULL;
-HANDLE hClientReadOver = NULL;
+
 
 int main(int argc, char const* argv[])
 {
-    while (!hShipFileMapping)
-    {
-        hShipFileMapping = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0,
-            sizeof(int), _T("ShipMem"));
-    }
+    SharedMemory* abc = new SharedMemory(L"ShipMem");
+    abc->CreateSharedMemory(sizeof(string),L"ServerWriteOver", L"ClientReadOver");
 
-    lpShipMem = MapViewOfFile(hShipFileMapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-
-    if (!lpShipMem)
-    {
-        cout << "MapView Of File failed : " << GetLastError() << endl;
-
-        return -1;
-    }
-    hServerWriteOver = CreateEvent(NULL, TRUE, FALSE, _T("ServerWriteOver"));
-    hClientReadOver = CreateEvent(NULL, TRUE, FALSE, _T("ClientReadOver"));
-    if (hServerWriteOver == NULL || hClientReadOver == NULL)
-    {
-        cout << "CreateEvent : " << GetLastError() << endl;
-    }
-    int* lp = (int*)lpShipMem;
-    int i;
+ 
+    string i;
     //do
     //{
-    //    cin >> i;
-    //    WaitForSingleObject(hClientReadOver, INFINITE);
-    //    *lp = i;
-    //    ResetEvent(hClientReadOver);
-    //    SetEvent(hServerWriteOver);
+        cin >> i;
+
+        SetEvent(abc->hClientReadOver);
+        abc->SetSharedMemory(i);
+       
     //} while (i != 0);
 
-    do {
-        SetEvent(hClientReadOver);
-        WaitForSingleObject(hServerWriteOver, INFINITE);
-        i = *lp;
-        cout << i << endl;
-        ResetEvent(hServerWriteOver);
-    } while (1);
+        string o;
+        abc->OpenSharedMemory(L"ServerWriteOver", L"ClientReadOver");
+        abc->GetSharedMemory(o);
+        cout << o<<endl;
 
-    if (hShipFileMapping != NULL)
-        CloseHandle(hShipFileMapping);
-    if (hServerWriteOver != NULL)
-        CloseHandle(hServerWriteOver);
-    if (hClientReadOver != NULL)
-        CloseHandle(hClientReadOver);
+    
+
+
+    //do {
+    //    SetEvent(hClientReadOver);
+    //    WaitForSingleObject(hServerWriteOver, INFINITE);
+    //    i = *lp;
+    //    cout << i << endl;
+    //    ResetEvent(hServerWriteOver);
+    //} while (1);
+
 
     return 0;
 
