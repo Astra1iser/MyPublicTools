@@ -45,6 +45,8 @@ private:
 	//HANDLE hServerWriteOver;
 	//HANDLE hClientReadOver;
 	CString SharedMemoryName;
+	//CString ServerWriteOverName;
+	//CString ClientReadOverName;
 
 public:
 	LPVOID lpShipMemCreator;

@@ -58,8 +58,8 @@ BOOL SharedMemory::OpenSharedMemory(CString ServerWriteOverName, CString ClientR
 	}
 
 
-	hServerWriteOver = CreateEvent(NULL, TRUE, FALSE, _T("ServerWriteOver"));
-	hClientReadOver = CreateEvent(NULL, TRUE, FALSE, _T("ClientReadOver"));
+	hServerWriteOver = CreateEvent(NULL, TRUE, FALSE, ServerWriteOverName);
+	hClientReadOver = CreateEvent(NULL, TRUE, FALSE, ClientReadOverName);
 	if (NULL == hServerWriteOver || NULL == hClientReadOver)
 	{
 		cout << "CreateEvent" << GetLastError() << endl;

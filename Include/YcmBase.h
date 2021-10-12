@@ -11,13 +11,13 @@
 #include <csignal>
 
 
-
 #include <windows.h>
 #include <assert.h>
 #include <atlconv.h>
 #include <atlstr.h>
 #include <wininet.h>
 #include <atlfile.h>
+
 
 #include <ScopeLock.h>//互斥锁（临界区）封装类
 #include <PathManager.h>//路径相关函数
@@ -28,7 +28,7 @@
 #include <JsonHelper.h>//json解析库
 #include <Mutex.h>//系统全局锁 Mutex(可作为线程锁和文件锁)
 #include <FIFO.h> //管道的实现
-#include <SharedMemory.h>
+#include <SharedMemory.h>//共享内存类的实现
 #include <httpdown.h>
 
 using namespace std;
