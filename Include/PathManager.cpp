@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "PathManager.h"
+#include <PathManager.h>
 
 CString PathManager::MyExeFullPath()
 {

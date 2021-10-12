@@ -27,12 +27,15 @@
 #include <tinyxml2.h>//XML操作一次封装
 #include <JsonHelper.h>//json解析库
 #include <Mutex.h>//系统全局锁 Mutex(可作为线程锁和文件锁)
+#include <FIFO.h> //管道的实现
+#include <SharedMemory.h>
 #include <httpdown.h>
 
 using namespace std;
 using namespace PathManager;
 using namespace RegeditManager;
 using namespace tinyxml2;
+using namespace FIFO;
 
 //这个宏是为了规避windows自带的XMLDocument类重定义
 #define XMLDocument tinyxml2::XMLDocument
@@ -328,197 +331,12 @@ namespace Base
 	//对于上面的例子 我们可以使用 func f = mytest;  f(10.1,"L");来使用函数 
 
 
-	/*
-	HANDLE h_Pipe = CreateFIFO(L"mypipe");
-	ConnectNamedPipe(h_Pipe, NULL);
-
-
-	如何使用命名管道:
-	1.HANDLE h_Pipe = CreateFIFO(L"mypipe");  //首先一个客户端端创建命名管道
-	2.WaitFIFO(L"mypipe"); //另一个客户端等待管道信号,这个函数如果执行时没有检测到对应的命名管道,则会直接返回,如果检测到了对应的命名管道,
-	则等待发送者使用ConnectFIFO()建立链接并创建管道文件
-	3.等待1和2完成时,则两端之间可使用ReadFIFO()和WriteFIFO进行通信
-	4.通信完成时请使用CloseFIFO()关闭管道
-	*/
-	HANDLE CreateFIFO(CString PipeName);
-
-	HANDLE WaitFIFO(CString PipeName);
-
-	BOOL ConnectFIFO(HANDLE h_Pipe);
-
-	BOOL CloseFIFO(HANDLE h_Pipe);
-
-	template<class T>
-	DWORD ReadFIFO(HANDLE h_Pipe,T& buffer)
-	{
-		DWORD len = 0;
-		if (ReadFile(h_Pipe, buffer, sizeof(buffer), &len, NULL) == FALSE)	//接收内容
-		{
-			std::cout << "Failed to read data!" << std::endl;
-			return FALSE;
-		}
-		else
-		{
-			std::cout << "Read data Success!" << std::endl;
-			return len;
-		}
-	}
-
-	template<class T>
-	DWORD WriteFIFO(HANDLE h_Pipe, const T& buffer)
-	{
-		DWORD len = 0;
-		if(WriteFile(h_Pipe, buffer, sizeof(buffer), &len, NULL) == FALSE)	//发送内容
-		{
-			std::cout << "Failed to write data!" << std::endl;
-			return FALSE;
-		}
-		else
-		{
-			std::cout << "Write data Success!" << std::endl;
-			return len;
-		}
-
-	}
+	
 
 
 
 
-	/*
-	如何使用共享内存
-	如果是两个进程 请创建相同的类 其中 建立链接端初始化CreateSHareMemory()函数,连接端初始化OpenSharedMemory()
-	初始化后的lpShipMemCreator和lpShipMemVisitor指针 就是
-	*/
-
-
-
-
-
-
-	class SharedMemory
-	{
-	private:
-		HANDLE hShipFileMappingCreator;
-		HANDLE hShipFileMappingVisitor;
-		//LPVOID lpShipMemCreator;
-		//LPVOID lpShipMemVisitor;
-		//HANDLE hServerWriteOver;
-		//HANDLE hClientReadOver;
-		CString SharedMemoryName;
-
-	public:
-		LPVOID lpShipMemCreator;
-		LPVOID lpShipMemVisitor;
-		HANDLE hServerWriteOver;
-		HANDLE hClientReadOver;
-
-		SharedMemory(CString SharedMemoryName)
-		{
-			hShipFileMappingCreator = NULL;
-			hShipFileMappingVisitor = NULL;
-			lpShipMemCreator = NULL;
-			lpShipMemVisitor = NULL;
-			hServerWriteOver = NULL;
-			hClientReadOver = NULL;
-			this->SharedMemoryName = SharedMemoryName;
-		}
-
-		BOOL CreateSharedMemory(unsigned long DataSize, CString ServerWriteOverName, CString ClientReadOverName)
-		{
-			while (!hShipFileMappingCreator)
-			{
-				hShipFileMappingCreator = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, DataSize, SharedMemoryName);
-			}
-
-			lpShipMemCreator = MapViewOfFile(hShipFileMappingCreator, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-
-			if (!lpShipMemCreator)
-			{
-				cout << "MapView Of File failed : " << GetLastError() << endl;
-				return FALSE;
-			}
-			hServerWriteOver = CreateEvent(NULL, TRUE, FALSE, ServerWriteOverName);
-			hClientReadOver = CreateEvent(NULL, TRUE, FALSE, ClientReadOverName);
-			if (hServerWriteOver == NULL || hClientReadOver == NULL)
-			{
-				cout << "CreateEvent : " << GetLastError() << endl;
-				return FALSE;
-			}
-			return TRUE;
-		}
-
-		BOOL OpenSharedMemory(CString ServerWriteOverName, CString ClientReadOverName)
-		{
-			while (!hShipFileMappingVisitor)
-			{
-				hShipFileMappingVisitor = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, SharedMemoryName);
-			}
-			if (!hShipFileMappingVisitor)
-			{
-				cout << "open HLAObject FileMapping failed : " << GetLastError() << endl;
-				return FALSE;
-			}
-				
-
-			lpShipMemVisitor = MapViewOfFile(hShipFileMappingVisitor, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-
-			if (!lpShipMemVisitor)
-			{
-				cout << "MapViewOfFile failed :  " << GetLastError() << endl;
-				return FALSE;
-			}
-				
-
-			hServerWriteOver = CreateEvent(NULL, TRUE, FALSE, _T("ServerWriteOver"));
-			hClientReadOver = CreateEvent(NULL, TRUE, FALSE, _T("ClientReadOver"));
-			if (NULL == hServerWriteOver || NULL == hClientReadOver)
-			{
-				cout << "CreateEvent" << GetLastError() << endl;
-				return FALSE;
-			}
-			return TRUE;
-		}
-
-		template<class T>
-		void SetSharedMemory(_In_ const T& Data)
-		{
-			WaitForSingleObject(hClientReadOver, INFINITE);
-			T* lp =(T*)lpShipMemCreator;
-			//*lp = Data;
-			memcpy(lp, &Data, sizeof(Data));
-			ResetEvent(hClientReadOver);
-			SetEvent(hServerWriteOver);
-		}
-
-		template<class T>
-		void GetSharedMemory(_Out_ T& Data)
-		{
-			SetEvent(hClientReadOver);
-			WaitForSingleObject(hServerWriteOver, INFINITE);
-			T* lp = (T*)lpShipMemCreator;
-			Data = *lp;
-			ResetEvent(hServerWriteOver);
-
-		}
-
-
-		~SharedMemory()
-		{
-			if (hShipFileMappingCreator != NULL)
-				CloseHandle(hShipFileMappingCreator);
-			if (hShipFileMappingVisitor != NULL)
-				CloseHandle(hShipFileMappingVisitor);
-			if (hServerWriteOver != NULL)
-				CloseHandle(hServerWriteOver);
-			if (hClientReadOver != NULL)
-				CloseHandle(hClientReadOver);
-			if (lpShipMemCreator != NULL)
-				delete lpShipMemCreator;
-			if (lpShipMemVisitor != NULL)
-				delete lpShipMemVisitor;
-		}
-	};
-
+	
 
 
 

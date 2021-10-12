@@ -264,8 +264,6 @@ int main(int argc, char const* argv[])
 {
     SharedMemory* abc = new SharedMemory(L"ShipMem");
     abc->CreateSharedMemory(sizeof(string),L"ServerWriteOver", L"ClientReadOver");
-
- 
     string i;
     //do
     //{
@@ -274,7 +272,7 @@ int main(int argc, char const* argv[])
         SetEvent(abc->hClientReadOver);
         abc->SetSharedMemory(i);
        
-    //} while (i != 0);
+    //} while (true);
 
         string o;
         abc->OpenSharedMemory(L"ServerWriteOver", L"ClientReadOver");
