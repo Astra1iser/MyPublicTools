@@ -203,7 +203,7 @@ BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL Is
 	ShExecInfo.hInstApp = NULL;
 	if (ShellExecuteEx(&ShExecInfo))
 	{
-		//线程挂起,直到唤起的进程有相应 如:关闭
+		//线程挂起,直到唤起的进程有响应 如:关闭
 		if (IsWaitForSingle == TRUE)
 			WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
 		return TRUE;

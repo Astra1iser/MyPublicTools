@@ -262,22 +262,22 @@ using namespace std;
 
 int main(int argc, char const* argv[])
 {
-    SharedMemory* abc = new SharedMemory(L"ShipMem");
-    abc->CreateSharedMemory(sizeof(string),L"ServerWriteOver", L"ClientReadOver");
-    string i;
-    //do
-    //{
-        cin >> i;
+    //SharedMemory* abc = new SharedMemory(L"ShipMem");
+    //abc->CreateSharedMemory(sizeof(string),L"ServerWriteOver", L"ClientReadOver");
+    //string i;
+    ////do
+    ////{
+    //    cin >> i;
 
-        SetEvent(abc->hClientReadOver);
-        abc->SetSharedMemory(i);
-       
-    //} while (true);
+    //    SetEvent(abc->hClientReadOver);
+    //    abc->SetSharedMemory(i);
+    //   
+    ////} while (true);
 
-        string o;
-        abc->OpenSharedMemory(L"ServerWriteOver", L"ClientReadOver");
-        abc->GetSharedMemory(o);
-        cout << o<<endl;
+    //    string o;
+    //    abc->OpenSharedMemory(L"ServerWriteOver", L"ClientReadOver");
+    //    abc->GetSharedMemory(o);
+    //    cout << o<<endl;
 
     
 
@@ -289,6 +289,9 @@ int main(int argc, char const* argv[])
     //    cout << i << endl;
     //    ResetEvent(hServerWriteOver);
     //} while (1);
+
+
+    StartPrograme(L"C:\\Users\\yuanchunming01\\Desktop\\Procmon64.exe");
 
 
     return 0;

@@ -215,7 +215,7 @@ public:
 private:
     queue<Task> taskQ;
     thread managerID;   //管理者线程ID
-    vector<thread> threadIDs;   //存储线程的ID的顺序容器(LTS)
+    vector<thread> threadIDs;   //存储工作线程的ID的顺序容器(LTS)
     int minNum;   //最小线程数
     int maxNum;   //最大线程数
     int busyNum;   //忙的线程数(工作中)
@@ -232,5 +232,5 @@ private:
     condition_variable inWaitting;     //任务队列是否为空(条件变量,使用.wait(lock)方法时获得后边的锁,当条件变量被唤醒时,释放后边的锁)
     bool isShutdown;    //是否销毁线程池，销毁为1，不销毁为0
     static void manager(void* arg);   //管理者线程
-    static void worker(void* arg);   //工作线程
+    static void worker(void* arg);   //工作线程函数,把本类对象的指针传进去
 };
