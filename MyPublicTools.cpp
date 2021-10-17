@@ -223,45 +223,45 @@ int func(int x)
 //    return 0;
 //}
 
-//int main()
-//{
-//	char buff[256];
-//
-//	HANDLE h_Pipe = CreateFIFO(L"mypipe");
-//
-//	ConnectFIFO(h_Pipe);
-//	
-//
-//	while (true)
-//	{
-//
-//		if (ReadFIFO(h_Pipe, buff) == FALSE)
-//			break;
-//		else
-//		{
-//			char d[256] = "i am server ,hello client";
-//			WriteFIFO(h_Pipe, d);
-//			Sleep(1000);
-//		}
-//	}
-//
-//	CloseHandle(h_Pipe);										//关闭管道释放资源
-//
-//	system("pause");
-//}
-
-
-
-
-#include<iostream>
-#include<windows.h>
-#include<tchar.h>
-using namespace std;
-
-
-
-int main(int argc, char const* argv[])
+int main()
 {
+	char buff[256];
+
+	HANDLE h_Pipe = CreateFIFO(L"mypipe");
+
+	ConnectFIFO(h_Pipe);
+	
+
+	while (true)
+	{
+
+		if (ReadFIFO(h_Pipe, buff) == FALSE)
+			break;
+		else
+		{
+			char d[256] = "i am server ,hello client";
+			WriteFIFO(h_Pipe, d);
+			Sleep(1000);
+		}
+	}
+
+	CloseHandle(h_Pipe);										//关闭管道释放资源
+
+	system("pause");
+}
+
+
+
+
+//#include<iostream>
+//#include<windows.h>
+//#include<tchar.h>
+//using namespace std;
+
+
+
+//int main(int argc, char const* argv[])
+//{
     //SharedMemory* abc = new SharedMemory(L"ShipMem");
     //abc->CreateSharedMemory(sizeof(string),L"ServerWriteOver", L"ClientReadOver");
     //string i;
@@ -291,9 +291,9 @@ int main(int argc, char const* argv[])
     //} while (1);
 
 
-    StartPrograme(L"C:\\Users\\yuanchunming01\\Desktop\\Procmon64.exe");
+    //StartPrograme(L"C:\\Users\\yuanchunming01\\Desktop\\Procmon64.exe");
 
 
-    return 0;
+    //return 0;
 
-}
+//}

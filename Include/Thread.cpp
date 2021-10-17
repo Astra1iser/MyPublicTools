@@ -370,14 +370,17 @@ ThreadPool::ThreadPool(/*int min,*/ int max)
 		NUMBER = 2;
 
 		isShutdown = false;
-		managerID = thread(manager, this);
 
 		threadIDs.resize(max);
 		state.resize(max);
 		for (int i = 0; i < max; i++)
 		{
-			state[i] = TRUE;
+			//state[i] = TRUE;
+			state[i] = FALSE;
 		}
+
+		managerID = thread(manager, this);
+
 		//for (int i = 0; i < min; ++i)
 		//{
 		//	threadIDs[i] = thread(worker, this);
@@ -534,7 +537,7 @@ void ThreadPool::manager(void* arg)
 	while (!pool->isShutdown)
 	{
 		//每隔3秒检测一次
-		Sleep(3);
+		Sleep(3000);
 
 		//取出线程池中任务的数量和当前线程的数量
 		unique_lock<mutex> lk(pool->mutexPool);
@@ -555,7 +558,10 @@ void ThreadPool::manager(void* arg)
 			for (int i = 0; i < pool->maxNum; i++)
 				if (FALSE == pool->state[i])
 				{
-					pool->threadIDs[i].join();
+					if (pool->threadIDs[i].joinable())
+					{
+						pool->threadIDs[i].join();
+					}
 				}
 			
 			for (int i = 0; i < pool->maxNum && /*count < pool->NUMBER &&*/ pool->liveNum < pool->maxNum; i++)
