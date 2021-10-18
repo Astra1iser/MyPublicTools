@@ -920,4 +920,30 @@ BOOL Base::DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode)
 
 
 
+CString Base::GetFileVersion(LPCSTR filename)
+{
+	#pragma warning(disable:4996)
+	string asVer = "";
+	VS_FIXEDFILEINFO* pVsInfo;
+	unsigned int iFileInfoSize = sizeof(VS_FIXEDFILEINFO);
+	int iVerInfoSize = GetFileVersionInfoSizeA(filename, NULL);
+	if (iVerInfoSize != 0)
+	{
+		char* pBuf = NULL;
 
+		while (!pBuf)
+		{
+			pBuf = new char[iVerInfoSize];
+		}
+		if (GetFileVersionInfoA(filename, 0, iVerInfoSize, pBuf))
+		{
+			if (VerQueryValueA(pBuf, "\\", (void**)&pVsInfo, &iFileInfoSize))
+			{
+				sprintf(pBuf, "%d.%d.%d.%d", HIWORD(pVsInfo->dwFileVersionMS), LOWORD(pVsInfo->dwFileVersionMS), HIWORD(pVsInfo->dwFileVersionLS), LOWORD(pVsInfo->dwFileVersionLS));
+				asVer = pBuf;
+			}
+		}
+		delete pBuf;
+	}
+	return CString(asVer.c_str());
+}

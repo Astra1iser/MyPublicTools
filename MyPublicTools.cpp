@@ -223,32 +223,32 @@ int func(int x)
 //    return 0;
 //}
 
-int main()
-{
-	char buff[256];
-
-	HANDLE h_Pipe = CreateFIFO(L"mypipe");
-
-	ConnectFIFO(h_Pipe);
-	
-
-	while (true)
-	{
-
-		if (ReadFIFO(h_Pipe, buff) == FALSE)
-			break;
-		else
-		{
-			char d[256] = "i am server ,hello client";
-			WriteFIFO(h_Pipe, d);
-			Sleep(1000);
-		}
-	}
-
-	CloseHandle(h_Pipe);										//关闭管道释放资源
-
-	system("pause");
-}
+//int main()
+//{
+//	char buff[256];
+//
+//	HANDLE h_Pipe = CreateFIFO(L"mypipe");
+//
+//	ConnectFIFO(h_Pipe);
+//	
+//
+//	while (true)
+//	{
+//
+//		if (ReadFIFO(h_Pipe, buff) == FALSE)
+//			break;
+//		else
+//		{
+//			char d[256] = "i am server ,hello client";
+//			WriteFIFO(h_Pipe, d);
+//			Sleep(1000);
+//		}
+//	}
+//
+//	CloseHandle(h_Pipe);										//关闭管道释放资源
+//
+//	system("pause");
+//}
 
 
 
@@ -297,3 +297,54 @@ int main()
     //return 0;
 
 //}
+
+
+
+#include "stdafx.h"
+#include <Windows.h>
+#include <tchar.h>
+#include <string>
+#include <iostream>
+
+#pragma comment(lib,"version.lib")
+using namespace std;
+
+//CString GetFileVersion(LPCSTR filename)
+//{
+//    string asVer = "";
+//    VS_FIXEDFILEINFO* pVsInfo;
+//    unsigned int iFileInfoSize = sizeof(VS_FIXEDFILEINFO);
+//    int iVerInfoSize = GetFileVersionInfoSizeA(filename, NULL);
+//    if (iVerInfoSize != 0)
+//    {
+//        char* pBuf = NULL;
+//
+//        while (!pBuf)
+//        {
+//            pBuf = new char[iVerInfoSize];
+//        }
+//        if (GetFileVersionInfoA(filename, 0, iVerInfoSize, pBuf))
+//        {
+//            if (VerQueryValueA(pBuf, "\\", (void**)&pVsInfo, &iFileInfoSize))
+//            {
+//                //sprintf(pBuf, "%d.%d.%d.%d", HIWORD(pVsInfo->dwFileVersionMS), LOWORD(pVsInfo->dwFileVersionMS), HIWORD(pVsInfo->dwFileVersionLS), LOWORD(pVsInfo->dwFileVersionLS));
+//                asVer = pBuf;
+//            }
+//        }
+//        delete pBuf;
+//    }
+//    return CString(asVer.c_str());
+//}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    string strFilePath = "C:\\Users\\yuanchunming01\\Desktop\\Procmon.exe";
+    CString version = GetFileVersion(strFilePath.c_str());
+
+    Wcout(version);
+
+
+    getchar();
+    system("pause");
+    return 0;
+}

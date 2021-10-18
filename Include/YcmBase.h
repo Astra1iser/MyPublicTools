@@ -334,8 +334,8 @@ namespace Base
 	
 
 
-
-
+	//获取文件版本号
+	CString GetFileVersion(LPCSTR filename);
 	
 
 
