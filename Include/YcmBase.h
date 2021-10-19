@@ -1,6 +1,7 @@
 //Base公共库
 #pragma once
 #pragma warning(disable:4129)//屏蔽不可转义的警告
+#pragma warning(disable:4996)
 
 #include <iostream>
 #include <string>
@@ -29,6 +30,7 @@
 #include <Mutex.h>//系统全局锁 Mutex(可作为线程锁和文件锁)
 #include <FIFO.h> //管道的实现
 #include <SharedMemory.h>//共享内存类的实现
+#include <HttpPost.h>
 #include <httpdown.h>
 
 using namespace std;

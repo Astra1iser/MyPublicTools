@@ -10,6 +10,7 @@
 #include <Mutex.cpp>
 #include <FIFO.cpp>
 #include <SharedMemory.cpp>
+#include <HttpPost.cpp>
 
 
 BOOL Base::IsAdmin() {
@@ -922,7 +923,7 @@ BOOL Base::DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode)
 
 CString Base::GetFileVersion(LPCSTR filename)
 {
-	#pragma warning(disable:4996)
+	//#pragma warning(disable:4996)
 	string asVer = "";
 	VS_FIXEDFILEINFO* pVsInfo;
 	unsigned int iFileInfoSize = sizeof(VS_FIXEDFILEINFO);

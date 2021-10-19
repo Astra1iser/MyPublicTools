@@ -54,10 +54,10 @@ CString PathManager::MyCombinePath(LPCTSTR strParentPath, LPCTSTR strCombinePath
 	return szDest;
 }
 
-MyMutex g_InstallPathLock;
+//MyMutex g_InstallPathLock;
 CString PathManager::GetProgramInstallPath(HKEY RegDir, LPCTSTR strRegPath, LPCTSTR strKeyName)
 {
-	MyScopeLock lock(g_InstallPathLock);
+	//MyScopeLock lock(g_InstallPathLock);
 
 	static CString strInsPath = _T("");
 	if (!strInsPath.IsEmpty())
