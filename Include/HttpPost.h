@@ -3,7 +3,7 @@
 //#include <atlbase.h>
 //#include <atlapp.h>
 //#include <atlmisc.h>
-#include <atlconv.h>
+//#include <atlconv.h>
 
 BOOL HttpPostForm(LPCTSTR szURL, LPVOID lpPostData, DWORD dwDataSize, CString& strResponse);
 

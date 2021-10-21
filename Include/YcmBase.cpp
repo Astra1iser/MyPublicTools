@@ -11,6 +11,8 @@
 #include <FIFO.cpp>
 #include <SharedMemory.cpp>
 #include <HttpPost.cpp>
+//#include <Ini.cpp>
+#include <MyIni.cpp>
 
 
 BOOL Base::IsAdmin() {
@@ -239,6 +241,94 @@ void Base::SetIniValue(LPCTSTR Node, LPCTSTR Key, LPCTSTR Value, LPCTSTR IniPath
 }
 
 
+string Base::ReadFileCoding(CString FilePath)
+{
+	if (!PathFileExists(FilePath))
+		return FALSE;
+
+	ifstream fin(FilePath, ios::binary);
+	unsigned char  s2;
+	fin.read((char*)&s2, sizeof(s2));//读取第一个字节，然后左移8位
+	int p = s2 << 8;
+	fin.read((char*)&s2, sizeof(s2));//读取第二个字节
+	p += s2;
+
+	string code;
+
+	switch (p)//判断文本前两个字节,穷举,如果后边有新的编码再继续穷举下去就行
+	{
+	case 0xfffe:  //65534
+		code = "UCS-2 LE BOM"; //Unicode
+		break;
+	case 0xfeff://65279
+		code = "UCS-2 BE BOM"; //Unicode big endian
+		break;
+	case 0xe6a2://59042
+		code = "UTF-8";
+		break;
+	case 0x5b61://23393
+		code = "UTF-8";
+		break;
+	case 0xefbb://61371
+		code = "UTF-8-BOM";
+		break;
+	case 0x5b64://23396
+		code = "ANSI";
+		break;
+	default:
+		code = "ERROR";
+	}
+	fin.close();
+	return code;
+}
+
+
+
+wstring Base::UTF8ToUnicode(const char* strSrc)
+{
+	std::wstring wstrRet;
+
+	if (NULL != strSrc)
+	{
+		int len = MultiByteToWideChar(CP_UTF8, 0, strSrc, -1, NULL, 0) * sizeof(WCHAR);
+		WCHAR* strDst = new(std::nothrow) WCHAR[len + 1];
+		if (NULL != strDst)
+		{
+			MultiByteToWideChar(CP_UTF8, 0, strSrc, -1, strDst, len);
+			wstrRet = strDst;;
+			delete[]strDst;
+		}
+	}
+
+	return wstrRet;
+}
+
+
+string Base::UnicodeToAnsi(const WCHAR* strSrc)
+{
+	std::string strRet;
+
+	if (NULL != strSrc)
+	{
+		int len = WideCharToMultiByte(CP_ACP, 0, strSrc, -1, NULL, 0, NULL, NULL);
+		char* strDst = new(std::nothrow) char[len + 1];
+		if (NULL != strDst)
+		{
+			WideCharToMultiByte(CP_ACP, 0, strSrc, -1, strDst, len, NULL, NULL);
+			strRet = strDst;
+			delete[]strDst;
+		}
+	}
+
+	return strRet;
+}
+
+
+string Base::UTF8ToAnsi(const char* strSrc)
+{
+	return UnicodeToAnsi(UTF8ToUnicode(strSrc).c_str());
+}
+
 char* Base::U2G(const char* utf8)
 {
 	int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
@@ -266,6 +356,30 @@ char* Base::G2U(const char* gb2312)
 	WideCharToMultiByte(CP_UTF8, 0, wstr, -1, str, len, NULL, NULL);
 	if (wstr) delete[] wstr;
 	return str;
+}
+
+
+void Base::CharToWchar(const char* constCharString, TCHAR* outWchar)
+{
+	int   nLen = strlen(constCharString) + 1;
+	int   nwLen = MultiByteToWideChar(CP_ACP, 0, constCharString, nLen, NULL, 0);
+
+	TCHAR* wString;
+	wString = new TCHAR[nwLen];
+
+
+	MultiByteToWideChar(CP_ACP, 0, constCharString, nLen, wString, nwLen);
+	_tcscpy(outWchar, wString);//   wcscpy(outWchar,wString);
+
+
+	delete[] wString;
+}
+
+
+void Base::WCharToChar(TCHAR* InWchar, char* OutStr)
+{
+	DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, InWchar, -1, NULL, 0, NULL, FALSE) + 1;
+	WideCharToMultiByte(CP_OEMCP, NULL, InWchar, wcslen(InWchar), OutStr, dwNum, NULL, FALSE);
 }
 
 
@@ -924,6 +1038,7 @@ BOOL Base::DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode)
 CString Base::GetFileVersion(LPCSTR filename)
 {
 	//#pragma warning(disable:4996)
+	#pragma comment(lib,"version.lib")
 	string asVer = "";
 	VS_FIXEDFILEINFO* pVsInfo;
 	unsigned int iFileInfoSize = sizeof(VS_FIXEDFILEINFO);

@@ -301,12 +301,7 @@ int func(int x)
 
 
 #include "stdafx.h"
-#include <Windows.h>
-#include <tchar.h>
-#include <string>
-#include <iostream>
 
-#pragma comment(lib,"version.lib")
 using namespace std;
 
 //CString GetFileVersion(LPCSTR filename)
@@ -336,13 +331,21 @@ using namespace std;
 //    return CString(asVer.c_str());
 //}
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, _TCHAR* argv[])
 {
-    string strFilePath = "C:\\Users\\yuanchunming01\\Desktop\\Procmon.exe";
-    CString version = GetFileVersion(strFilePath.c_str());
+    //string strFilePath = "C:\\Users\\yuanchunming01\\Desktop\\Procmon.exe";
+    //CString version = GetFileVersion(strFilePath.c_str());
 
-    Wcout(version);
+    //Wcout(version);
 
+    CIni ini(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
+
+    //cout << ini.GetString(L"abc", L"aaa", 0);
+    Wcout(ini.GetString(L"abc", L"aaa"));
+
+
+
+    cout << ReadFileCoding(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
 
     getchar();
     system("pause");

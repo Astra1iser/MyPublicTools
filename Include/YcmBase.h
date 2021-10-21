@@ -11,11 +11,11 @@
 #include <map>
 #include <csignal>
 
-
+//#include <afxwin.h>
+#include <atlstr.h>
 #include <windows.h>
 #include <assert.h>
 #include <atlconv.h>
-#include <atlstr.h>
 #include <wininet.h>
 #include <atlfile.h>
 
@@ -32,6 +32,8 @@
 #include <SharedMemory.h>//共享内存类的实现
 #include <HttpPost.h>
 #include <httpdown.h>
+//#include <Ini.h>
+#include <MyIni.h>
 
 using namespace std;
 using namespace PathManager;
@@ -195,12 +197,34 @@ namespace Base
 
 	void SetIniValue(LPCTSTR Node, LPCTSTR Key, LPCTSTR Value, LPCTSTR IniPath);
 
+
+
+	string ReadFileCoding(CString FilePath);
+
+
+	wstring UTF8ToUnicode(const char* strSrc);
+
+	string UnicodeToAnsi(const WCHAR* strSrc);
+
+
+	string UTF8ToAnsi(const char* strSrc);
+
+
+
+
 	//10.文本编码 UTF-8到GB2312的转换
 	char* U2G(const char* utf8);
 
 
 	//11.文本编码 GB2312到UTF-8的转换
 	char* G2U(const char* gb2312);
+
+
+
+
+	void CharToWchar(const char* constCharString, TCHAR* outWchar);
+
+	void WCharToChar(TCHAR* InWchar, char* OutStr);
 
 
 	//12.将wstring转换为string
