@@ -338,14 +338,18 @@ int main(int argc, _TCHAR* argv[])
 
     //Wcout(version);
 
-    CIni ini(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
+    IniManager ini(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
 
     //cout << ini.GetString(L"abc", L"aaa", 0);
-    Wcout(ini.GetString(L"abc", L"aaa"));
-
-
-
-    cout << ReadFileCoding(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
+    //Wcout(ini.GetString(L"abc", L"aaa"));
+    //ini.AppendString(L"abc", L"aaa", L"卧槽");
+    //cout << ini.IsSectionExist(L"abcc") << endl;
+    ini.CopySection(L"abc", L"aaa", 0);
+    //Wcout(ini.GetString(L"abc", L"bbb", 0));
+    //Wcout(CString(ini.GetChar(L"abc", L"aaa", 0)));
+    //cout<<ini.WriteDouble(L"abc", L"aaa", 11.321);
+    //cout << ini.GetInt(L"abc", L"aaa", 0)<<endl;
+    //cout << ReadFileCoding(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
 
     getchar();
     system("pause");

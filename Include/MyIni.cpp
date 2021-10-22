@@ -25,18 +25,18 @@ struct STR_LIMIT
 /////////////////////////////////////////////////////////////////////////////////
 // 构造函数 & 析构函数
 /////////////////////////////////////////////////////////////////////////////////
-CIni::CIni()
+IniManager::IniManager()
 {
 	m_pszPathName = NULL;
 }
 
-CIni::CIni(LPCTSTR lpPathName)
+IniManager::IniManager(LPCTSTR lpPathName)
 {
 	m_pszPathName = NULL;
 	SetPathName(lpPathName);
 }
 
-CIni::~CIni()
+IniManager::~IniManager()
 {
 	if (m_pszPathName != NULL)
 	{
@@ -49,8 +49,8 @@ CIni::~CIni()
 // Ini 文件路径访问
 /////////////////////////////////////////////////////////////////////////////////
 
-// 分配ini文件路径名
-void CIni::SetPathName(LPCTSTR lpPathName)
+
+void IniManager::SetPathName(LPCTSTR lpPathName)
 {
 	if (lpPathName == NULL)
 	{
@@ -69,7 +69,7 @@ void CIni::SetPathName(LPCTSTR lpPathName)
 	}
 }
 
-CString CIni::GetPathName() const
+CString IniManager::GetPathName() const
 {
 	return CString(m_pszPathName);
 }
@@ -79,9 +79,7 @@ CString CIni::GetPathName() const
 // 原始字符串访问
 /////////////////////////////////////////////////////////////////////////////////
 
-// 获取配置文件字符串值，如果缓冲区不够大，结果可能会被截断。
-
-DWORD CIni::GetString(LPCTSTR lpSection, LPCTSTR lpKey, LPTSTR lpBuffer, DWORD dwBufSize, LPCTSTR lpDefault) const
+DWORD IniManager::GetString(LPCTSTR lpSection, LPCTSTR lpKey, LPTSTR lpBuffer, DWORD dwBufSize, LPCTSTR lpDefault) const
 {
 	if (lpBuffer != NULL)
 		*lpBuffer = _T('\0');
@@ -99,27 +97,17 @@ DWORD CIni::GetString(LPCTSTR lpSection, LPCTSTR lpKey, LPTSTR lpBuffer, DWORD d
 	return dwLen;
 }
 
-CString CIni::GetString(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpDefault) const
+CString IniManager::GetString(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpDefault) const
 {
 	LPTSTR psz = __GetStringDynamic(lpSection, lpKey, lpDefault);
-	CString str(psz);
-	
-	if ("UTF-8" == ReadFileCoding(m_pszPathName))
-	{
-		char* buffer = 0;
-		//CharToWchar(buffer, psz);
-		WCharToChar(psz, buffer);
-		str = UTF8ToUnicode(buffer).c_str();
-		delete buffer;
-	}
-		
+	CString str(psz);		
 	delete [] psz;
 	return str;
 }
 
 
-// 将字符串值写入 ini 文件
-BOOL CIni::WriteString(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpValue) const
+
+BOOL IniManager::WriteString(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpValue) const
 {
 	if (lpSection == NULL || lpKey == NULL)
 		return FALSE;
@@ -127,8 +115,8 @@ BOOL CIni::WriteString(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpValue) const
 	return ::WritePrivateProfileString(lpSection, lpKey, lpValue == NULL ? _T("") : lpValue, m_pszPathName);
 }
 
-// 从 ini 文件中读取一个字符串值，在它后面附加另一个字符串，然后将其写回 ini 文件
-BOOL CIni::AppendString(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpString) const
+
+BOOL IniManager::AppendString(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpString) const
 {
 	if (lpString == NULL)
 		return FALSE;
@@ -148,39 +136,39 @@ BOOL CIni::AppendString(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpString) cons
 
 // 获取字符串数组
 
-DWORD CIni::GetArray(LPCTSTR lpSection, LPCTSTR lpKey, LPTSTR lpBuffer, DWORD dwBufSize, LPCTSTR lpDelimiter, BOOL bTrimString) const
-{
-	if (lpBuffer != NULL)
-		*lpBuffer = _T('\0');
+//DWORD IniManager::GetArray(LPCTSTR lpSection, LPCTSTR lpKey, LPTSTR lpBuffer, DWORD dwBufSize, LPCTSTR lpDelimiter, BOOL bTrimString) const
+//{
+//	if (lpBuffer != NULL)
+//		*lpBuffer = _T('\0');
+//
+//	if (lpSection == NULL || lpKey == NULL)
+//		return 0;
+//
+//	LPTSTR psz = __GetStringDynamic(lpSection, lpKey);
+//
+//	DWORD dwCopied = 0;
+//
+//	if (*psz != _T('\0'))
+//	{
+//		if (lpBuffer == NULL)
+//		{
+//			// 只需计算所需的缓冲区大小
+//			const DWORD MAX_LEN = _tcslen(psz) + 2;
+//			LPTSTR p = new TCHAR[MAX_LEN + 1];
+//			dwCopied = __StringSplit(psz, p, MAX_LEN, lpDelimiter, bTrimString);
+//			delete[] p;
+//		}
+//		else
+//		{
+//			dwCopied = __StringSplit(psz, lpBuffer, dwBufSize, lpDelimiter, bTrimString);
+//		}
+//	}
+//
+//	delete[] psz;
+//	return dwCopied;
+//}
 
-	if (lpSection == NULL || lpKey == NULL)
-		return 0;
-
-	LPTSTR psz = __GetStringDynamic(lpSection, lpKey);
-
-	DWORD dwCopied = 0;
-
-	if (*psz != _T('\0'))
-	{
-		if (lpBuffer == NULL)
-		{
-			// 只需计算所需的缓冲区大小
-			const DWORD MAX_LEN = _tcslen(psz) + 2;
-			LPTSTR p = new TCHAR[MAX_LEN + 1];
-			dwCopied = __StringSplit(psz, p, MAX_LEN, lpDelimiter, bTrimString);
-			delete[] p;
-		}
-		else
-		{
-			dwCopied = __StringSplit(psz, lpBuffer, dwBufSize, lpDelimiter, bTrimString);
-		}
-	}
-
-	delete[] psz;
-	return dwCopied;
-}
-
-//void CIni::GetArray(LPCTSTR lpSection, LPCTSTR lpKey, CStringArray *pArray, LPCTSTR lpDelimiter, BOOL bTrimString) const
+//void IniManager::GetArray(LPCTSTR lpSection, LPCTSTR lpKey, CStringArray *pArray, LPCTSTR lpDelimiter, BOOL bTrimString) const
 //{
 //	if (pArray != NULL)
 //		pArray->RemoveAll();
@@ -197,7 +185,7 @@ DWORD CIni::GetArray(LPCTSTR lpSection, LPCTSTR lpKey, LPTSTR lpBuffer, DWORD dw
 
 
 
-//BOOL CIni::WriteArray(LPCTSTR lpSection, LPCTSTR lpKey, const CStringArray *pArray, int nWriteCount, LPCTSTR lpDelimiter) const
+//BOOL IniManager::WriteArray(LPCTSTR lpSection, LPCTSTR lpKey, const CStringArray *pArray, int nWriteCount, LPCTSTR lpDelimiter) const
 //{
 //	if (pArray == NULL)
 //		return FALSE;
@@ -223,56 +211,56 @@ DWORD CIni::GetArray(LPCTSTR lpSection, LPCTSTR lpKey, LPTSTR lpBuffer, DWORD dw
 // 原始数据类型访问
 /////////////////////////////////////////////////////////////////////////////////
 
-// 获取有符号整数值
-int CIni::GetInt(LPCTSTR lpSection, LPCTSTR lpKey, int nDefault, int nBase) const
+
+int IniManager::GetInt(LPCTSTR lpSection, LPCTSTR lpKey, int nDefault, int nBase) const
 {
 	TCHAR sz[DEF_PROFILE_NUM_LEN + 1] = _T("");
 	GetString(lpSection, lpKey, sz, DEF_PROFILE_NUM_LEN);
 	return *sz == _T('\0') ? nDefault : int(_tcstoul(sz, NULL, __ValidateBase(nBase)));
 }
 
-// 获取无符号整数值
-UINT CIni::GetUInt(LPCTSTR lpSection, LPCTSTR lpKey, UINT nDefault, int nBase) const
+
+UINT IniManager::GetUInt(LPCTSTR lpSection, LPCTSTR lpKey, UINT nDefault, int nBase) const
 {
 	TCHAR sz[DEF_PROFILE_NUM_LEN + 1] = _T("");
 	GetString(lpSection, lpKey, sz, DEF_PROFILE_NUM_LEN);
 	return *sz == _T('\0') ? nDefault : UINT(_tcstoul(sz, NULL, __ValidateBase(nBase)));
 }
 
-// 获取布尔值
-BOOL CIni::GetBool(LPCTSTR lpSection, LPCTSTR lpKey, BOOL bDefault) const
+
+BOOL IniManager::GetBool(LPCTSTR lpSection, LPCTSTR lpKey, BOOL bDefault) const
 {
 	TCHAR sz[DEF_PROFILE_NUM_LEN + 1] = _T("");
 	GetString(lpSection, lpKey, sz, DEF_PROFILE_NUM_LEN);
 	return StringToBool(sz, bDefault);
 }
 
-// 获取双浮点值
-double CIni::GetDouble(LPCTSTR lpSection, LPCTSTR lpKey, double fDefault) const
+
+double IniManager::GetDouble(LPCTSTR lpSection, LPCTSTR lpKey, double fDefault) const
 {
 	TCHAR sz[DEF_PROFILE_NUM_LEN + 1] = _T("");
 	GetString(lpSection, lpKey, sz, DEF_PROFILE_NUM_LEN);
 	return *sz == _T('\0') ? fDefault : _tcstod(sz, NULL);
 }
 
-// 将有符号整数值写入 ini 文件
-BOOL CIni::WriteInt(LPCTSTR lpSection, LPCTSTR lpKey, int nValue, int nBase) const
+
+BOOL IniManager::WriteInt(LPCTSTR lpSection, LPCTSTR lpKey, int nValue, int nBase) const
 {
 	TCHAR szValue[DEF_PROFILE_NUM_LEN + 1] = _T("");
 	__IntToString(nValue, szValue, nBase);
 	return WriteString(lpSection, lpKey, szValue);
 }
 
-// 将无符号值写入 ini 文件
-BOOL CIni::WriteUInt(LPCTSTR lpSection, LPCTSTR lpKey, UINT nValue, int nBase) const
+
+BOOL IniManager::WriteUInt(LPCTSTR lpSection, LPCTSTR lpKey, UINT nValue, int nBase) const
 {
 	TCHAR szValue[DEF_PROFILE_NUM_LEN + 1] = _T("");
 	__UIntToString(nValue, szValue, nBase);
 	return WriteString(lpSection, lpKey, szValue);
 }
 
-// 将双浮点值写入 ini 文件
-BOOL CIni::WriteDouble(LPCTSTR lpSection, LPCTSTR lpKey, double fValue, int nPrecision) const
+
+BOOL IniManager::WriteDouble(LPCTSTR lpSection, LPCTSTR lpKey, double fValue, int nPrecision) const
 {
 	TCHAR szFmt[16] = _T("%f");
 
@@ -284,50 +272,50 @@ BOOL CIni::WriteDouble(LPCTSTR lpSection, LPCTSTR lpKey, double fValue, int nPre
 	return WriteString(lpSection, lpKey, szValue);
 }
 
-// 从 ini 文件中读取一个双精度值，增加它然后写回
-BOOL CIni::IncreaseDouble(LPCTSTR lpSection, LPCTSTR lpKey, double fIncrease, int nPrecision) const
+
+BOOL IniManager::IncreaseDouble(LPCTSTR lpSection, LPCTSTR lpKey, double fIncrease, int nPrecision) const
 {
 	double f = GetDouble(lpSection, lpKey, 0.0);
 	f += fIncrease;
 	return WriteDouble(lpSection, lpKey, f, nPrecision);
 }
 
-// 将布尔值写入 ini 文件
-BOOL CIni::WriteBool(LPCTSTR lpSection, LPCTSTR lpKey, BOOL bValue) const
+
+BOOL IniManager::WriteBool(LPCTSTR lpSection, LPCTSTR lpKey, BOOL bValue) const
 {
 	return WriteInt(lpSection, lpKey, bValue ? 1 : 0, BASE_DECIMAL);
 }
 
-// 从 ini 文件中读取一个布尔值，将其反转（真变为假，假变为真），然后将其写回
-BOOL CIni::InvertBool(LPCTSTR lpSection, LPCTSTR lpKey) const
+
+BOOL IniManager::InvertBool(LPCTSTR lpSection, LPCTSTR lpKey) const
 {
 	return WriteBool(lpSection, lpKey, !GetBool(lpSection, lpKey, FALSE));
 }
 
-// 从ini文件中读取一个int，增加它，然后将它写回ini文件
-BOOL CIni::IncreaseInt(LPCTSTR lpSection, LPCTSTR lpKey, int nIncrease, int nBase) const
+
+BOOL IniManager::IncreaseInt(LPCTSTR lpSection, LPCTSTR lpKey, int nIncrease, int nBase) const
 {
 	int nVal = GetInt(lpSection, lpKey, 0, nBase);
 	nVal += nIncrease;
 	return WriteInt(lpSection, lpKey, nVal, nBase);
 }
 
-// 从 ini 文件中读取一个 UINT，增加它，然后将它写回 ini 文件
-BOOL CIni::IncreaseUInt(LPCTSTR lpSection, LPCTSTR lpKey, UINT nIncrease, int nBase) const
+
+BOOL IniManager::IncreaseUInt(LPCTSTR lpSection, LPCTSTR lpKey, UINT nIncrease, int nBase) const
 {
 	UINT nVal = GetUInt(lpSection, lpKey, 0, nBase);
 	nVal += nIncrease;
 	return WriteUInt(lpSection, lpKey, nVal, nBase);
 }
 
-TCHAR CIni::GetChar(LPCTSTR lpSection, LPCTSTR lpKey, TCHAR cDefault) const
+TCHAR IniManager::GetChar(LPCTSTR lpSection, LPCTSTR lpKey, TCHAR cDefault) const
 {
 	TCHAR sz[2] = _T("");
 	GetString(lpSection, lpKey, sz, 1);
 	return *sz == _T('\0') ? cDefault : sz[0];
 }
 
-BOOL CIni::WriteChar(LPCTSTR lpSection, LPCTSTR lpKey, TCHAR c) const
+BOOL IniManager::WriteChar(LPCTSTR lpSection, LPCTSTR lpKey, TCHAR c) const
 {
 	TCHAR sz[2] = { c, _T('\0') };
 	return WriteString(lpSection, lpKey, sz);
@@ -338,122 +326,122 @@ BOOL CIni::WriteChar(LPCTSTR lpSection, LPCTSTR lpKey, TCHAR c) const
 /////////////////////////////////////////////////////////////////////////////////
 
 // 从 ini 文件中获取原始数据块
-DWORD CIni::GetDataBlock(LPCTSTR lpSection, LPCTSTR lpKey, LPVOID lpBuffer, DWORD dwBufSize, DWORD dwOffset) const
-{
-	LPTSTR psz = __GetStringDynamic(lpSection, lpKey);
-	DWORD dwLen = _tcslen(psz) / 2;
-	if (dwLen <= dwOffset)
-	{
-		delete [] psz;
-		return 0;
-	}
-
-	// verify psz, must be all in hex format
-	for (int i = 0; psz[i] != _T('\0'); i++)
-	{
-		TCHAR c = psz[i];
-		if ((c >= _T('0') && c <= _T('9'))
-			|| (c >= _T('a') && c <= _T('f'))
-			|| (c >= _T('A') && c <= _T('F')))
-		{
-			// valid
-		}
-		else
-		{
-			delete [] psz;
-			return 0;
-		}
-	}
-
-	DWORD dwProcLen = 0;
-	LPBYTE lpb = (LPBYTE)lpBuffer;
-
-	if (lpb != NULL)
-	{
-		dwProcLen = min(dwLen - dwOffset, dwBufSize);
-		LPCTSTR p = &psz[dwOffset * 2];
-		for (DWORD i = 0; i < dwProcLen; i++)
-		{			
-			TCHAR sz[3] = _T("");
-			_tcsncpy(sz, p, 2);			
-			lpb[i] = BYTE(_tcstoul(sz, NULL, 16));
-			p = &p[2];
-		}			
-	}
-	else
-	{
-		dwProcLen = dwLen - dwOffset;
-	}
-	delete [] psz;
-	return dwProcLen;
-}
+//DWORD IniManager::GetDataBlock(LPCTSTR lpSection, LPCTSTR lpKey, LPVOID lpBuffer, DWORD dwBufSize, DWORD dwOffset) const
+//{
+//	LPTSTR psz = __GetStringDynamic(lpSection, lpKey);
+//	DWORD dwLen = _tcslen(psz) / 2;
+//	if (dwLen <= dwOffset)
+//	{
+//		delete [] psz;
+//		return 0;
+//	}
+//
+//	// verify psz, must be all in hex format
+//	for (int i = 0; psz[i] != _T('\0'); i++)
+//	{
+//		TCHAR c = psz[i];
+//		if ((c >= _T('0') && c <= _T('9'))
+//			|| (c >= _T('a') && c <= _T('f'))
+//			|| (c >= _T('A') && c <= _T('F')))
+//		{
+//			// valid
+//		}
+//		else
+//		{
+//			delete [] psz;
+//			return 0;
+//		}
+//	}
+//
+//	DWORD dwProcLen = 0;
+//	LPBYTE lpb = (LPBYTE)lpBuffer;
+//
+//	if (lpb != NULL)
+//	{
+//		dwProcLen = min(dwLen - dwOffset, dwBufSize);
+//		LPCTSTR p = &psz[dwOffset * 2];
+//		for (DWORD i = 0; i < dwProcLen; i++)
+//		{			
+//			TCHAR sz[3] = _T("");
+//			_tcsncpy(sz, p, 2);			
+//			lpb[i] = BYTE(_tcstoul(sz, NULL, 16));
+//			p = &p[2];
+//		}			
+//	}
+//	else
+//	{
+//		dwProcLen = dwLen - dwOffset;
+//	}
+//	delete [] psz;
+//	return dwProcLen;
+//}
 
 // 将原始数据块写入 ini 文件
-BOOL CIni::WriteDataBlock(LPCTSTR lpSection, LPCTSTR lpKey, LPCVOID lpData, DWORD dwDataSize) const
-{
-	const BYTE* lpb = (const BYTE*)lpData;
-	if (lpb == NULL)
-		return FALSE;
-
-	LPTSTR psz = new TCHAR[dwDataSize * 2 + 1];
-	for (DWORD i = 0, j = 0; i < dwDataSize; i++, j += 2)
-		_stprintf(&psz[j], _T("%02X"), lpb[i]);
-	const BOOL RES = WriteString(lpSection, lpKey, psz);
-	delete [] psz;
-	return RES;
-}
+//BOOL IniManager::WriteDataBlock(LPCTSTR lpSection, LPCTSTR lpKey, LPCVOID lpData, DWORD dwDataSize) const
+//{
+//	const BYTE* lpb = (const BYTE*)lpData;
+//	if (lpb == NULL)
+//		return FALSE;
+//
+//	LPTSTR psz = new TCHAR[dwDataSize * 2 + 1];
+//	for (DWORD i = 0, j = 0; i < dwDataSize; i++, j += 2)
+//		_stprintf(&psz[j], _T("%02X"), lpb[i]);
+//	const BOOL RES = WriteString(lpSection, lpKey, psz);
+//	delete [] psz;
+//	return RES;
+//}
 
 // 将原始数据块附加到 ini 文件中的指定键
-BOOL CIni::AppendDataBlock(LPCTSTR lpSection, LPCTSTR lpKey, LPCVOID lpData, DWORD dwDataSize) const
-{
-	const BYTE* lpb = (const BYTE*)lpData;
-	if (lpb == NULL)
-		return FALSE;
-
-	LPTSTR psz = new TCHAR[dwDataSize * 2 + 1];
-	for (DWORD i = 0, j = 0; i < dwDataSize; i++, j += 2)
-		_stprintf(&psz[j], _T("%02X"), lpb[i]);
-	const BOOL RES = AppendString(lpSection, lpKey, psz);
-	delete [] psz;
-	return RES;
-}
+//BOOL IniManager::AppendDataBlock(LPCTSTR lpSection, LPCTSTR lpKey, LPCVOID lpData, DWORD dwDataSize) const
+//{
+//	const BYTE* lpb = (const BYTE*)lpData;
+//	if (lpb == NULL)
+//		return FALSE;
+//
+//	LPTSTR psz = new TCHAR[dwDataSize * 2 + 1];
+//	for (DWORD i = 0, j = 0; i < dwDataSize; i++, j += 2)
+//		_stprintf(&psz[j], _T("%02X"), lpb[i]);
+//	const BOOL RES = AppendString(lpSection, lpKey, psz);
+//	delete [] psz;
+//	return RES;
+//}
 
 // 获取 POINT 值
-POINT CIni::GetPoint(LPCTSTR lpSection, LPCTSTR lpKey, POINT ptDefault) const
-{
-	POINT pt;
-	if (GetDataBlock(lpSection, lpKey, &pt, sizeof(POINT)) != sizeof(POINT))
-		pt = ptDefault;
-	return pt;
-}
+//POINT IniManager::GetPoint(LPCTSTR lpSection, LPCTSTR lpKey, POINT ptDefault) const
+//{
+//	POINT pt;
+//	if (GetDataBlock(lpSection, lpKey, &pt, sizeof(POINT)) != sizeof(POINT))
+//		pt = ptDefault;
+//	return pt;
+//}
 
 // 获取 RECT 值
-RECT CIni::GetRect(LPCTSTR lpSection, LPCTSTR lpKey, RECT rcDefault) const
-{
-	RECT rc;
-	if (GetDataBlock(lpSection, lpKey, &rc, sizeof(RECT)) != sizeof(RECT))
-		rc = rcDefault;
-	return rc;
-}
+//RECT IniManager::GetRect(LPCTSTR lpSection, LPCTSTR lpKey, RECT rcDefault) const
+//{
+//	RECT rc;
+//	if (GetDataBlock(lpSection, lpKey, &rc, sizeof(RECT)) != sizeof(RECT))
+//		rc = rcDefault;
+//	return rc;
+//}
 
 // 将 POINT 写入 ini 文件
-BOOL CIni::WritePoint(LPCTSTR lpSection, LPCTSTR lpKey, POINT pt) const
-{
-	return WriteDataBlock(lpSection, lpKey, &pt, sizeof(POINT));
-}
+//BOOL IniManager::WritePoint(LPCTSTR lpSection, LPCTSTR lpKey, POINT pt) const
+//{
+//	return WriteDataBlock(lpSection, lpKey, &pt, sizeof(POINT));
+//}
 
 // 将 RECT 写入 ini 文件
-BOOL CIni::WriteRect(LPCTSTR lpSection, LPCTSTR lpKey, RECT rc) const
-{
-	return WriteDataBlock(lpSection, lpKey, &rc, sizeof(RECT));
-}
+//BOOL IniManager::WriteRect(LPCTSTR lpSection, LPCTSTR lpKey, RECT rc) const
+//{
+//	return WriteDataBlock(lpSection, lpKey, &rc, sizeof(RECT));
+//}
 
 /////////////////////////////////////////////////////////////////////////////////
 // 部分和键访问
 /////////////////////////////////////////////////////////////////////////////////
 
 // 检索指定部分的密钥行（密钥对）列表
-DWORD CIni::GetKeyLines(LPCTSTR lpSection, LPTSTR lpBuffer, DWORD dwBufSize) const
+DWORD IniManager::GetKeyLines(LPCTSTR lpSection, LPTSTR lpBuffer, DWORD dwBufSize) const
 {
 	if (lpBuffer != NULL)
 		*lpBuffer = _T('\0');
@@ -486,7 +474,7 @@ DWORD CIni::GetKeyLines(LPCTSTR lpSection, LPTSTR lpBuffer, DWORD dwBufSize) con
 }
 
 // 检索指定部分的键名列表
-DWORD CIni::GetKeyNames(LPCTSTR lpSection, LPTSTR lpBuffer, DWORD dwBufSize) const
+DWORD IniManager::GetKeyNames(LPCTSTR lpSection, LPTSTR lpBuffer, DWORD dwBufSize) const
 {
 	if (lpBuffer != NULL)
 		*lpBuffer = _T('\0');
@@ -513,7 +501,7 @@ DWORD CIni::GetKeyNames(LPCTSTR lpSection, LPTSTR lpBuffer, DWORD dwBufSize) con
 }
 
 // 从 ini 文件中获取所有部分名称
-DWORD CIni::GetSectionNames(LPTSTR lpBuffer, DWORD dwBufSize) const
+DWORD IniManager::GetSectionNames(LPTSTR lpBuffer, DWORD dwBufSize) const
 {
 	if (lpBuffer == NULL)
 	{
@@ -538,7 +526,7 @@ DWORD CIni::GetSectionNames(LPTSTR lpBuffer, DWORD dwBufSize) const
 	}
 }
 
-//void CIni::GetSectionNames(CStringArray *pArray) const
+//void IniManager::GetSectionNames(CStringArray *pArray) const
 //{
 //	if (pArray != NULL)
 //		pArray->RemoveAll();
@@ -556,7 +544,7 @@ DWORD CIni::GetSectionNames(LPTSTR lpBuffer, DWORD dwBufSize) const
 
 
 // 检索指定部分的密钥行（密钥对）列表
-//void CIni::GetKeyLines(LPCTSTR lpSection, CStringArray *pArray) const
+//void IniManager::GetKeyLines(LPCTSTR lpSection, CStringArray *pArray) const
 //{
 //	if (pArray != NULL)
 //		pArray->RemoveAll();
@@ -574,7 +562,7 @@ DWORD CIni::GetSectionNames(LPTSTR lpBuffer, DWORD dwBufSize) const
 
 
 // 检索指定部分的键名列表
-//void CIni::GetKeyNames(LPCTSTR lpSection, CStringArray *pArray) const
+//void IniManager::GetKeyNames(LPCTSTR lpSection, CStringArray *pArray) const
 //{
 //	if (pArray == NULL)
 //		return;
@@ -589,18 +577,18 @@ DWORD CIni::GetSectionNames(LPTSTR lpBuffer, DWORD dwBufSize) const
 
 
 // 从 ini 文件中删除整个部分
-BOOL CIni::DeleteSection(LPCTSTR lpSection) const
+BOOL IniManager::DeleteSection(LPCTSTR lpSection) const
 {
 	return ::WritePrivateProfileString(lpSection, NULL, _T(""), m_pszPathName);
 }
 
 // 从部分中删除一个键
-BOOL CIni::DeleteKey(LPCTSTR lpSection, LPCTSTR lpKey) const
+BOOL IniManager::DeleteKey(LPCTSTR lpSection, LPCTSTR lpKey) const
 {
 	return ::WritePrivateProfileString(lpSection, lpKey, NULL, m_pszPathName);
 }
 
-BOOL CIni::IsSectionExist(LPCTSTR lpSection) const
+BOOL IniManager::IsSectionExist(LPCTSTR lpSection) const
 {
 	if (lpSection == NULL)
 		return FALSE;
@@ -617,7 +605,7 @@ BOOL CIni::IsSectionExist(LPCTSTR lpSection) const
 	return RES;
 }
 
-BOOL CIni::IsKeyExist(LPCTSTR lpSection, LPCTSTR lpKey) const
+BOOL IniManager::IsKeyExist(LPCTSTR lpSection, LPCTSTR lpKey) const
 {
 	if (lpSection == NULL || lpKey == NULL)
 		return FALSE;
@@ -629,7 +617,7 @@ BOOL CIni::IsKeyExist(LPCTSTR lpSection, LPCTSTR lpKey) const
 	return RES;
 }
 
-BOOL CIni::CopySection(LPCTSTR lpSrcSection, LPCTSTR lpDestSection, BOOL bFailIfExist) const
+BOOL IniManager::CopySection(LPCTSTR lpSrcSection, LPCTSTR lpDestSection, BOOL bFailIfExist) const
 {
 	if (lpSrcSection == NULL || lpDestSection == NULL)
 		return FALSE;
@@ -655,7 +643,7 @@ BOOL CIni::CopySection(LPCTSTR lpSrcSection, LPCTSTR lpDestSection, BOOL bFailIf
 	return RES;
 }
 
-BOOL CIni::CopyKey(LPCTSTR lpSrcSection, LPCTSTR lpSrcKey, LPCTSTR lpDestSection, LPCTSTR lpDestKey, BOOL bFailIfExist) const
+BOOL IniManager::CopyKey(LPCTSTR lpSrcSection, LPCTSTR lpSrcKey, LPCTSTR lpDestSection, LPCTSTR lpDestKey, BOOL bFailIfExist) const
 {
 	if (lpSrcSection == NULL || lpSrcKey == NULL || lpDestKey == NULL)
 		return FALSE;
@@ -676,13 +664,13 @@ BOOL CIni::CopyKey(LPCTSTR lpSrcSection, LPCTSTR lpSrcKey, LPCTSTR lpDestSection
 	return RES;
 }
 
-BOOL CIni::MoveSection(LPCTSTR lpSrcSection, LPCTSTR lpDestSection, BOOL bFailIfExist) const
+BOOL IniManager::MoveSection(LPCTSTR lpSrcSection, LPCTSTR lpDestSection, BOOL bFailIfExist) const
 {
 	return CopySection(lpSrcSection, lpDestSection, bFailIfExist)
 		&& DeleteSection(lpSrcSection);
 }
 
-BOOL CIni::MoveKey(LPCTSTR lpSrcSection, LPCTSTR lpSrcKey, LPCTSTR lpDestSection, LPCTSTR lpDestKey, BOOL bFailIfExist) const
+BOOL IniManager::MoveKey(LPCTSTR lpSrcSection, LPCTSTR lpSrcKey, LPCTSTR lpDestSection, LPCTSTR lpDestKey, BOOL bFailIfExist) const
 {
 	return CopyKey(lpSrcSection, lpSrcKey, lpDestSection, lpDestKey, bFailIfExist)
 		&& DeleteKey(lpSrcSection, lpSrcKey);
@@ -695,7 +683,7 @@ BOOL CIni::MoveKey(LPCTSTR lpSrcSection, LPCTSTR lpSrcKey, LPCTSTR lpDestSection
 // 获取一个配置文件字符串值，返回一个堆指针所以我们不必担心
 // 关于缓冲区大小，但是这个函数需要调用者手动释放内存。
 // 该函数是该类所有“Getxxx”函数的主干。
-LPTSTR CIni::__GetStringDynamic(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpDefault) const
+LPTSTR IniManager::__GetStringDynamic(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpDefault) const
 {
 	TCHAR* psz = NULL;
 	if (lpSection == NULL || lpKey == NULL)
@@ -733,8 +721,8 @@ LPTSTR CIni::__GetStringDynamic(LPCTSTR lpSection, LPCTSTR lpKey, LPCTSTR lpDefa
 }
 
 // 使用特定的分隔符拆分字符串，拆分结果以“双空终止字符串”格式复制到lpBuffer中，如下图所示：xxx\0xxxx\0xx\0xxx\0\0
-// 比如分隔符是","，那么字符串"ab,cd,e"会被拆分成"ab\0cd\0e\0\0"，这种字符串格式可以解析成子字符串数组 轻松使用用户定义的函数或 CIni::ParseStringArray。
-DWORD CIni::__StringSplit(LPCTSTR lpString, LPTSTR lpBuffer, DWORD dwBufSize, LPCTSTR lpDelimiter, BOOL bTrimString)
+// 比如分隔符是","，那么字符串"ab,cd,e"会被拆分成"ab\0cd\0e\0\0"，这种字符串格式可以解析成子字符串数组 轻松使用用户定义的函数或 IniManager::ParseStringArray。
+DWORD IniManager::__StringSplit(LPCTSTR lpString, LPTSTR lpBuffer, DWORD dwBufSize, LPCTSTR lpDelimiter, BOOL bTrimString)
 {
 	if (lpString == NULL || lpBuffer == NULL || dwBufSize == 0)
 		return 0;	
@@ -806,7 +794,7 @@ DWORD CIni::__StringSplit(LPCTSTR lpString, LPTSTR lpBuffer, DWORD dwBufSize, LP
 
 // 解析一个“双空终止字符串”，将每个子字符串传递给一个用户定义的
 // 回调函数
-BOOL CIni::ParseDNTString(LPCTSTR lpString, SUBSTRPROC lpFnStrProc, LPVOID lpParam)
+BOOL IniManager::ParseDNTString(LPCTSTR lpString, SUBSTRPROC lpFnStrProc, LPVOID lpParam)
 {
 	if (lpString == NULL || lpFnStrProc == NULL)
 		return FALSE;
@@ -826,7 +814,7 @@ BOOL CIni::ParseDNTString(LPCTSTR lpString, SUBSTRPROC lpFnStrProc, LPVOID lpPar
 }
 
 // 用于将“双空终止字符串”中的元素与给定字符串进行比较的回调函数。 用于在节名称列表中搜索。
-BOOL CALLBACK CIni::__SubStrCompare(LPCTSTR lpString1, LPVOID lpParam)
+BOOL CALLBACK IniManager::__SubStrCompare(LPCTSTR lpString1, LPVOID lpParam)
 {
 	assert(lpString1 != NULL);
 	LPCTSTR lpString2 = (LPCTSTR)lpParam;
@@ -836,7 +824,7 @@ BOOL CALLBACK CIni::__SubStrCompare(LPCTSTR lpString1, LPVOID lpParam)
 }
 
 // 用于处理密钥对的回调函数，它从密钥对字符串中提取密钥名称
-BOOL CALLBACK CIni:: __KeyPairProc(LPCTSTR lpString, LPVOID lpParam)
+BOOL CALLBACK IniManager:: __KeyPairProc(LPCTSTR lpString, LPVOID lpParam)
 {
 	STR_LIMIT* psl = (STR_LIMIT*)lpParam;
 	if (lpString == NULL || psl== NULL)
@@ -878,7 +866,7 @@ BOOL CALLBACK CIni:: __KeyPairProc(LPCTSTR lpString, LPVOID lpParam)
 }
 
 // 用于将从“双空终止字符串”中提取的元素添加到 MFC CStringArray 的回调函数。
-//BOOL CALLBACK CIni::__SubStrAdd(LPCTSTR lpString, LPVOID lpParam)
+//BOOL CALLBACK IniManager::__SubStrAdd(LPCTSTR lpString, LPVOID lpParam)
 //{
 //	CStringArray* pArray = (CStringArray*)lpParam;
 //	if (pArray == NULL || lpString == NULL)
@@ -890,7 +878,7 @@ BOOL CALLBACK CIni:: __KeyPairProc(LPCTSTR lpString, LPVOID lpParam)
 
 
 // 将整数转换为二进制字符串格式
-void CIni::__ToBinaryString(UINT nNumber, LPTSTR lpBuffer, DWORD dwBufSize)
+void IniManager::__ToBinaryString(UINT nNumber, LPTSTR lpBuffer, DWORD dwBufSize)
 {
 	if (dwBufSize == 0)
 		return;
@@ -907,7 +895,7 @@ void CIni::__ToBinaryString(UINT nNumber, LPTSTR lpBuffer, DWORD dwBufSize)
 }
 
 // 确保基数为预期值
-int CIni::__ValidateBase(int nBase)
+int IniManager::__ValidateBase(int nBase)
 {
 	switch (nBase)
 	{
@@ -924,7 +912,7 @@ int CIni::__ValidateBase(int nBase)
 }
 
 // 根据其基数将有符号整数转换为字符串表示
-void CIni::__IntToString(int nNumber, LPTSTR lpBuffer, int nBase)
+void IniManager::__IntToString(int nNumber, LPTSTR lpBuffer, int nBase)
 {
 	switch (nBase)
 	{
@@ -941,7 +929,7 @@ void CIni::__IntToString(int nNumber, LPTSTR lpBuffer, int nBase)
 }
 
 // 根据其基数将无符号整数转换为字符串表示
-void CIni::__UIntToString(UINT nNumber, LPTSTR lpBuffer, int nBase)
+void IniManager::__UIntToString(UINT nNumber, LPTSTR lpBuffer, int nBase)
 {
 	switch (nBase)
 	{
@@ -963,7 +951,7 @@ void CIni::__UIntToString(UINT nNumber, LPTSTR lpBuffer, int nBase)
 	}	
 }
 
-BOOL CIni::StringToBool(LPCTSTR lpString, BOOL bDefault)
+BOOL IniManager::StringToBool(LPCTSTR lpString, BOOL bDefault)
 {
 	// 默认值：空字符串
 	// TRUE: "true", "yes", 非零十进制数
@@ -976,7 +964,7 @@ BOOL CIni::StringToBool(LPCTSTR lpString, BOOL bDefault)
 		|| _tcstol(lpString, NULL, BASE_DECIMAL) != 0);
 }
 
-BOOL CIni::__TrimString(LPTSTR lpString)
+BOOL IniManager::__TrimString(LPTSTR lpString)
 {
 	if (lpString == NULL)
 		return FALSE;
@@ -1017,7 +1005,7 @@ BOOL CIni::__TrimString(LPTSTR lpString)
 	return bTrimmed;
 }
 
-LPTSTR CIni::__StrDupEx(LPCTSTR lpStart, LPCTSTR lpEnd)
+LPTSTR IniManager::__StrDupEx(LPCTSTR lpStart, LPCTSTR lpEnd)
 {
 	const DWORD LEN = ((DWORD)lpEnd - (DWORD)lpStart) / sizeof(TCHAR);
 	LPTSTR psz = new TCHAR[LEN + 1];

@@ -30,10 +30,10 @@
 #include <Mutex.h>//系统全局锁 Mutex(可作为线程锁和文件锁)
 #include <FIFO.h> //管道的实现
 #include <SharedMemory.h>//共享内存类的实现
-#include <HttpPost.h>
+#include <MyIni.h>//ini解析类
+#include <HttpPost.h>//实现http的post操作
 #include <httpdown.h>
-//#include <Ini.h>
-#include <MyIni.h>
+
 
 using namespace std;
 using namespace PathManager;

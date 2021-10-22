@@ -10,9 +10,9 @@
 #include <Mutex.cpp>
 #include <FIFO.cpp>
 #include <SharedMemory.cpp>
-#include <HttpPost.cpp>
-//#include <Ini.cpp>
 #include <MyIni.cpp>
+#include <HttpPost.cpp>
+
 
 
 BOOL Base::IsAdmin() {
@@ -267,7 +267,7 @@ string Base::ReadFileCoding(CString FilePath)
 		code = "UTF-8";
 		break;
 	case 0x5b61://23393
-		code = "UTF-8";
+		code = "ANSI OR UTF-8";//不知道为啥这个值对应了两个编码
 		break;
 	case 0xefbb://61371
 		code = "UTF-8-BOM";
