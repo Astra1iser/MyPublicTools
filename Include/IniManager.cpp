@@ -3,7 +3,7 @@
 
 
 //#include "stdafx.h" // include if you got "fatal error C1010: unexpected end of file..."
-#include <MyIni.h>
+#include <IniManager.h>
 //#include <string.h>
 //#include <stdio.h>
 //#include <assert.h>
