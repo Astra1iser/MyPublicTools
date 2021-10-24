@@ -2,6 +2,10 @@
 #pragma once
 #pragma warning(disable:4129)//屏蔽不可转义的警告
 #pragma warning(disable:4996)
+#pragma warning(disable:4267)
+#pragma warning(disable:4311)
+#pragma warning(disable:4302)
+
 
 #include <iostream>
 #include <string>

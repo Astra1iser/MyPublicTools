@@ -331,6 +331,8 @@ using namespace std;
 //    return CString(asVer.c_str());
 //}
 
+
+
 int main(int argc, _TCHAR* argv[])
 {
     //string strFilePath = "C:\\Users\\yuanchunming01\\Desktop\\Procmon.exe";
@@ -338,20 +340,30 @@ int main(int argc, _TCHAR* argv[])
 
     //Wcout(version);
 
-    IniManager ini(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
+    //IniManager ini(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
 
     //cout << ini.GetString(L"abc", L"aaa", 0);
     //Wcout(ini.GetString(L"abc", L"aaa"));
     //ini.AppendString(L"abc", L"aaa", L"卧槽");
     //cout << ini.IsSectionExist(L"abcc") << endl;
-    ini.CopySection(L"abc", L"aaa", 0);
+    //ini.CopySection(L"abc", L"aaa", 0);
     //Wcout(ini.GetString(L"abc", L"bbb", 0));
     //Wcout(CString(ini.GetChar(L"abc", L"aaa", 0)));
     //cout<<ini.WriteDouble(L"abc", L"aaa", 11.321);
     //cout << ini.GetInt(L"abc", L"aaa", 0)<<endl;
     //cout << ReadFileCoding(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
+    XmlManager xml("卧槽.xml");
+    string abc;
+    xml.GetXMLDeclaration(abc);
+    XMLElement* aaa;
+    xml.FindXMLNode(aaa,"lib1");
+    xml.RenameNode(aaa, "qqqq");
 
-    getchar();
+
+
+
+
+    getchar(); 
     system("pause");
     return 0;
 }
