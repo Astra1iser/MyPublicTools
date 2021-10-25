@@ -357,7 +357,15 @@ int main(int argc, _TCHAR* argv[])
     xml.GetXMLDeclaration(abc);
     XMLElement* aaa;
     xml.FindXMLNode(aaa,"lib1");
-    xml.RenameNode(aaa, "qqqq");
+
+    XMLElement* bbb;
+    xml.FindXMLNode(bbb, "table", {},aaa);
+    string text;
+    xml.GetXMLNodeText(text, bbb);
+
+
+
+
 
 
 

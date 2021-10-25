@@ -4,39 +4,58 @@
 #include <tinyxml2.cpp>
 
 
-XmlManager::XmlManager(const char* xmlPath)
+XmlManager::XmlManager(string xmlPath)
 {
 	m_xmlPath = xmlPath;
+	m_pDoc = NULL;
+	PreaseInfo();
 
-	m_pDoc = LoadXMLFile(m_xmlPath);
-	if (NULL != m_pDoc)
-	{
-		m_pRoot = m_pDoc->RootElement();
-	}
 }
 
 XmlManager::~XmlManager()
 {
-
+	if (NULL != m_pDoc)
+		delete m_pDoc;
 }
 
-BOOL XmlManager::SetXMLPath(const char* newXmlPath)
+
+BOOL XmlManager::PreaseInfo()
 {
-	m_xmlPath = newXmlPath;
-	m_pDoc = LoadXMLFile(m_xmlPath);
-	if (!m_pDoc)
+	if (NULL != m_pDoc)
+	{
+		delete m_pDoc;
+		m_pDoc = LoadXMLFile(m_xmlPath);
+		if (NULL == m_pDoc)
+			return FALSE;
+	}
+		
+	else
+	{
+		m_pDoc = LoadXMLFile(m_xmlPath);
+		if (NULL == m_pDoc)
+			return FALSE;
+	}
+		
+	if (NULL != m_pDoc)
 	{
 		m_pRoot = m_pDoc->RootElement();
-		if (!m_pRoot)
-		{
-			return TRUE;
-		}
-		return FALSE;
+		if (NULL == m_pRoot)
+			return FALSE;
 	}
-	return FALSE;
+	return TRUE;
 }
 
-XMLDocument* XmlManager::CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
+BOOL XmlManager::SetXMLPath(string newXmlPath)
+{
+	m_xmlPath = newXmlPath;
+
+	if (PreaseInfo())
+		return TRUE;
+	else
+		return FALSE;
+}
+
+XMLDocument* XmlManager::CreateEmptyXMLFile(string xmlPath, string rootNodeName)
 {
 	const char* declaration = "<?xml version=\"1.0\" encoding=\"GBK\" standalone=\"yes\"?>";
 	XMLDocument* doc = new XMLDocument;
@@ -47,10 +66,10 @@ XMLDocument* XmlManager::CreateEmptyXMLFile(const char* xmlPath, const char* roo
 	//doc.InsertFirstChild(declaration);
 
 	//XMLElement* rootNode = doc->NewElement(G2U(rootNodeName));
-	XMLElement* rootNode = doc->NewElement(rootNodeName);
+	XMLElement* rootNode = doc->NewElement(rootNodeName.c_str());
 	doc->InsertEndChild(rootNode);
 
-	if (!(doc->SaveFile(xmlPath)))
+	if ((doc->SaveFile(xmlPath.c_str())))
 	{
 		return NULL;
 	}
@@ -59,19 +78,20 @@ XMLDocument* XmlManager::CreateEmptyXMLFile(const char* xmlPath, const char* roo
 }
 
 
-XMLDocument* XmlManager::LoadXMLFile(const char* xmlPath)
+XMLDocument* XmlManager::LoadXMLFile(string xmlPath)
 {
 	XMLDocument* doc = new XMLDocument;
-	int res = doc->LoadFile(xmlPath);
+	int res = doc->LoadFile(xmlPath.c_str());
 	if (res != 0)
 	{
+		doc = NULL;
 		return NULL;
 	}
 	return doc;
 }
 
 
-BOOL XmlManager::SaveXMLFile(XMLDocument* doc, const char* xmlSavePath)
+BOOL XmlManager::SaveXMLFile(XMLDocument* doc, string xmlSavePath)
 {
 	if (NULL == doc)
 	{
@@ -80,16 +100,17 @@ BOOL XmlManager::SaveXMLFile(XMLDocument* doc, const char* xmlSavePath)
 			return FALSE;
 	}
 
-	if (NULL == xmlSavePath)
+	if ("" == xmlSavePath)
 	{
 		xmlSavePath = m_xmlPath;
 	}
 
-	if ((doc->SaveFile(xmlSavePath)))
+	if ((doc->SaveFile(xmlSavePath.c_str())))
 	{
 		return FALSE;
 	}
 
+	//PreaseInfo();
 	//delete doc;
 	return TRUE;
 }
@@ -120,7 +141,7 @@ BOOL XmlManager::GetXMLDeclaration(string& strDecl, XMLDocument* doc)
 }
 
 
-BOOL XmlManager::FindXMLNode(XMLElement*& pNode, const string nodeName, map<const char*, const char*> Attribution, XMLElement* pRoot)
+BOOL XmlManager::FindXMLNode(XMLElement*& pNode, string nodeName, map<string, string> Attribution, XMLElement* pRoot)
 {
 	if (NULL == pRoot)
 	{
@@ -129,7 +150,7 @@ BOOL XmlManager::FindXMLNode(XMLElement*& pNode, const string nodeName, map<cons
 			return FALSE;
 	}
 
-	const char* value = pRoot->Value();
+	//string value = pRoot->Value();
 	if (strcmp(pRoot->Value(), nodeName.c_str()) == 0)
 	{
 		if (0 != Attribution.size())
@@ -137,7 +158,7 @@ BOOL XmlManager::FindXMLNode(XMLElement*& pNode, const string nodeName, map<cons
 			int j = 0;
 			for (auto it = Attribution.begin(); it != Attribution.end(); ++it)
 			{
-				string source = pRoot->Attribute(it->first);
+				string source = pRoot->Attribute(it->first.c_str());
 				string target = it->second;
 				if (source == target)
 				{
@@ -170,14 +191,14 @@ BOOL XmlManager::FindXMLNode(XMLElement*& pNode, const string nodeName, map<cons
 }
 
 
-BOOL XmlManager::GetXMLNodeText(const char*& text, XMLElement* pRoot, const string nodeName, map<const char*, const char*> Attribution)
+BOOL XmlManager::GetXMLNodeText(string& text, XMLElement* pRoot, string nodeName, map<string, string> Attribution)
 {
-	if (!pRoot && "" == nodeName)
+	if (NULL == pRoot && "" == nodeName)
 		return FALSE;
-	if (!pRoot)
+	if (NULL == pRoot)
 	{
 		pRoot = m_pRoot;
-		if(!pRoot)
+		if(NULL == pRoot)
 			return FALSE;
 	}
 
@@ -204,14 +225,14 @@ BOOL XmlManager::GetXMLNodeText(const char*& text, XMLElement* pRoot, const stri
 }
 
 
-BOOL XmlManager::GetXMLNodeAttribute(map<string, string>& mapAttribute, XMLElement* pRoot, const string nodeName, map<const char*, const char*> Attribution)
+BOOL XmlManager::GetXMLNodeAttribute(map<string, string>& mapAttribute, string nodeName, map<string, string> Attribution, XMLElement* pRoot)
 {
-	if (!pRoot && "" == nodeName)
+	if (NULL == pRoot && "" == nodeName)
 		return FALSE;
-	if (!pRoot)
+	if (NULL == pRoot)
 	{
 		pRoot = m_pRoot;
-		if (!pRoot)
+		if (NULL == pRoot)
 			return FALSE;
 	}
 
@@ -246,7 +267,7 @@ BOOL XmlManager::GetXMLNodeAttribute(map<string, string>& mapAttribute, XMLEleme
 }
 
 
-BOOL XmlManager::SetXMLNodeText(const string text, XMLElement* pRoot, const string nodeName, map<const char*, const char*> Attribution, XMLDocument* doc, const char* xmlSavePath)
+BOOL XmlManager::SetXMLNodeText(string text, XMLElement* pRoot, string nodeName, map<string, string> Attribution, XMLDocument* doc, string xmlSavePath)
 {
 	if (NULL == doc)
 	{
@@ -255,22 +276,22 @@ BOOL XmlManager::SetXMLNodeText(const string text, XMLElement* pRoot, const stri
 			return FALSE;
 	}
 
-	if (NULL == xmlSavePath)
+	if ("" == xmlSavePath)
 	{
 		xmlSavePath = m_xmlPath;
 	}
 
-	if (!pRoot && ""==nodeName)
+	if (NULL == pRoot && ""==nodeName)
 		return FALSE;
 
-	if (!pRoot)
+	if (NULL == pRoot)
 	{
 		pRoot = m_pRoot;
-		if (!pRoot)
+		if (NULL == pRoot)
 			return FALSE;
 	}
 
-	if ("" == nodeName)
+	if ("" == nodeName && pRoot != m_pRoot)
 	{
 		try
 		{
@@ -333,7 +354,7 @@ BOOL XmlManager::SetXMLNodeText(const string text, XMLElement* pRoot, const stri
 }
 
 
-BOOL XmlManager::SetXMLNodeAttribution(map<string, string>& mapAttribute, XMLElement* pRoot, const string nodeName, map<const char*, const char*> Attribution, XMLDocument* doc, const char* xmlSavePath)
+BOOL XmlManager::SetXMLNodeAttribution(map<string, string>& mapAttribute, XMLElement* pRoot, string nodeName, map<string, string> Attribution, XMLDocument* doc, string xmlSavePath)
 {
 	if (NULL == doc)
 	{
@@ -342,22 +363,22 @@ BOOL XmlManager::SetXMLNodeAttribution(map<string, string>& mapAttribute, XMLEle
 			return FALSE;
 	}
 
-	if (NULL == xmlSavePath)
+	if ("" == xmlSavePath)
 	{
 		xmlSavePath = m_xmlPath;
 	}
 
-	if (!pRoot && "" == nodeName)
+	if (NULL == pRoot && "" == nodeName)
 		return FALSE;
 
-	if (!pRoot)
+	if (NULL == pRoot)
 	{
 		pRoot = m_pRoot;
-		if (!pRoot)
+		if (NULL == pRoot)
 			return FALSE;
 	}
 
-	if ("" == nodeName)
+	if ("" == nodeName && pRoot != m_pRoot)
 	{
 		const XMLAttribute* pAttr = pRoot->FirstAttribute();
 
@@ -527,7 +548,7 @@ BOOL XmlManager::SetXMLNodeAttribution(map<string, string>& mapAttribute, XMLEle
 }
 
 
-BOOL XmlManager::SetXMLNewNode(XMLElement* pFatherRoot, const char* newNodeName, map<string, string>newMapAttribute, const char* newText, const string nodeName, map<const char*, const char*> Attribution, XMLDocument* doc, const char* xmlSavePath)
+BOOL XmlManager::SetXMLNewNode(XMLElement* pFatherRoot, string newNodeName, map<string, string>newMapAttribute, string newText, string nodeName, map<string, string> Attribution, XMLDocument* doc, string xmlSavePath)
 {
 	if (NULL == doc)
 	{
@@ -536,33 +557,33 @@ BOOL XmlManager::SetXMLNewNode(XMLElement* pFatherRoot, const char* newNodeName,
 			return FALSE;
 	}
 
-	if (NULL == xmlSavePath)
+	if ("" == xmlSavePath)
 	{
 		xmlSavePath = m_xmlPath;
 	}
 
-	if (!pFatherRoot && "" == nodeName)
+	if (NULL == pFatherRoot && "" == nodeName)
 		return FALSE;
 
-	if (!pFatherRoot)
+	if (NULL == pFatherRoot)
 	{
 		pFatherRoot = m_pRoot;
-		if (!pFatherRoot)
+		if (NULL == pFatherRoot)
 			return FALSE;
 	}
 
-	if ("" == nodeName)
+	if ("" == nodeName && pFatherRoot != m_pRoot)
 	{
 		if ("" != newNodeName)
 		{
-			XMLElement* pNewNode = pFatherRoot->InsertNewChildElement(newNodeName);
+			XMLElement* pNewNode = pFatherRoot->InsertNewChildElement(newNodeName.c_str());
 			if (0 != newMapAttribute.size())
 			{
-				SetXMLNodeAttribution(newMapAttribute, pNewNode, NULL, {}, doc, xmlSavePath);
+				SetXMLNodeAttribution(newMapAttribute, pNewNode, "", {}, doc, xmlSavePath);
 			}
 			if ("" != newText)
 			{
-				SetXMLNodeText(newText, pNewNode, NULL, {}, doc, xmlSavePath);
+				SetXMLNodeText(newText, pNewNode, "", {}, doc, xmlSavePath);
 			}
 
 			if (SaveXMLFile(doc, xmlSavePath))
@@ -578,14 +599,15 @@ BOOL XmlManager::SetXMLNewNode(XMLElement* pFatherRoot, const char* newNodeName,
 	{
 		if ("" != newNodeName)
 		{
-			XMLElement* pNewNode = pNode->InsertNewChildElement(newNodeName);
+			XMLElement* pNewNode = pNode->InsertNewChildElement(newNodeName.c_str());
 			if (0 != newMapAttribute.size())
 			{
-				SetXMLNodeAttribution(newMapAttribute, pNewNode, NULL, {}, doc, xmlSavePath);
+				SetXMLNodeAttribution(newMapAttribute, pNewNode, "", {}, doc, xmlSavePath);
 			}
 			if ("" != newText)
+			//if(strlen(newText) != 0)
 			{
-				SetXMLNodeText(newText, pNewNode, NULL, {}, doc, xmlSavePath);
+				SetXMLNodeText(newText, pNewNode, "", {}, doc, xmlSavePath);
 			}
 
 			if (SaveXMLFile(doc, xmlSavePath))
@@ -602,7 +624,7 @@ BOOL XmlManager::SetXMLNewNode(XMLElement* pFatherRoot, const char* newNodeName,
 }
 
 
-BOOL XmlManager::RenameNode(XMLElement* pRoot, const char* newNodeName, XMLDocument* doc, const char* xmlSavePath)
+BOOL XmlManager::RenameNode(XMLElement* pRoot, string newNodeName, XMLDocument* doc, string xmlSavePath)
 {
 	if (NULL == doc)
 	{
@@ -611,15 +633,15 @@ BOOL XmlManager::RenameNode(XMLElement* pRoot, const char* newNodeName, XMLDocum
 			return FALSE;
 	}
 
-	if (NULL == xmlSavePath)
+	if ("" == xmlSavePath)
 	{
 		xmlSavePath = m_xmlPath;
 	}
-	if (NULL == pRoot || NULL == newNodeName)
+	if (NULL == pRoot || "" == newNodeName)
 		return FALSE;
 
 
-	pRoot->SetName(newNodeName);
+	pRoot->SetName(newNodeName.c_str());
 
 	if (SaveXMLFile(doc, xmlSavePath))
 	{
@@ -630,8 +652,7 @@ BOOL XmlManager::RenameNode(XMLElement* pRoot, const char* newNodeName, XMLDocum
 
 
 
-
-BOOL XmlManager::DeleteXMLNode(XMLElement* pRoot, const string nodeName, map<const char*, const char*> Attribution, XMLDocument* doc, const char* xmlSavePath)
+BOOL XmlManager::DeleteXMLNode(XMLElement* pRoot, string nodeName, map<string, string> Attribution, XMLDocument* doc, string xmlSavePath)
 {
 	if (NULL == pRoot)
 	{
