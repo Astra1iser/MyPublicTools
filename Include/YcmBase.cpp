@@ -13,7 +13,7 @@
 #include <IniManager.cpp>
 #include <HttpPost.cpp>
 #include <XmlManager.cpp>
-
+#include <LogWriter.cpp>
 
 BOOL Base::IsAdmin() {
 	#define ACCESS_READ		1  

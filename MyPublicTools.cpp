@@ -352,28 +352,35 @@ int main(int argc, _TCHAR* argv[])
     //cout<<ini.WriteDouble(L"abc", L"aaa", 11.321);
     //cout << ini.GetInt(L"abc", L"aaa", 0)<<endl;
     //cout << ReadFileCoding(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
-    XmlManager xml("卧槽.xml");
-    string abc;
-    xml.GetXMLDeclaration(abc);
-    XMLElement* aaa;
-    xml.FindXMLNode(aaa,"lib1");
+    //XmlManager xml("卧槽.xml");
+    //string abc;
+    //xml.GetXMLDeclaration(abc);
+    //XMLElement* aaa;
+    //xml.FindXMLNode(aaa,"lib1");
 
-    XMLElement* bbb;
-    xml.FindXMLNode(bbb, "lib2");
-    string text;
-    //xml.FindXMLNode(bbb, "item", { {"id","1"} }, bbb);
+    //XMLElement* bbb;
+    //xml.FindXMLNode(bbb, "lib2");
+    //string text;
+    ////xml.FindXMLNode(bbb, "item", { {"id","1"} }, bbb);
 
-    //xml.GetXMLNodeText(text, bbb,"table");
+    ////xml.GetXMLNodeText(text, bbb,"table");
 
-    XMLElement* ccc;
-    xml.FindXMLNode(ccc, "item", { {"id","1"} },bbb);
-    //xml.FindXMLNode(ccc, "table", {},ccc);
+    //XMLElement* ccc;
+    //xml.FindXMLNode(ccc, "item", { {"id","1"} },bbb);
+    ////xml.FindXMLNode(ccc, "table", {},ccc);
 
-    //xml.GetXMLNodeText(text, ccc);
-    xml.SetXMLNodeAttribution({{"d","3"}}, ccc, "table", {});
-    xml.SetXMLNodeAttribution({ {"e","3"} }, ccc, "table", {});
-    xml.DeleteXMLNodeAttribution({ "d" }, ccc, "table", {});
+    ////xml.GetXMLNodeText(text, ccc);
+    //xml.SetXMLNodeAttribution({{"d","3"}}, ccc, "table", {});
+    //xml.SetXMLNodeAttribution({ {"e","3"} }, ccc, "table", {});
+    //xml.DeleteXMLNodeAttribution({ "d" }, ccc, "table", {});
 
+    //g_logger.Init(L"C:\\Users\\yuanchunming01\\Desktop\\rizhi.log");
+    while (true)
+    {
+        Sleep(1000);
+        WRITE_LOG(L"%d",123);
+    }
+    
 
 
 

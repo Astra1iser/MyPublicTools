@@ -68,10 +68,12 @@ BOOL CLogWriter::Write(LPCWSTR format, ...)
 		if (dwRet <= 0 || dwRet > dwLen)
 			return FALSE;
 
-		PathCombine(szLogPath, szTempPath, L"InstallAssist");
+		//PathCombine(szLogPath, szTempPath, L"MyPublicLogWriter");
+		PathCombine(szLogPath, szTempPath, MyExeName(FALSE));
 
 		CString strLogPath;
-		strLogPath.Format(L"%s-%d.log",szLogPath, GetCurrentProcessId());
+		//strLogPath.Format(L"%s-%d.log", szLogPath, GetCurrentProcessId());
+		strLogPath.Format(L"%s.log", szLogPath);
 
 		g_logger.Init(strLogPath);	
 	}
@@ -85,7 +87,7 @@ BOOL CLogWriter::Write(LPCWSTR format, ...)
 
 	GetLocalTime(&st);
 
-	StringCchPrintf(szFlag, 80, L"%04d-%02d-%02d %02d:%02d:%02d [%d-%d] ", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, GetCurrentProcessId(), GetCurrentThreadId());
+	StringCchPrintf(szFlag, 80, L"%04d-%02d-%02d %02d:%02d:%02d [ProgressID:%05d] [ThreadID:%05d] ", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, GetCurrentProcessId(), GetCurrentThreadId());
 
 	nNumberOfBytesToWrite = wcslen(szFlag) * sizeof(WCHAR);
 	WriteFile(m_hLogFile, szFlag, nNumberOfBytesToWrite, &nNumberOfBytesWritten, NULL);

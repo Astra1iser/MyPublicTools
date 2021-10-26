@@ -37,6 +37,7 @@
 #include <IniManager.h>//ini解析类
 #include <HttpPost.h>//实现http的post操作
 #include <XmlManager.h>//XML解析类
+#include <LogWriter.h>//日志输出类
 #include <httpdown.h>
 
 
@@ -52,6 +53,8 @@ using namespace FIFO;
 #define SetText_UTF8(x) SetText(G2U(x))
 #define NewElement_UTF8(x) NewElement(G2U(x))
 #define SetAttribute_UTF8(x) SetAttribute(G2U(x))
+
+#define WRITE_LOG(x,...)	g_logger.Write(x,__VA_ARGS__)
 
 #ifndef _YCMBASE_H
 #define _YCMBASE_H
