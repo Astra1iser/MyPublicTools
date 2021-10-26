@@ -78,16 +78,8 @@ using namespace FIFO;
 14.将LPCTSTR转换为string																								string LPCTSTR2string(LPCTSTR lpctstr)
 15.将俩个LPCTSRT拼接																									LPCTSTR CombineLPCTSRT (T1 lpctstr1, T2 lpctstr2)
 16.一个简易的ftp下载方法																								BOOL EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
-17.创建一个且只有根节点的xml文件																						XMLDocument* CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName)
-18.载入xml文件																											XMLDocument* LoadXMLFile(const char* xmlPath)
-19.保存xml内容																											BOOL SaveXMLFile(XMLDocument* doc, const char* xmlPath)
-20.读取XML声明																											BOOL GetXMLDeclaration(XMLDocument* doc, string& strDecl)
-21.寻找XML中的某个节点																									BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, const char* Attribute = NULL, const char* AttributeValue = NULL)
-																														BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
-22.1根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某个(某些)属性的值"，获取该节点文本			BOOL GetXMLNodeText(XMLElement* pRoot, const char*& text, const string nodeName = "", const char* Attribute = NULL, const char* AttributeValue = NULL)
-																														BOOL GetXMLNodeText(XMLElement* pRoot, const char*& text, const string nodeName = "", AttributeList& attributelist = NULL, AttributeValueList& attributevaluelist = NULL)
 
-23.
+17.
 */
 
 namespace Base
@@ -263,71 +255,6 @@ namespace Base
 	void Wcout(CString string);
 
 
-
-
-
-	////17.创建一个且只有根节点的xml文件,可自定义根节点名称,返回创建的xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
-	////参数1:要创建的xml的路径
-	////参数2:根节点名称
-	//XMLDocument* CreateEmptyXMLFile(const char* xmlPath, const char* rootNodeName);
-
-
-	////18.载入xml文件,返回xml的XMLDocument*指针,这个指针可以用来继续对创建的xml进行读写操作
-	////参数:要加载的xml的路径
-	//XMLDocument* LoadXMLFile(const char* xmlPath);
-	//
-
-	////19.保存xml内容,此方法不同于SaveFile()之处在于此处如果保存成功,则释放doc指针并返回TRUE,若保存失败,则返回FALSE但此时不释放doc指针
-	//BOOL SaveXMLFile(XMLDocument* doc, const char* xmlSavePath);
-
-
-	////20.读取XML声明
-	//BOOL GetXMLDeclaration(XMLDocument* doc, string& strDecl);
-
-
-	////21.根据"节点的名字"或者"节点的名字及其节点某些属性的值"来寻找节点(此重载针对多属性的node进行精确定位,注意参数4和参数5有一一对应关系)(这个函数有重载)
-	////参数1 需要查询的xml中某个节点(仅会遍历这个节点和兄弟节点中的子节点)的指针(如果实在不确定,可以填xml根节点的指针,但是此时请填写参数4)
-	////参数2 需要查询的节点名字
-	////参数3 如果查询到了返回的节点的地址,没查到则原引用的地址不变
-	////参数4 要查询的节点的某些具体属性 例如: map<const char*, const char*> adc = { {"class","15班"}}; (也可以不填)
-	//BOOL FindXMLNode(XMLElement* pRoot, const string nodeName, XMLElement*& pNode, map<const char*, const char*> Attribution = {});
-
-
-	////22.根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值"，获取该节点文本(此重载针对多属性的node进行精确定位,注意参数4和参数5有一一对应关系)(这个函数有重载)
-	////参数1 需要查询的xml中某个节点(仅会遍历这个节点和兄弟节点中的子节点)的指针(如果实在不确定,可以填xml根节点的指针,但是此时请填写参数4)
-	////参数2 如果查询到了返回的文字的const char* 指针,没查到则原引用的地址不变
-	////参数3 需要查询的节点名字(如果为空则只查询参数1的节点的文本)
-	////参数4 要查询的节点的某些具体属性 例如: map<const char*, const char*> adc = { {"class","15班"}}; (也可以不填)
-	//BOOL GetXMLNodeText(XMLElement* pRoot, const char*& text, const string nodeName = "", map<const char*, const char*> Attribution = {});
-
-
-	////23.根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值"，获取节点属性(这个函数有重载)
-	////参数1 需要查询的xml中某个节点(仅会遍历这个节点和兄弟节点中的子节点)的指针(如果实在不确定,可以填xml根节点的指针,但是此时请填写参数4)
-	////参数2 如果查询到了返回属性的map<string, string>,没查到则原引用的内容不变
-	////参数3 需要查询的节点名字(如果为空则只查询参数1的节点的属性)(请务必遵循一个xml中同名节点的属性名都相同的结构来构造xml,因为此方法只会返回查找到的第一个同名节点的属性名和值,如果你想获取某些同名节点的属性构成的话)
-	////参数4 要查询的节点的某些具体属性 例如: map<const char*, const char*> adc = { {"class","15班"}}; (也可以不填)
-	//BOOL GetXMLNodeAttribute(XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName = "", map<const char*, const char*> Attribution = {});
-
-
-	////24.根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",更新节点的文本(没有文本会添加,有文本会更新)
-	//BOOL SetXMLNodeText(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const string text, const string nodeName = "", map<const char*, const char*> Attribution = {});
-
-
-	////25.根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",更新节点的属性的值(没有的属性会添加,已经有的属性会更新)
-	//BOOL SetXMLNodeAttribution(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, map<string, string>& mapAttribute, const string nodeName = "", map<const char*, const char*> Attribution = {});
-
-
-	////26.根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",添加新节点
-	//BOOL SetXMLNewNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* newNodeName, map<string, string>newMapAttribute = {}, const char* newText = "", const string nodeName = "", map<const char*, const char*> Attribution = {});
-
-
-	////27.1根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",删除父节点下的所有节点
-	//BOOL DeleteXMLNode(XMLDocument* doc, const char* xmlSavePath, XMLElement* pRoot, const char* delNodeName, const string nodeName = "", map<const char*, const char*> Attribution = {});
-
-
-	////27.2删除父节点下的指定子节点
-	//BOOL DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode);
-
 	// 这是一个返回值后置的例子
 	template<class T, class Y>
 	auto funcExample(T& t, Y& y) -> decltype(t + y)
@@ -372,71 +299,6 @@ namespace Base
 
 
 
-
-
-
-
-
-
-	//这里本身是要做一个封装xml的互斥量锁  暂时先放着 后边再完善
-
-	//class XMLManager
-	//{
-	//	public:
-
-	//		XMLManager(const char* xmlPath)
-	//		{
-	//			InitializeSRWLock(&g_srwLock);//初始化文件锁
-	//			InitializeCriticalSection(&g_cs);//初始化临界区
-	//			m_xmlPath = xmlPath;
-	//		}
-
-	//		~XMLManager()
-	//		{
-
-	//			DeleteCriticalSection(&g_cs);//删除临界区
-	//			ReleaseSRWLockExclusive(&g_srwLock);//释放写文件锁
-	//			ReleaseSRWLockShared(&g_srwLock);//释放读文件锁
-	//			delete this;
-	//		}
-
-	//		void ReadLock()
-	//		{
-	//			//读者申请读取文件
-	//			AcquireSRWLockShared(&g_srwLock);//请求读文件锁
-	//			EnterCriticalSection(&g_cs);//创建临界区
-	//		}
-	//		void ReadUnlock()
-	//		{
-	//			//读者结束读取文件
-	//			ReleaseSRWLockShared(&g_srwLock);//释放读文件锁
-	//			LeaveCriticalSection(&g_cs);//释放临界区
-	//		}
-	//		void WriteLock()
-	//		{
-	//			AcquireSRWLockExclusive(&g_srwLock);//请求写文件锁
-	//			EnterCriticalSection(&g_cs);//创建临界区
-	//		}
-	//		void WriteUnlock()
-	//		{
-	//			ReleaseSRWLockExclusive(&g_srwLock);//释放写文件锁
-	//			LeaveCriticalSection(&g_cs);//释放临界区
-	//		}
-
-
-	//		XMLDocument* LoadXMLFile(const char* xmlPath);
-
-
-
-
-
-	//	private:
-
-	//		CRITICAL_SECTION g_cs;
-	//		SRWLOCK          g_srwLock;
-	//		const char*		m_xmlPath;
-	//};
-	
 	
 
 

@@ -359,14 +359,20 @@ int main(int argc, _TCHAR* argv[])
     xml.FindXMLNode(aaa,"lib1");
 
     XMLElement* bbb;
-    xml.FindXMLNode(bbb, "table", {},aaa);
+    xml.FindXMLNode(bbb, "lib2");
     string text;
-    xml.GetXMLNodeText(text, bbb);
+    //xml.FindXMLNode(bbb, "item", { {"id","1"} }, bbb);
 
+    //xml.GetXMLNodeText(text, bbb,"table");
 
+    XMLElement* ccc;
+    xml.FindXMLNode(ccc, "item", { {"id","1"} },bbb);
+    //xml.FindXMLNode(ccc, "table", {},ccc);
 
-
-
+    //xml.GetXMLNodeText(text, ccc);
+    xml.SetXMLNodeAttribution({{"d","3"}}, ccc, "table", {});
+    xml.SetXMLNodeAttribution({ {"e","3"} }, ccc, "table", {});
+    xml.DeleteXMLNodeAttribution({ "d" }, ccc, "table", {});
 
 
 

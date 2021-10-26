@@ -28,9 +28,6 @@ private:
 	*/
 	XMLDocument* LoadXMLFile(string xmlPath);
 
-
-
-
 public:
 
 	XmlManager(string xmlPath);
@@ -74,7 +71,7 @@ public:
 	参数1:如果查询到了返回的节点的地址,没查到则原引用的地址不变
 	参数2:需要查询的节点名字
 	参数3:要查询的节点的某些具体属性 例如: map<string, string> adc = { {"class","15班"}}; (也可以不填)
-	参数4:需要查询的xml中某个节点(仅会遍历这个节点和其子节点)的指针
+	参数4:需要查询的xml中某个节点(仅会遍历这个节点和其子节点)的指针(配合参数2,3来细化查找)
 	*/
 	BOOL FindXMLNode(XMLElement*& pNode, string nodeName, map<string, string> Attribution = {}, XMLElement* pRoot = NULL);
 
@@ -86,7 +83,7 @@ public:
 		3.节点名及节点属性及父节点指针
 		4.节点指针
 	参数1:如果查询到了则给参数1传值,没查到则传空
-	参数2:需要查询的xml中某个节点(仅会遍历这个节点及子节点)的指针
+	参数2:需要查询的xml中某个节点(仅会遍历这个节点及子节点)的指针,如果填NULL,则默认父节点是加载的xml的根节点,如果这个值不是xml的根节点且参数3和4也没填,则直接查找这个节点的文本
 	参数3:需要查询的节点名字(如果为空则只查询参数2的节点的文本)
 	参数4:要查询的节点的某些具体属性 例如: map<const char*, const char*> adc = { {"class","15班"}}; (也可以不填)
 	*/
@@ -98,12 +95,13 @@ public:
 		1.节点名(若有重名节点则只会返回第一个节点的数据)
 		2.节点名及节点属性
 		3.节点名及节点属性及父节点指针
+		4.节点指针
 	参数1:如果查询到了返回属性的map<string, string>,没查到则原引用的内容不变
-	参数2:需要查询的节点名字(如果为空则只查询参数1的节点的属性)
-	参数3:要查询的节点的某些具体属性 例如: map<const char*, const char*> adc = { {"class","15班"}}; (也可以不填)
-	参数4:需要查询的xml中某个节点(仅会遍历这个节点和子节点)的指针
+	参数2:需要查询的xml中某个节点(仅会遍历这个节点和子节点)的指针,如果填NULL,则默认父节点是加载的xml的根节点,如果这个值不是xml的根节点且参数3和4也没填,则直接查找这个节点的文本
+	参数3:需要查询的节点名字(如果为空则只查询参数1的节点的属性)
+	参数4:要查询的节点的某些具体属性 例如: map<const char*, const char*> adc = { {"class","15班"}}; (也可以不填)
 	*/
-	BOOL GetXMLNodeAttribute(map<string, string>& mapAttribute, string nodeName = "", map<string, string> Attribution = {}, XMLElement * pRoot = NULL);
+	BOOL GetXMLNodeAttribute(map<string, string>& mapAttribute, XMLElement* pRoot = NULL, string nodeName = "", map<string, string> Attribution = {});
 
 	/*
 	根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",更新节点的文本(没有文本会添加,有文本会更新)
@@ -113,13 +111,13 @@ public:
 		3.节点名及节点属性及父节点指针
 		4.如果只有参数1和参数2且参数2不是NULL,则直接修改填入的节点指针指向的节点
 	参数1:要设置(更新)的字符串
-	参数2:节点指针,填入想要设置的节点或者其父节点,如果填NULL,则默认父节点是加载的xml的根节点,如果只有参数1和参数2且参数2不是NULL,则直接修改填入的节点指针指向的节点
+	参数2:节点指针,填入想要设置的节点或者其父节点,如果填NULL,则默认父节点是加载的xml的根节点,如果只有参数1和参数2且参数2不是NULL,则直接修改填入的节点指针指向的节点,
 	参数3:要修改的节点的名称,配合参数2来查找具体节点
 	参数4:要修改的节点的属性,配合参数2来查找具体节点
 	参数5:不需要改变
 	参数6:不需要改变
 	*/
-	BOOL SetXMLNodeText(string text, XMLElement* pRoot, string nodeName = "", map<string, string> Attribution = {},XMLDocument * doc = NULL, string xmlSavePath= NULL);
+	BOOL SetXMLNodeText(string text, XMLElement* pRoot, string nodeName = "", map<string, string> Attribution = {},XMLDocument * doc = NULL, string xmlSavePath= "");
 
 	/*
 	重命名节点
@@ -143,7 +141,7 @@ public:
 	参数5:不需要改变
 	参数6:不需要改变
 	*/
-	BOOL SetXMLNodeAttribution(map<string, string>& mapAttribute, XMLElement* pRoot, string nodeName = "", map<string, string> Attribution = {}, XMLDocument* doc = NULL, string xmlSavePath= NULL);
+	BOOL SetXMLNodeAttribution(map<string, string>mapAttribute, XMLElement* pRoot, string nodeName = "", map<string, string> Attribution = {}, XMLDocument* doc = NULL, string xmlSavePath= "");
 
 
 	/*
@@ -162,10 +160,42 @@ public:
 	参数7:不需要改变
 	参数8,不需要改变
 	*/
-	BOOL SetXMLNewNode(XMLElement* pFatherRoot, string newNodeName, map<string, string>newMapAttribute = {}, string newText = "", string nodeName = "", map<string, string> Attribution = {}, XMLDocument* doc = NULL, string xmlSavePath = NULL);
+	BOOL SetXMLNewNode(XMLElement* pFatherRoot, string newNodeName, map<string, string>newMapAttribute = {}, string newText = "", string nodeName = "", map<string, string> Attribution = {}, XMLDocument* doc = NULL, string xmlSavePath = "");
+
 
 	/*
-	27.1根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",删除父节点下的所有节点
+	根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",删除节点的文本
+	你可以选择如下搭配来寻找节点:
+		1.节点名(若有重名节点则只会返回第一个节点的数据)
+		2.节点名及节点属性
+		3.节点名及节点属性及父节点指针
+		4.如果只有参数1和参数2且参数2不是NULL,则直接修改填入的节点指针指向的节点
+	参数1:节点指针,填入想要设置的节点或者其父节点,如果填NULL,则默认父节点是加载的xml的根节点,如果只有参数1和参数2且参数2不是NULL,则直接修改填入的节点指针指向的节点,
+	参数2:要修改的节点的名称,配合参数2来查找具体节点
+	参数3:要修改的节点的属性,配合参数2来查找具体节点
+	参数4:不需要改变
+	参数5:不需要改变
+	*/
+	BOOL DeleteXMLNodeText(XMLElement* pRoot, string nodeName = "", map<string, string> Attribution = {}, XMLDocument* doc = NULL, string xmlSavePath = "");
+
+	/*
+	根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",删除节点特定属性
+	你可以选择如下搭配来寻找节点:
+		1.节点名(若有重名节点则只会返回第一个节点的数据)
+		2.节点名及节点属性
+		3.节点名及节点属性及父节点指针
+		4.如果只有参数1和参数2且参数2不是NULL,则直接修改填入的节点指针指向的节点
+	参数1:要删除的属性名(遍历vector中的所有名字)
+	参数2:节点指针,填入想要设置的节点或者其父节点,如果填NULL,则默认父节点是加载的xml的根节点,如果只有参数1和参数2且参数2不是NULL,则直接修改填入的节点指针指向的节点
+	参数3:要修改的节点的名称,配合参数2来查找具体节点
+	参数4:要修改的节点的属性,配合参数2来查找具体节点
+	参数5:不需要改变
+	参数6:不需要改变
+	*/
+	BOOL DeleteXMLNodeAttribution(vector<string>AttributeName, XMLElement* pRoot, string nodeName = "", map<string, string> Attribution = {}, XMLDocument* doc = NULL, string xmlSavePath = "");
+
+	/*
+	根据"节点指针"或者"节点指针和节点名"或者"节点指针和节点的名字及其节点某些属性的值",删除父节点下的所有节点
 	你可以选择如下搭配来寻找节点:
 		1.节点名(若有重名节点则只会返回第一个节点的数据)
 		2.节点名及节点属性
@@ -177,13 +207,12 @@ public:
 	参数4:不需要改变
 	参数5:不需要改变
 	*/
-	BOOL DeleteXMLNode(XMLElement* pRoot, string nodeName = "", map<string, string> Attribution = {}, XMLDocument* doc = NULL, string xmlSavePath = NULL);
-
+	BOOL DeleteXMLNode(XMLElement* pRoot, string nodeName = "", map<string, string> Attribution = {}, XMLDocument* doc = NULL, string xmlSavePath = "");
 
 	/*
 	删除父节点下的指定子节点
 	参数1:父节点指针
 	参数2:父节点下的子节点的指针
 	*/
-	BOOL DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode);
+	BOOL DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode, XMLDocument* doc = NULL, string xmlSavePath = "");
 };

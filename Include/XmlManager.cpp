@@ -12,6 +12,7 @@ XmlManager::XmlManager(string xmlPath)
 
 }
 
+
 XmlManager::~XmlManager()
 {
 	if (NULL != m_pDoc)
@@ -45,6 +46,7 @@ BOOL XmlManager::PreaseInfo()
 	return TRUE;
 }
 
+
 BOOL XmlManager::SetXMLPath(string newXmlPath)
 {
 	m_xmlPath = newXmlPath;
@@ -54,6 +56,7 @@ BOOL XmlManager::SetXMLPath(string newXmlPath)
 	else
 		return FALSE;
 }
+
 
 XMLDocument* XmlManager::CreateEmptyXMLFile(string xmlPath, string rootNodeName)
 {
@@ -114,7 +117,6 @@ BOOL XmlManager::SaveXMLFile(XMLDocument* doc, string xmlSavePath)
 	//delete doc;
 	return TRUE;
 }
-
 
 
 BOOL XmlManager::GetXMLDeclaration(string& strDecl, XMLDocument* doc)
@@ -202,7 +204,7 @@ BOOL XmlManager::GetXMLNodeText(string& text, XMLElement* pRoot, string nodeName
 			return FALSE;
 	}
 
-	if ("" == nodeName)
+	if ("" == nodeName && pRoot != m_pRoot)
 	{
 		text = pRoot->GetText();
 		return TRUE;
@@ -225,7 +227,7 @@ BOOL XmlManager::GetXMLNodeText(string& text, XMLElement* pRoot, string nodeName
 }
 
 
-BOOL XmlManager::GetXMLNodeAttribute(map<string, string>& mapAttribute, string nodeName, map<string, string> Attribution, XMLElement* pRoot)
+BOOL XmlManager::GetXMLNodeAttribute(map<string, string>& mapAttribute, XMLElement* pRoot, string nodeName, map<string, string> Attribution)
 {
 	if (NULL == pRoot && "" == nodeName)
 		return FALSE;
@@ -236,7 +238,7 @@ BOOL XmlManager::GetXMLNodeAttribute(map<string, string>& mapAttribute, string n
 			return FALSE;
 	}
 
-	if ("" == nodeName)
+	if ("" == nodeName && pRoot != m_pRoot)
 	{
 		const XMLAttribute* pAttr = NULL;
 		for (pAttr = pRoot->FirstAttribute(); pAttr != NULL; pAttr = pAttr->Next())
@@ -354,7 +356,7 @@ BOOL XmlManager::SetXMLNodeText(string text, XMLElement* pRoot, string nodeName,
 }
 
 
-BOOL XmlManager::SetXMLNodeAttribution(map<string, string>& mapAttribute, XMLElement* pRoot, string nodeName, map<string, string> Attribution, XMLDocument* doc, string xmlSavePath)
+BOOL XmlManager::SetXMLNodeAttribution(map<string, string>mapAttribute, XMLElement* pRoot, string nodeName, map<string, string> Attribution, XMLDocument* doc, string xmlSavePath)
 {
 	if (NULL == doc)
 	{
@@ -651,6 +653,158 @@ BOOL XmlManager::RenameNode(XMLElement* pRoot, string newNodeName, XMLDocument* 
 }
 
 
+BOOL XmlManager::DeleteXMLNodeText(XMLElement * pRoot, string nodeName, map<string, string> Attribution, XMLDocument * doc, string xmlSavePath)
+{
+	if (NULL == doc)
+	{
+		doc = m_pDoc;
+		if (NULL == doc)
+			return FALSE;
+	}
+
+	if ("" == xmlSavePath)
+	{
+		xmlSavePath = m_xmlPath;
+	}
+
+	if (NULL == pRoot && "" == nodeName)
+		return FALSE;
+
+	if (NULL == pRoot)
+	{
+		pRoot = m_pRoot;
+		if (NULL == pRoot)
+			return FALSE;
+	}
+
+	if ("" == nodeName && pRoot != m_pRoot)
+	{
+		try
+		{
+
+			XMLNode* pText = pRoot->LastChild();
+			if (NULL != pText)
+			{
+				pText->SetValue("");
+			}
+			else
+			{
+				//DoNothing
+			}
+		}
+		catch (...)
+		{
+			//DoNothing
+		}
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	XMLElement* pNode = NULL;
+	if (FindXMLNode(pNode, nodeName, Attribution, pRoot))
+	{
+		try
+		{
+			XMLNode* pText = pNode->LastChild();
+			if (NULL != pText)
+			{
+				pText->SetValue("");
+			}
+			else
+			{
+				//DoNothing
+			}
+		}
+		catch (...)
+		{
+			//DoNothing
+		}
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+BOOL XmlManager::DeleteXMLNodeAttribution(vector<string>AttributeName, XMLElement* pRoot, string nodeName, map<string, string> Attribution, XMLDocument* doc, string xmlSavePath)
+{
+	if (NULL == doc)
+	{
+		doc = m_pDoc;
+		if (NULL == doc)
+			return FALSE;
+	}
+
+	if ("" == xmlSavePath)
+	{
+		xmlSavePath = m_xmlPath;
+	}
+
+	if (NULL == pRoot && "" == nodeName)
+		return FALSE;
+
+	if (NULL == pRoot)
+	{
+		pRoot = m_pRoot;
+		if (NULL == pRoot)
+			return FALSE;
+	}
+
+	if ("" == nodeName && pRoot != m_pRoot)
+	{
+		const XMLAttribute* pAttr = pRoot->FirstAttribute();
+
+		if (NULL == pAttr)
+		{
+			for (auto it = AttributeName.begin(); it != AttributeName.end(); ++it)
+			{
+				if ("" != it->c_str())
+				{
+					pRoot->DeleteAttribute(it->c_str());
+				}
+				else
+				{
+					return FALSE;
+				}
+			}
+		}
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	XMLElement* pNode = NULL;
+	if (FindXMLNode(pNode, nodeName, Attribution, pRoot))
+	{
+
+		for (auto it = AttributeName.begin(); it != AttributeName.end(); ++it)
+		{
+			if ("" != it->c_str())
+			{
+				pNode->DeleteAttribute(it->c_str());
+			}
+			else
+			{
+				return FALSE;
+			}
+		}
+
+		if (SaveXMLFile(doc, xmlSavePath))
+		{
+			return TRUE;
+		}
+		return FALSE;
+	}
+	return FALSE;
+}
+
 
 BOOL XmlManager::DeleteXMLNode(XMLElement* pRoot, string nodeName, map<string, string> Attribution, XMLDocument* doc, string xmlSavePath)
 {
@@ -688,8 +842,13 @@ BOOL XmlManager::DeleteXMLNode(XMLElement* pRoot, string nodeName, map<string, s
 }
 
 
-BOOL XmlManager::DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode)
+BOOL XmlManager::DeleteXMLNode(XMLElement* fatherNode, XMLElement* childrenNode, XMLDocument* doc, string xmlSavePath)
 {
 	fatherNode->DeleteChild(childrenNode); //删除指定节点
-	return TRUE;
+	if (SaveXMLFile(doc, xmlSavePath))
+	{
+		return TRUE;
+	}
+	return FALSE;
+
 }
