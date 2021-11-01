@@ -1,6 +1,7 @@
 #pragma once
 #include <FIFO.h>
 
+
 HANDLE FIFO::CreateFIFO(CString PipeName)
 {
 	CString buffer;

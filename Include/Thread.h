@@ -180,6 +180,7 @@ int main()
 */
 
 using callback = void(*)(void*);    //定义void fun(void* pl)函数指针callback
+//typedef void(*callback)(void*);
 
 //定义任务队列的结构体
 struct Task

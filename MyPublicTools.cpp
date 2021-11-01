@@ -337,58 +337,194 @@ using namespace std;
 
 
 
-int main(int argc, _TCHAR* argv[])
+//int main(int argc, _TCHAR* argv[])
+//{
+//    //string strFilePath = "C:\\Users\\yuanchunming01\\Desktop\\Procmon.exe";
+//    //CString version = GetFileVersion(strFilePath.c_str());
+//
+//    //Wcout(version);
+//
+//    //IniManager ini(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
+//
+//    //cout << ini.GetString(L"abc", L"aaa", 0);
+//    //Wcout(ini.GetString(L"abc", L"aaa"));
+//    //ini.AppendString(L"abc", L"aaa", L"卧槽");
+//    //cout << ini.IsSectionExist(L"abcc") << endl;
+//    //ini.CopySection(L"abc", L"aaa", 0);
+//    //Wcout(ini.GetString(L"abc", L"bbb", 0));
+//    //Wcout(CString(ini.GetChar(L"abc", L"aaa", 0)));
+//    //cout<<ini.WriteDouble(L"abc", L"aaa", 11.321);
+//    //cout << ini.GetInt(L"abc", L"aaa", 0)<<endl;
+//    //cout << ReadFileCoding(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
+//    //XmlManager xml("卧槽.xml");
+//    //string abc;
+//    //xml.GetXMLDeclaration(abc);
+//    //XMLElement* aaa;
+//    //xml.FindXMLNode(aaa,"lib1");
+//
+//    //XMLElement* bbb;
+//    //xml.FindXMLNode(bbb, "lib2");
+//    //string text;
+//    ////xml.FindXMLNode(bbb, "item", { {"id","1"} }, bbb);
+//
+//    ////xml.GetXMLNodeText(text, bbb,"table");
+//
+//    //XMLElement* ccc;
+//    //xml.FindXMLNode(ccc, "item", { {"id","1"} },bbb);
+//    ////xml.FindXMLNode(ccc, "table", {},ccc);
+//
+//    ////xml.GetXMLNodeText(text, ccc);
+//    //xml.SetXMLNodeAttribution({{"d","3"}}, ccc, "table", {});
+//    //xml.SetXMLNodeAttribution({ {"e","3"} }, ccc, "table", {});
+//    //xml.DeleteXMLNodeAttribution({ "d" }, ccc, "table", {});
+//
+//    //g_logger.Init(L"C:\\Users\\yuanchunming01\\Desktop\\rizhi.log");
+//
+//    while (true)
+//    {
+//        Sleep(1000);
+//        WRITE_LOG(L"%s",L"我我我我我我我我");
+//    }
+//    
+//
+//
+//
+//    getchar(); 
+//    system("pause");
+//    return 0;
+//}
+
+MySocket aaaaaaa;
+
+class Example3 : public Thread
 {
-    //string strFilePath = "C:\\Users\\yuanchunming01\\Desktop\\Procmon.exe";
-    //CString version = GetFileVersion(strFilePath.c_str());
+public:
+	//重写Run;
 
-    //Wcout(version);
+	void Run() override
+	{
+		aaaaaaa.InitSender(7001);
+		int nLoop = 0;
+		char buff[MAX_BUF_LEN];
+		memset(buff, 0, MAX_BUF_LEN);
 
-    //IniManager ini(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
+		while (this->bRun)
+		{
+			nLoop++;
 
-    //cout << ini.GetString(L"abc", L"aaa", 0);
-    //Wcout(ini.GetString(L"abc", L"aaa"));
-    //ini.AppendString(L"abc", L"aaa", L"卧槽");
-    //cout << ini.IsSectionExist(L"abcc") << endl;
-    //ini.CopySection(L"abc", L"aaa", 0);
-    //Wcout(ini.GetString(L"abc", L"bbb", 0));
-    //Wcout(CString(ini.GetChar(L"abc", L"aaa", 0)));
-    //cout<<ini.WriteDouble(L"abc", L"aaa", 11.321);
-    //cout << ini.GetInt(L"abc", L"aaa", 0)<<endl;
-    //cout << ReadFileCoding(L"C:\\Users\\yuanchunming01\\Desktop\\123.ini");
-    //XmlManager xml("卧槽.xml");
-    //string abc;
-    //xml.GetXMLDeclaration(abc);
-    //XMLElement* aaa;
-    //xml.FindXMLNode(aaa,"lib1");
+			//sprintf(buff, "Message %d", nLoop);
+			//aaaaaaa.Send(buff);
+			aaaaaaa.Send(nLoop);
+			Sleep(5000);
+		}
+		return;
+	}
 
-    //XMLElement* bbb;
-    //xml.FindXMLNode(bbb, "lib2");
-    //string text;
-    ////xml.FindXMLNode(bbb, "item", { {"id","1"} }, bbb);
+};
 
-    ////xml.GetXMLNodeText(text, bbb,"table");
+class Example4 : public Thread
+{
+public:
+	//重写Run;
 
-    //XMLElement* ccc;
-    //xml.FindXMLNode(ccc, "item", { {"id","1"} },bbb);
-    ////xml.FindXMLNode(ccc, "table", {},ccc);
+	void Run() override
+	{
+		aaaaaaa.InitReceiver(7001);
+		int nLoop = 0;
 
-    ////xml.GetXMLNodeText(text, ccc);
-    //xml.SetXMLNodeAttribution({{"d","3"}}, ccc, "table", {});
-    //xml.SetXMLNodeAttribution({ {"e","3"} }, ccc, "table", {});
-    //xml.DeleteXMLNodeAttribution({ "d" }, ccc, "table", {});
 
-    //g_logger.Init(L"C:\\Users\\yuanchunming01\\Desktop\\rizhi.log");
-    while (true)
-    {
-        Sleep(1000);
-        WRITE_LOG(L"%d",123);
-    }
-    
+		while (this->bRun)
+		{
+			nLoop++;
+			aaaaaaa.Receive();
+		}
+		return;
+	}
+
+};
 
 
 
-    getchar(); 
-    system("pause");
-    return 0;
+#include "stdafx.h"
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	//WORD wVersionRequested;
+	//WSADATA wsaData;
+	//int err;
+
+	//wVersionRequested = MAKEWORD(2, 2);
+	//err = WSAStartup(wVersionRequested, &wsaData);
+	//if (err != 0)
+	//{
+	//	return -1;
+	//}
+	//if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
+	//{
+	//	WSACleanup();
+	//	return -1;
+	//}
+
+	//SOCKET clientSock = socket(AF_INET, SOCK_DGRAM, 0);
+	//if (INVALID_SOCKET == clientSock)
+	//{
+	//	err = WSAGetLastError();
+	//	printf("socket error:%d\n", err);
+	//	WSACleanup();
+	//	return -1;
+	//}
+
+
+
+
+
+
+	////创建本地地址信息并绑定
+	//SOCKADDR_IN sin;
+	//sin.sin_family = AF_INET;
+	//sin.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
+	//sin.sin_port = htons(7001);
+	//if (bind(clientSock, (SOCKADDR*)&sin, sizeof(sin)) != 0)
+	//{
+	//	err = WSAGetLastError();
+	//	printf("bind error:%d\n", err);
+	//	closesocket(clientSock);
+	//	WSACleanup();
+	//	return -1;
+	//}
+
+	////SOCKADDR_IN clientAddr;
+	////int addrLen = sizeof(clientAddr);
+	//int addrLen = sizeof(SOCKADDR_IN);
+	//int nSize;
+	//char recvBuff[1024];
+	//memset(recvBuff, 0, 1024);
+
+	//while (1) {
+	//	//nSize = recvfrom(clientSock, recvBuff, 1024, 0, (SOCKADDR*)&clientAddr, &addrLen);
+	//	nSize = recvfrom(clientSock, recvBuff, 1024, 0, (SOCKADDR*)&sin, &addrLen);
+	//	if (nSize == SOCKET_ERROR)
+	//	{
+	//		err = WSAGetLastError();
+	//		printf("recv error:%d\n", err);
+	//		break;
+	//	}
+	//	recvBuff[nSize] = '\0';
+	//	printf("%s\n", recvBuff);
+
+	//}
+
+	//closesocket(clientSock);
+	//WSACleanup();
+
+	Example3 ddd;
+	Example4 dddd;
+	//ddd.Start();
+	dddd.Start();
+
+	system("pause");
+
+
+	return 0;
 }

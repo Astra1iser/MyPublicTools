@@ -1,5 +1,4 @@
 #pragma once
-
 /*
 	HANDLE h_Pipe = CreateFIFO(L"mypipe");
 	ConnectNamedPipe(h_Pipe, NULL);

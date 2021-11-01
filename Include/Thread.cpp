@@ -45,6 +45,7 @@ void Thread::Start()
 		return;
 	}
 }
+
 void Thread::Stop()
 {
 	if (bRun == false)

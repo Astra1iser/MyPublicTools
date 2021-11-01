@@ -5,15 +5,16 @@
 #include <RegeditManager.cpp>
 #include <MyOperFile.cpp>
 #include <Thread.cpp>
-
-#include <httpdown.cpp>
 #include <Mutex.cpp>
 #include <FIFO.cpp>
 #include <SharedMemory.cpp>
 #include <IniManager.cpp>
-#include <HttpPost.cpp>
 #include <XmlManager.cpp>
 #include <LogWriter.cpp>
+#include <Socket.cpp>
+
+#include <HttpPost.cpp>
+#include <httpdown.cpp>
 
 BOOL Base::IsAdmin() {
 	#define ACCESS_READ		1  

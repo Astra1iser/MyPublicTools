@@ -29,15 +29,15 @@
 #include <RegeditManager.h>//注册表操作相关函数
 #include <MyOperFile.h>//文件读写和文件信息相关函数
 #include <Thread.h>//线程类/线程池
-
 #include <JsonHelper.h>//json解析库
 #include <Mutex.h>//系统全局锁 Mutex(可作为线程锁和文件锁)
 #include <FIFO.h> //管道的实现
 #include <SharedMemory.h>//共享内存类的实现
 #include <IniManager.h>//ini解析类
-#include <HttpPost.h>//实现http的post操作
 #include <XmlManager.h>//XML解析类
 #include <LogWriter.h>//日志输出类
+#include <Socket.h>//Socket连接类
+#include <HttpPost.h>//实现http的post操作
 #include <httpdown.h>
 
 
