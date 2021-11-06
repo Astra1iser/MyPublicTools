@@ -163,7 +163,7 @@ BOOL MySocket::InitReceiver(u_short port)
 	if (bind(sock_type, (SOCKADDR*)&ReceiveUdpServ, sizeof(ReceiveUdpServ)) != 0)
 	{
 		err = WSAGetLastError();
-		printf("bind error:%d\n", err);
+		printf("Bind error:%d\n", err);
 		closesocket(sock_type);
 		WSACleanup();
 		return 0;
@@ -185,13 +185,14 @@ string MySocket::Receive()
 		if (nSize == SOCKET_ERROR)
 		{
 			err = WSAGetLastError();
-			printf("recv error:%d\n", err);
+			printf("Recv error:%d\n", err);
 			return "";
 		}
 		else
 		{
 			//recvBuffer[nSize] = '\0';
-			printf("receive: %s\n", recvBuffer);
+			printf("Receive: %s,From Ip: %s\n", recvBuffer, inet_ntoa(ReceiveUdpServ.sin_addr));
+
 			return recvBuffer;
 		}
 	//}

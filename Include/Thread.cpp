@@ -52,7 +52,6 @@ void Thread::Stop()
 		return;
 	bRun = false;
 	TerminateThread(hThread, EXIT_FAILURE);
-
 }
 
 BOOL Thread::WaitExit()

@@ -92,11 +92,11 @@ namespace Base
 
 
 	//2.返回当前系统语言
-	LPCTSTR SetLangaueSyncOS();
+	CString SetLangaueSyncOS();
 
 
 	//3.一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
-	BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE);
+	BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE, _Out_opt_ HANDLE ProgrameHandle = NULL);
 
 
 	//4.获得数组的元素个数,参数为任意数组的引用

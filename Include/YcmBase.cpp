@@ -110,7 +110,7 @@ BOOL Base::IsAdmin() {
 }
 
 
-LPCTSTR Base::SetLangaueSyncOS()
+CString Base::SetLangaueSyncOS()
 {
 	CString strLanguage = L"zh_cn";
 
@@ -138,7 +138,7 @@ LPCTSTR Base::SetLangaueSyncOS()
 		return strLanguage;
 	}
 
-	return NULL;
+	return L"";
 
 }
 
@@ -162,7 +162,7 @@ LPCTSTR Base::SetLangaueSyncOS()
 //}
 
 
-BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL IsWaitForSingle)
+BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL IsWaitForSingle, _Out_opt_ HANDLE ProgrameHandle)
 {
 
 	//if (!PathIsDirectory(Path))
@@ -205,15 +205,20 @@ BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL Is
 
 	//如果函数运行成功，该项的值将大于32，否则其他的值自己查
 	ShExecInfo.hInstApp = NULL;
+
 	if (ShellExecuteEx(&ShExecInfo))
 	{
 		//线程挂起,直到唤起的进程有响应 如:关闭
 		if (IsWaitForSingle == TRUE)
 			WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+		ProgrameHandle = ShExecInfo.hwnd;
 		return TRUE;
 	}	
 	else
-		return FALSE;	
+	{
+		ProgrameHandle = ShExecInfo.hwnd;
+		return FALSE;
+	}
 }
 
 

@@ -403,14 +403,15 @@ public:
 
 	void Run() override
 	{
-		aaaaaaa.InitSender(7001);
-		int nLoop = 0;
+		//aaaaaaa.InitSender(7001/*, "172.24.83.25"*/);
+		aaaaaaa.InitSender(7001, "10.41.4.49");
+		int nLoop = 1;
 		char buff[MAX_BUF_LEN];
 		memset(buff, 0, MAX_BUF_LEN);
 
 		while (this->bRun)
 		{
-			nLoop++;
+			//nLoop++;
 
 			//sprintf(buff, "Message %d", nLoop);
 			//aaaaaaa.Send(buff);
@@ -519,9 +520,22 @@ int _tmain(int argc, _TCHAR* argv[])
 	//WSACleanup();
 
 	Example3 ddd;
-	Example4 dddd;
-	//ddd.Start();
-	dddd.Start();
+	//Example4 dddd;
+	ddd.Start();
+	//dddd.Start();
+
+	
+
+	//HANDLE h_Pipe = WaitFIFO(L"mypipe");
+	//while (h_Pipe)
+	//{
+	//	int a = 0;
+	//	ReadFIFO(h_Pipe, a);
+	//	cout << a << endl;
+	//	break;
+	//}
+
+
 
 	system("pause");
 

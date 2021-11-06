@@ -28,7 +28,7 @@ namespace FIFO
 	DWORD ReadFIFO(HANDLE h_Pipe, T& buffer)
 	{
 		DWORD len = 0;
-		if (ReadFile(h_Pipe, buffer, sizeof(buffer), &len, NULL) == FALSE)	//接收内容
+		if (ReadFile(h_Pipe, &buffer, sizeof(buffer), &len, NULL) == FALSE)	//接收内容
 		{
 			std::cout << "Failed to read data!" << std::endl;
 			return FALSE;
@@ -41,10 +41,10 @@ namespace FIFO
 	}
 
 	template<class T>
-	DWORD WriteFIFO(HANDLE h_Pipe, const T& buffer)
+	DWORD WriteFIFO(HANDLE h_Pipe, T& buffer)
 	{
 		DWORD len = 0;
-		if (WriteFile(h_Pipe, buffer, sizeof(buffer), &len, NULL) == FALSE)	//发送内容
+		if (WriteFile(h_Pipe, &buffer, sizeof(buffer), &len, NULL) == FALSE)	//发送内容
 		{
 			std::cout << "Failed to write data!" << std::endl;
 			return FALSE;
