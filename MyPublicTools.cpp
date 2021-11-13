@@ -395,6 +395,7 @@ using namespace std;
 //}
 
 MySocket aaaaaaa;
+static int nLoop = 1;
 
 class Example3 : public Thread
 {
@@ -403,9 +404,8 @@ public:
 
 	void Run() override
 	{
-		//aaaaaaa.InitSender(7001/*, "172.24.83.25"*/);
-		aaaaaaa.InitSender(7001, "10.41.4.49");
-		int nLoop = 1;
+		aaaaaaa.InitSender(7001, "172.24.83.25");
+		//aaaaaaa.InitSender(7001, "10.41.4.49");
 		char buff[MAX_BUF_LEN];
 		memset(buff, 0, MAX_BUF_LEN);
 
@@ -436,8 +436,7 @@ public:
 
 		while (this->bRun)
 		{
-			nLoop++;
-			aaaaaaa.Receive();
+			cin >> nLoop;
 		}
 		return;
 	}
@@ -446,11 +445,86 @@ public:
 
 
 
+#include <sstream>
 #include "stdafx.h"
+
+
+
+
+
+int isNum(string str)
+{
+	//stringstream sin(str);
+	//double d;
+	//char c;
+	//int e;
+	//if (!(sin >> d))
+	//{
+	//	/*解释：
+	//		sin>>t表示把sin转换成double的变量（其实对于int和float型的都会接收），
+	//		如果转换成功，则值为非0，如果转换不成功就返回为0
+	//	*/
+	//	cout << "请别输入字符!" << endl;
+	//	return false;
+	//}
+	//if (sin >> c)
+	//{
+	//	/*解释：
+	//	此部分用于检测错误输入中，数字加字符串的输入形式（例如：34.f），在上面的的部分（sin>>t）
+	//	已经接收并转换了输入的数字部分，在stringstream中相应也会把那一部分给清除，
+	//	此时接收的是.f这部分，所以条件成立，返回false
+	//	  */
+	//	cout << "请别输入字符!" << endl;
+	//	return false;
+	//}
+	//sin >> e;
+	//nLoop = e;
+	//return true;
+	try 
+	{
+		stoi(str);
+	}
+	catch (...)
+	{
+		cout << "输入了非数字!" << endl;
+		return 1;
+	}
+
+	return stoi(str);
+
+
+}
+
+
+HANDLE SimpleShellExec(CString lpFileName, LPCWSTR lpParam, CString lpDirectory, WORD wShowWindow)
+{
+#ifndef SEE_MASK_FORCENOIDLIST
+#define SEE_MASK_FORCENOIDLIST 0x1000
+#endif
+
+	SHELLEXECUTEINFO si;
+	ZeroMemory(&si, sizeof(si));
+	si.cbSize = sizeof(si);
+	si.lpFile = lpFileName;
+	si.lpParameters = lpParam;
+	si.lpDirectory = lpDirectory;
+	si.nShow = wShowWindow;
+	si.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FORCENOIDLIST;
+
+	ShellExecuteEx(&si);
+
+	return si.hProcess;
+}
+
+
+
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+
+	Wcout(WhoIsUser(684));
+
 	//WORD wVersionRequested;
 	//WSADATA wsaData;
 	//int err;
@@ -519,9 +593,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	//closesocket(clientSock);
 	//WSACleanup();
 
-	Example3 ddd;
+	//Example3 ddd;
 	//Example4 dddd;
-	ddd.Start();
+	//ddd.Start();
 	//dddd.Start();
 
 	
@@ -534,6 +608,34 @@ int _tmain(int argc, _TCHAR* argv[])
 	//	cout << a << endl;
 	//	break;
 	//}
+
+	//string dd;
+
+	//while (true)
+	//{
+	//	cin >> dd;
+	//	nLoop = isNum(dd);
+	//}
+
+	//Wcout(GetFileVersion("C:\\Users\\yuanchunming01\\Desktop\\BootLeakFixer.tpi"));
+
+	//HANDLE FF = CreateFIFO("myfifo");
+	//ConnectFIFO(FF);
+
+	//int a = 0;
+	//cin >> a;
+	//WriteFIFO(FF, a);
+	//cin >> a;
+	//WriteFIFO(FF, a);
+	//CloseFIFO(FF);
+
+	//cin >> a;
+
+	//FF = CreateFIFO("myfifo");
+	//ConnectFIFO(FF);
+	//WriteFIFO(FF, a);
+
+	//cin >> a;
 
 
 

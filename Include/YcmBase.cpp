@@ -162,7 +162,7 @@ CString Base::SetLangaueSyncOS()
 //}
 
 
-BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL IsWaitForSingle, _Out_opt_ HANDLE ProgrameHandle)
+BOOL Base::StartPrograme(LPCTSTR Path, _Out_opt_ HANDLE& ProgrameHandle, LPCTSTR Parameters, BOOL IsAdmin, BOOL IsWaitForSingle)
 {
 
 	//if (!PathIsDirectory(Path))
@@ -190,6 +190,8 @@ BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL Is
 		ShExecInfo.lpVerb = L"open";
 
 
+	//指向父窗口的句柄
+	ShExecInfo.hwnd = NULL;
 	//要运行的文件路径
 	//ShExecInfo.lpFile = L"cmd";
 	ShExecInfo.lpFile = Path;
@@ -211,12 +213,24 @@ BOOL Base::StartPrograme(LPCTSTR Path, LPCTSTR Parameters, BOOL IsAdmin, BOOL Is
 		//线程挂起,直到唤起的进程有响应 如:关闭
 		if (IsWaitForSingle == TRUE)
 			WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-		ProgrameHandle = ShExecInfo.hwnd;
+
+		//为什么注释掉这个,首先这个lambda表达式可以抽象出一个使用pid找进程句柄的函数
+		//然后就是一个进程可能有多个句柄,这里还是返回创建进程时的句柄比较好
+		//DWORD dwId = 0L;
+		//dwId = GetProcessId(ShExecInfo.hProcess);
+
+		//[=,&ProgrameHandle](DWORD pid) mutable
+		//{
+		//	ProgrameHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+		//}(dwId);
+
+		ProgrameHandle = ShExecInfo.hProcess;
+
 		return TRUE;
 	}	
 	else
 	{
-		ProgrameHandle = ShExecInfo.hwnd;
+		ProgrameHandle = NULL;
 		return FALSE;
 	}
 }
@@ -448,7 +462,8 @@ BOOL Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 #endif // UNICODE
 
 	// 标准url的正则表达式
-	std::string pattern{ "^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}|[a-zA-Z]{1}))(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+))*$"}; 
+	//std::string pattern{ "^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}|[a-zA-Z]{1}))(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+))*$"}; 
+	std::string pattern{ "^(https?|http|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]"}; 
 	std::regex re(pattern);
 
 	//std::vector<std::string> str{"http://www.baidu.com", "www.baidu.com"};
@@ -543,4 +558,243 @@ CString Base::GetFileVersion(LPCSTR filename)
 		delete pBuf;
 	}
 	return CString(asVer.c_str());
+}
+
+
+BOOL Base::CompareVersion(/*LARGE_INTEGER llLeft,*/ LPCTSTR lpLeftVersion, LPCTSTR lpRightVersion, CString& sOpt, BOOL& bResult)
+{
+	LARGE_INTEGER llLeft;
+	DWORD wHMS_L = 0, wHLS_L = 0, wLMS_L = 0, wLLS_L = 0;
+	swscanf_s(lpLeftVersion, L"%u.%u.%u.%u", &wHMS_L, &wHLS_L, &wLMS_L, &wLLS_L);
+	llLeft.HighPart = MAKELONG(wHLS_L, wHMS_L);
+	llLeft.LowPart = MAKELONG(wLLS_L, wLMS_L);
+
+
+
+	LARGE_INTEGER llRight;
+	DWORD wHMS_R = 0, wHLS_R = 0, wLMS_R = 0, wLLS_R = 0;
+	swscanf_s(lpRightVersion, L"%u.%u.%u.%u", &wHMS_R, &wHLS_R, &wLMS_R, &wLLS_R);
+	llRight.HighPart = MAKELONG(wHLS_R, wHMS_R);
+	llRight.LowPart = MAKELONG(wLLS_R, wLMS_R);
+
+	BOOL bRet = TRUE;
+	if (sOpt == L"<")
+	{
+		bResult = (llLeft.QuadPart < llRight.QuadPart);
+	}
+	else if (sOpt == L"<=")
+	{
+		bResult = (llLeft.QuadPart <= llRight.QuadPart);
+	}
+	else if (sOpt == L">")
+	{
+		bResult = (llLeft.QuadPart > llRight.QuadPart);
+	}
+	else if (sOpt == L">=")
+	{
+		bResult = (llLeft.QuadPart >= llRight.QuadPart);
+	}
+	else if (sOpt == L"=")
+	{
+		bResult = (llLeft.QuadPart == llRight.QuadPart);
+	}
+	else if (sOpt == L"!=")
+	{
+		bResult = (llLeft.QuadPart != llRight.QuadPart);
+	}
+	else
+	{
+		bRet = FALSE;
+		ATLASSERT(FALSE);
+	}
+
+	return bRet;
+}
+
+
+BOOL Base::IsDirectoryWritable(CString lpwszPath)
+{
+	BOOL bRet = FALSE;
+
+	if (PathIsDirectoryW(lpwszPath))
+	{
+		WCHAR wszPath[MAX_PATH] = { 0 };
+		PathCombineW(wszPath, lpwszPath, _T("Mypublic.test"));
+
+		HANDLE hFile = CreateFileW(wszPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile != INVALID_HANDLE_VALUE)
+		{
+			bRet = TRUE;
+			CloseHandle(hFile);
+		}
+
+		DeleteFileW(wszPath);
+	}
+
+	return bRet;
+}
+
+
+
+void Base:: SystemTimeToTimet(SYSTEMTIME st, time_t* pt)
+{
+	FILETIME ft;
+	SystemTimeToFileTime(&st, &ft);
+
+	LONGLONG ll;
+
+	ULARGE_INTEGER ui;
+	ui.LowPart = ft.dwLowDateTime;
+	ui.HighPart = ft.dwHighDateTime;
+
+	ll = ((LONGLONG)ft.dwHighDateTime << 32) + ft.dwLowDateTime;
+
+	*pt = (DWORD)((LONGLONG)(ui.QuadPart - 116444736000000000) / 10000000);
+}
+
+
+void Base::TimetToSystemTime(time_t t, LPSYSTEMTIME pst)
+{
+	FILETIME ft;
+
+	LONGLONG ll = Int32x32To64(t, 10000000) + 116444736000000000;
+	ft.dwLowDateTime = (DWORD)ll;
+	ft.dwHighDateTime = (DWORD)(ll >> 32);
+
+	FileTimeToSystemTime(&ft, pst);
+}
+
+CString Base:: GetProcessUserNameAndIntegrity(DWORD dwPid, DWORD* pdwLevel)
+{
+	#define   INTEGRITY_LEVEL_LOW			1  
+	#define   INTEGRITY_LEVEL_MEDIUM		2  
+	#define   INTEGRITY_LEVEL_HIGH			3  
+	#define   INTEGRITY_LEVEL_SYSTEM		4  
+
+	HANDLE hProcess = NULL;
+	CString strUserName = L"";
+	HANDLE hToken = NULL;
+	PTOKEN_USER pTokenUser = NULL;
+	DWORD dwSize = 0;
+	WCHAR szName[200] = {};
+	WCHAR szDomain[200] = {};
+	DWORD cchName = 200;
+	SID_NAME_USE SNU;
+	PTOKEN_MANDATORY_LABEL pTIL = NULL;
+	DWORD dwIntegrityLevel;
+
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwPid);
+	if (!hProcess)
+	{
+		WRITE_LOG(L"GetProcessUserName OpenProcess Failed PID[%d]GLE[%d]", dwPid, GetLastError());
+		goto _exit;
+	}
+
+	if (!OpenProcessToken(hProcess, TOKEN_QUERY, &hToken))
+	{
+		WRITE_LOG(L"GetProcessUserName OpenProcessToken Failed PID[%d]GLE[%d]", dwPid, GetLastError());
+		goto _exit;
+	}
+
+	if (!GetTokenInformation(hToken, TokenUser, NULL, 0, &dwSize))
+	{
+		if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+		{
+			WRITE_LOG(L"GetProcessUserName GetTokenInformation1 Failed PID[%d]GLE[%d]", dwPid, GetLastError());
+			goto _exit;
+		}
+
+	}
+	if (dwSize == 0)
+		goto _exit;
+
+	pTokenUser = (PTOKEN_USER)new BYTE[dwSize];
+	if (!GetTokenInformation(hToken, TokenUser, pTokenUser, dwSize, &dwSize))
+	{
+		WRITE_LOG(L"GetProcessUserName GetTokenInformation2 Failed PID[%d]GLE[%d]", dwPid, GetLastError());
+		goto _exit;
+	}
+
+	if (!LookupAccountSid(NULL, pTokenUser->User.Sid, szName, &cchName, szDomain, &cchName, &SNU))
+	{
+		WRITE_LOG(L"GetProcessUserName LookupAccountSid Failed PID[%d]GLE[%d]", dwPid, GetLastError());
+		goto _exit;
+	}
+
+	strUserName = szName;
+
+	if (0 == strUserName.GetLength())
+	{
+		WRITE_LOG(L"Waring:GetProcessUserName Name Is Empty...");
+	}
+
+	if (pdwLevel)
+	{
+		if (!GetTokenInformation(hToken, TokenIntegrityLevel, NULL, 0, &dwSize))
+		{
+			if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+				goto _exit;
+
+		}
+		if (dwSize == 0)
+			goto _exit;
+
+		pTIL = (PTOKEN_MANDATORY_LABEL)new BYTE[dwSize];
+		if (!GetTokenInformation(hToken, TokenIntegrityLevel, pTIL, dwSize, &dwSize))
+			goto _exit;
+
+		dwIntegrityLevel = *GetSidSubAuthority(pTIL->Label.Sid, (DWORD)(UCHAR)(*GetSidSubAuthorityCount(pTIL->Label.Sid) - 1));
+
+		if (dwIntegrityLevel == SECURITY_MANDATORY_LOW_RID)
+		{
+			// Low Integrity
+			*pdwLevel = INTEGRITY_LEVEL_LOW;
+
+		}
+		else if (dwIntegrityLevel >= SECURITY_MANDATORY_MEDIUM_RID &&
+			dwIntegrityLevel < SECURITY_MANDATORY_HIGH_RID)
+		{
+			// Medium Integrity
+			*pdwLevel = INTEGRITY_LEVEL_MEDIUM;
+		}
+		else if (dwIntegrityLevel >= SECURITY_MANDATORY_HIGH_RID)
+		{
+			// High Integrity
+			*pdwLevel = INTEGRITY_LEVEL_HIGH;
+		}
+		else if (dwIntegrityLevel >= SECURITY_MANDATORY_SYSTEM_RID)
+		{
+			// System Integrity
+			*pdwLevel = INTEGRITY_LEVEL_SYSTEM;
+		}
+
+	}
+
+_exit:
+	if (hProcess)
+		CloseHandle(hProcess);
+
+	if (hToken)
+		CloseHandle(hToken);
+
+	if (pTokenUser)
+		delete pTokenUser;
+
+	if (pTIL)
+		delete pTIL;
+
+	return strUserName;
+}
+
+CString Base::WhoIsUser(DWORD dwPid)
+{
+	DWORD dwIntegrityLevel = 0;
+	CString strUsername = GetProcessUserNameAndIntegrity(dwPid, &dwIntegrityLevel);
+	//if (dwIntegrityLevel == INTEGRITY_LEVEL_HIGH && !strUsername.IsEmpty() && strUsername.CompareNoCase(L"SYSTEM") == 0)
+	//{
+	//	//在system用户下，但完整性级别应该是High
+	//	return ;
+	//}
+
+	return strUsername;
 }

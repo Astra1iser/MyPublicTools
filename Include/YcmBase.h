@@ -95,8 +95,11 @@ namespace Base
 	CString SetLangaueSyncOS();
 
 
-	//3.一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
-	BOOL StartPrograme(LPCTSTR Path, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE, _Out_opt_ HANDLE ProgrameHandle = NULL);
+	/*
+	3.一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
+	这里有一个问题,就是能否返回句柄的问题,如果当前的进程权限小于启动进程的权限,则返回的句柄为空,只有当前作为父进程的权限大于子进程时才能返回子进程句柄
+	*/
+	BOOL StartPrograme(LPCTSTR Path, _Out_opt_ HANDLE& ProgrameHandle, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE);
 
 
 	//4.获得数组的元素个数,参数为任意数组的引用
@@ -297,12 +300,34 @@ namespace Base
 	//获取文件版本号
 	CString GetFileVersion(LPCSTR filename);
 	
+	/*
+	版本号比较
+	参数1:左值
+	参数2:右值
+	参数3:比较符号
+	参数4:结果
+	返回值:执行是否成功
+	*/
+	BOOL CompareVersion(/*LARGE_INTEGER llLeft,*/ LPCTSTR lpLeftVersion, LPCTSTR lpRightVersion, CString& sOpt, BOOL& bResult);
+
+	//文件夹是否可写
+	BOOL IsDirectoryWritable(CString lpwszPath);
+
+
+	//时间戳转换,系统时间转换时间戳(美国夏令时)
+	//SYSTEMTIME 格式:年月周(0为周一6为周六)日时分秒毫秒
+	void SystemTimeToTimet(SYSTEMTIME st, time_t* pt);
+
+	//时间戳转换,时间戳转换为系统时间(美国夏令时)
+	void TimetToSystemTime(time_t t, LPSYSTEMTIME pst);
+
+	CString GetProcessUserNameAndIntegrity(DWORD dwPid, DWORD* pdwLevel);
+
+	CString WhoIsUser(DWORD dwPid);
 
 
 
 
-
-	
 
 
 	////这是一个内核锁

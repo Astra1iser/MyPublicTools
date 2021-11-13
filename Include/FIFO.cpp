@@ -82,7 +82,14 @@ BOOL FIFO::ConnectFIFO(HANDLE h_Pipe)
 BOOL FIFO::CloseFIFO(HANDLE h_Pipe)
 {
 	if (CloseHandle(h_Pipe))
+	//if (CancelIoEx(h_Pipe, NULL))
+	{
+		cout << "Colse pipe Success!";
 		return TRUE;
+	}
 	else
+	{
+		cout << "Close pipe Failed!";
 		return FALSE;
+	}
 }
