@@ -1,5 +1,5 @@
 #pragma once
-#include "stdafx.h"
+//#include "stdafx.h"
 //#include <WinSock2.h>
 #pragma comment(lib, "ws2_32.lib")
 const int MAX_BUF_LEN = 255;
