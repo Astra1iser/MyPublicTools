@@ -1,4 +1,4 @@
-//Base公共库的实现
+//QTBase公共库的实现
 #pragma once
 #include <YcmBase.h>
 #include <Pathmanager.cpp>

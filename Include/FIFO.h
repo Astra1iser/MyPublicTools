@@ -15,7 +15,6 @@
 	*/
 
 
-
 namespace FIFO
 {
 	HANDLE CreateFIFO(CString PipeName);

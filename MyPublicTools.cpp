@@ -451,7 +451,6 @@ public:
 
 
 
-
 int isNum(string str)
 {
 	//stringstream sin(str);
