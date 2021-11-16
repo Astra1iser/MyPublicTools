@@ -61,12 +61,12 @@ public:
 	BOOL OpenSharedMemory(CString ServerWriteOverName, CString ClientReadOverName);
 
 	template<class T>
-	void SetSharedMemory(_In_ const T& Data)
+	void SetSharedMemory(_In_ const T Data, DWORD DataMemorySize)
 	{
 		WaitForSingleObject(hClientReadOver, INFINITE);
 		T* lp = (T*)lpShipMemCreator;
 		//*lp = Data;
-		memcpy(lp, &Data, sizeof(Data));
+		memcpy(lp, &Data, DataMemorySize);
 		ResetEvent(hClientReadOver);
 		SetEvent(hServerWriteOver);
 	}

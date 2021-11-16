@@ -8,6 +8,7 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
 {
     ui.setupUi(this);
 
+
     //qstringתcstring
     //string str = m_QStrFile.toLocal8Bit().data();
     //CString CStrbuffer = str.c_str();
