@@ -448,6 +448,53 @@ string Base::LPCTSTR2string(LPCTSTR lpctstr)
 }
 
 
+LPTSTR Base:: string2LPTSTR(string str)
+{
+/*
+ 为什么定义这个宏,请参考
+ https://docs.microsoft.com/zh-cn/cpp/preprocessor/predefined-macros?view=msvc-170
+ _NATIVE_WCHAR_T_DEFINED条目和comutil.h的用法
+ */
+#ifdef _NATIVE_WCHAR_T_DEFINED
+	#pragma comment(lib,"comsuppw.lib")
+#else
+	#pragma comment(lib,"comsupp.lib")
+#endif
+	_bstr_t bstr(str.c_str());
+	return (LPTSTR)bstr;
+}
+
+
+string Base::GetSysErrorMessage(_Out_opt_ int* pErrCode)
+{
+	string errMsg;
+	LPVOID lpMsgBuf;
+
+	*pErrCode = 0;
+	*pErrCode = GetLastError();
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		*pErrCode,			//错误码
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // 默认输出语言
+		reinterpret_cast<LPTSTR>(&lpMsgBuf),
+		0,
+		NULL
+	);
+
+	//lstrcpy(*szMsg, (LPTSTR)lpMsgBuf);
+	errMsg = LPCTSTR2string((LPCTSTR)lpMsgBuf);
+	//MessageBox(NULL,(LPCTSTR)lpMsgBuf, L"ERROR", MB_OK);
+	// 释放缓冲区
+	LocalFree(lpMsgBuf);
+
+	return errMsg;
+}
+
+
+
 BOOL Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 {
 	BOOL iswhole = TRUE;

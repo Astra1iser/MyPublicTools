@@ -7,6 +7,9 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+    int errorc = 0;
+
+    //cout << GetSysErrorMessage(&errorc, &szMsg);
 
 
     //qstringתcstring

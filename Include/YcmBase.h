@@ -22,7 +22,7 @@
 #include <atlconv.h>
 #include <wininet.h>
 #include <atlfile.h>
-
+#include <comutil.h>
 
 #include <ScopeLock.h>//互斥锁（临界区）封装类
 #include <PathManager.h>//路径相关函数
@@ -240,6 +240,12 @@ namespace Base
 	//14.将LPCTSTR转换为string
 	string LPCTSTR2string(LPCTSTR lpctstr);
 
+	//string转换为LPTSTR
+	LPTSTR string2LPTSTR(string str);
+
+
+	//返回错误信息和错误码
+	string GetSysErrorMessage(_Out_opt_ int* pErrCode);
 
 	//15.将俩个LPCTSRT拼接
 	//参数1:LPCTSRT变量1
