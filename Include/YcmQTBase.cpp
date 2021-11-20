@@ -1,7 +1,10 @@
 #pragma   once
 #include <YcmQTBase.h>
 #include <YcmBase.cpp>
-
+#include <QTInclude\MyToolTip\MyToolTip.cpp>
+//#include <QTInclude\MyQHeaderView\MyQHeaderView.cpp>
+//#include <QTInclude\MyQTTitleBar\MyTitleBar.cpp>
+//#include <QTInclude\MyQTTitleBar\moc_MyTitleBar.cpp>
 
 
 QString QTBase::YString(const char* str)

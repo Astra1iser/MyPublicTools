@@ -46,6 +46,19 @@ void Thread::Start()
 	}
 }
 
+
+void Thread::SleepFor(int milliseconds)
+{
+	this_thread::sleep_for(chrono::milliseconds(milliseconds));
+}
+
+void Thread::SleepUntil(time_t time)
+{
+	using std::chrono::system_clock;
+	struct std::tm* ptm = std::localtime(&time);
+	std::this_thread::sleep_until(system_clock::from_time_t(mktime(ptm)));
+}
+
 void Thread::Stop()
 {
 	if (bRun == false)

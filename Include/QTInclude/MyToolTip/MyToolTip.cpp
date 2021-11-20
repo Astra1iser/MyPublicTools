@@ -1,11 +1,12 @@
 #pragma   once
 #include "MyToolTip.h"
 
-QString ToolTipWrap(QString strSrc,int width) 
+QString ToolTipWrap(QString strSrc,int width, const QFontMetrics& fontsize)
 { 
 	QString result;
-	QFontMetrics fm(fontMetrics());
+	QFontMetrics fm(fontsize);
 	int textWidthInPxs = fm.width(strSrc);
+	//fontMetrics();
 	const int rear = strSrc.length();
 	int pre = 0, vernier = 1;
 	unsigned int pickUpWidthPxs = 0;

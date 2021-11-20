@@ -17,12 +17,13 @@ MyTitleBar::MyTitleBar(QWidget *parent)
 	, m_buttonType(MIN_MAX_BUTTON)
 	, m_windowBorderWidth(0)
 	, m_isTransparent(false)
+	, parent(parent)
 {
 	// 初始化;
 	initControl();
-	initConnections();
+	initConnections(parent);
 	// 加载本地样式 MyTitle.css文件;
-	loadStyleSheet(QString::fromLocal8Bit("信任区"));
+	//loadStyleSheet(QString::fromLocal8Bit("信任区"));
 }
 
 MyTitleBar::~MyTitleBar()
@@ -36,10 +37,10 @@ void MyTitleBar::initControl()
 	m_pIcon = new QLabel;
 	m_pTitleContent = new QLabel;
 
-	m_pButtonMin = new QPushButton;
-	m_pButtonRestore = new QPushButton;
-	m_pButtonMax = new QPushButton;
-	m_pButtonClose = new QPushButton;
+	m_pButtonMin = new QPushButton;			//最小化按钮
+	m_pButtonRestore = new QPushButton;		//还原按钮
+	m_pButtonMax = new QPushButton;			//最大化按钮
+	m_pButtonClose = new QPushButton;		//关闭按钮
 
 	m_pButtonMin->setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT));
 	m_pButtonRestore->setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT));
@@ -60,6 +61,7 @@ void MyTitleBar::initControl()
 	QHBoxLayout* mylayout = new QHBoxLayout(this);
 	mylayout->addWidget(m_pIcon);
 	mylayout->addWidget(m_pTitleContent);
+
 
 	mylayout->addWidget(m_pButtonMin);
 	mylayout->addWidget(m_pButtonRestore);
@@ -88,18 +90,39 @@ void MyTitleBar::initControl()
 	mylayout->setContentsMargins(5, 0, 0, 0);
 	mylayout->setSpacing(0);
 
+
+	nPos = 30;
+	isChange = 0;
 	m_pTitleContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	this->setFixedHeight(TITLE_HEIGHT);
+
+
+
+
+
+
 	this->setWindowFlags(Qt::FramelessWindowHint);
+	this->setTitleWidth();
+	this->setFixedHeight(TITLE_HEIGHT);
+	this->move(0, 0);
+
+
 }
 
 // 信号槽的绑定;
-void MyTitleBar::initConnections()
+void MyTitleBar::initConnections(QWidget* parent)
 {
 	connect(m_pButtonMin, SIGNAL(clicked()), this, SLOT(onButtonMinClicked()));
 	connect(m_pButtonRestore, SIGNAL(clicked()), this, SLOT(onButtonRestoreClicked()));
 	connect(m_pButtonMax, SIGNAL(clicked()), this, SLOT(onButtonMaxClicked()));
 	connect(m_pButtonClose, SIGNAL(clicked()), this, SLOT(onButtonCloseClicked()));
+
+	parent->setWindowFlags(Qt::FramelessWindowHint);
+	connect(this, SIGNAL(signalButtonMinClicked(QWidget*)), this, SLOT(onButtonMinClicked2(QWidget*)));
+	connect(this, SIGNAL(signalButtonRestoreClicked(QWidget*)), this, SLOT(onButtonRestoreClicked2(QWidget*)));
+	connect(this, SIGNAL(signalButtonMaxClicked(QWidget*)), this, SLOT(onButtonMaxClicked2(QWidget*)));
+	connect(this, SIGNAL(signalButtonCloseClicked(QWidget*)), this, SLOT(onButtonCloseClicked2(QWidget*)));
+
+
 }
 
 // 设置标题栏背景色,在paintEvent事件中进行绘制标题栏背景色;
@@ -122,14 +145,15 @@ void MyTitleBar::setTitleIcon(QString filePath, QSize IconSize)
 }
 
 // 设置标题内容;
-void MyTitleBar::setTitleContent(QString titleContent, int titleFontSize)
+void MyTitleBar::setTitleContent(QString titleContent, int titleFontSize, const char* ColorStyle)
 {
 	// 设置标题字体大小;
 	QFont font = m_pTitleContent->font();
 	font.setBold(true);
 	font.setPointSize(titleFontSize);
 	m_pTitleContent->setFont(font);
-	m_pTitleContent->setStyleSheet("color:white;"); 
+	//m_pTitleContent->setStyleSheet("color:white;"); 
+	m_pTitleContent->setStyleSheet(ColorStyle); 
 	// 设置标题内容;
 	m_pTitleContent->setText(titleContent);
 	m_titleContent = titleContent;
@@ -138,6 +162,10 @@ void MyTitleBar::setTitleContent(QString titleContent, int titleFontSize)
 // 设置标题栏长度;
 void MyTitleBar::setTitleWidth(int width)
 {
+	if (0 == width)
+	{
+		width = parent->width();
+	}
 	this->setFixedWidth(width);
 }
 
@@ -174,11 +202,11 @@ void MyTitleBar::setButtonType(ButtonType buttonType)
 }
 
 // 设置标题栏中的标题是否会自动滚动，跑马灯的效果;
-// 一般情况下标题栏中的标题内容是不滚动的，但是既然自定义就看自己需要嘛，想怎么设计就怎么搞O(∩_∩)O！
+// 一般情况下标题栏中的标题内容是不滚动的
 void MyTitleBar::setTitleRoll()
 {
 	connect(&m_titleRollTimer, SIGNAL(timeout()), this, SLOT(onRollTitle()));
-	m_titleRollTimer.start(200);
+	m_titleRollTimer.start(5);
 }
 
 // 设置窗口边框宽度;
@@ -303,37 +331,102 @@ void MyTitleBar::loadStyleSheet(const QString &sheetName)
 // 以下为按钮操作响应的槽;
 void MyTitleBar::onButtonMinClicked()
 {
-	emit signalButtonMinClicked();
+	emit signalButtonMinClicked(parent);
 }
 
 void MyTitleBar::onButtonRestoreClicked()
 {
 	m_pButtonRestore->setVisible(false);
 	m_pButtonMax->setVisible(true);
-	emit signalButtonRestoreClicked();
+	emit signalButtonRestoreClicked(parent);
 }
 
 void MyTitleBar::onButtonMaxClicked()
 {
 	m_pButtonMax->setVisible(false);
 	m_pButtonRestore->setVisible(true);
-	emit signalButtonMaxClicked();
+	emit signalButtonMaxClicked(parent);
 }
 
 void MyTitleBar::onButtonCloseClicked()
 {
-	emit signalButtonCloseClicked();
+	emit signalButtonCloseClicked(parent);
 }
 
 // 该方法主要是让标题栏中的标题显示为滚动的效果;
 void MyTitleBar::onRollTitle()
 {
-	static int nPos = 0;
-	QString titleContent = m_titleContent;
-	// 当截取的位置比字符串长时，从头开始;
-	if (nPos > titleContent.length())
-		nPos = 0;
+	//static int nPos = 0;
+	//QString titleContent = m_titleContent;
+	//// 当截取的位置比字符串长时，从头开始;
+	//if (nPos > titleContent.length())
+	//	nPos = 0;
 
-	m_pTitleContent->setText(titleContent.mid(nPos));
-	nPos++;
+	//m_pTitleContent->setText(titleContent.mid(nPos));
+	//nPos++;
+
+
+	QString titleContent = m_titleContent;
+	int a = parent->width();
+
+
+	QFontMetrics fm(m_pTitleContent->font());
+	int textWidthInPxs = fm.width(m_titleContent);
+
+	int ButtonWidthCount = m_pButtonMin->width() + m_pButtonMax->width() + m_pButtonRestore->width() + m_pButtonClose->width();
+
+	if ((nPos + textWidthInPxs) >= (a - ButtonWidthCount))
+	{
+		nPos = a- ButtonWidthCount - textWidthInPxs;
+		isChange = TRUE;
+	}
+
+	if (nPos <= 30)
+	{
+		nPos = 30;
+		isChange = FALSE;
+	}
+
+	m_pTitleContent->move(nPos, (m_pTitleContent->height())/2);
+
+	if (FALSE == isChange)
+		nPos++;
+	else
+		nPos--;
+
+
+}
+
+
+
+
+
+
+
+
+// 以下为按钮操作响应的槽;
+void MyTitleBar::onButtonMinClicked2(QWidget* parent)
+{
+	parent->showMinimized();
+}
+
+void MyTitleBar::onButtonRestoreClicked2(QWidget* parent)
+{
+	QPoint windowPos;
+	QSize windowSize;
+	this->getRestoreInfo(windowPos, windowSize);
+	parent->setGeometry(QRect(windowPos, windowSize));
+}
+
+void MyTitleBar::onButtonMaxClicked2(QWidget* parent)
+{
+	this->saveRestoreInfo(parent->pos(), QSize(parent->width(), parent->height()));
+	QRect desktopRect = QApplication::desktop()->availableGeometry();
+	QRect FactRect = QRect(desktopRect.x() - 3, desktopRect.y() - 3, desktopRect.width() + 6, desktopRect.height() + 6);
+	parent->setGeometry(FactRect);
+}
+
+void MyTitleBar::onButtonCloseClicked2(QWidget* parent)
+{
+	parent->close();
 }

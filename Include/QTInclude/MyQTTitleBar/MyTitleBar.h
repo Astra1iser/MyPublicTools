@@ -1,11 +1,13 @@
 #pragma   once
 #ifndef MYTITLEBAR_H
 #define MYTITLEBAR_H
+#include <QtWidgets>
 #include <QWidget>
 #include <QtWidgets/QDialog>
 #include <QLabel>
 #include <QPushButton>
 #include <QTimer>
+
 
 enum ButtonType
 {
@@ -111,9 +113,11 @@ public:
 	// 设置标题栏图标;
 	void setTitleIcon(QString filePath , QSize IconSize = QSize(25 , 25));
 	// 设置标题内容;
-	void setTitleContent(QString titleContent , int titleFontSize = 9);
+	void setTitleContent(QString titleContent , int titleFontSize = 9, const char* ColorStyle = "color:white;");
+	// 设置标题内容;
+	void setTitleContent2(QString titleContent, int titleFontSize = 9, const char* ColorStyle = "color:white;");
 	// 设置标题栏长度;
-	void setTitleWidth(int width);
+	void setTitleWidth(int width = 0);
 	// 设置标题栏上按钮类型;
 	void setButtonType(ButtonType buttonType);
 	// 设置标题栏中的标题是否会滚动;具体可以看效果;
@@ -135,16 +139,16 @@ private:
 	// 初始化控件;
 	void initControl();
 	// 信号槽的绑定;
-	void initConnections();
+	void initConnections(QWidget* parent);
 	// 加载样式文件;
 	void loadStyleSheet(const QString &sheetName);
 
 signals:
 	// 按钮触发的信号;
-	void signalButtonMinClicked();
-	void signalButtonRestoreClicked();
-	void signalButtonMaxClicked();
-	void signalButtonCloseClicked();
+	void signalButtonMinClicked(QWidget* parent);
+	void signalButtonRestoreClicked(QWidget* parent);
+	void signalButtonMaxClicked(QWidget* parent);
+	void signalButtonCloseClicked(QWidget* parent);
 
 	private slots:
 		// 按钮触发的槽;
@@ -154,9 +158,19 @@ signals:
 		void onButtonCloseClicked();
 		void onRollTitle();
 
+
+		void onButtonMinClicked2(QWidget* parent);
+		void onButtonRestoreClicked2(QWidget* parent);
+		void onButtonMaxClicked2(QWidget* parent);
+		void onButtonCloseClicked2(QWidget* parent);
+
+
 private:
+	QWidget* parent;					//父窗口指针
+
 	QLabel* m_pIcon;                    // 标题栏图标;
 	QLabel* m_pTitleContent;            // 标题栏内容;
+	QLabel* m_pTitleContent2;            // 标题栏内容;
 	QPushButton* m_pButtonMin;          // 最小化按钮;
 	QPushButton* m_pButtonRestore;      // 最大化还原按钮;
 	QPushButton* m_pButtonMax;          // 最大化按钮;
@@ -177,12 +191,17 @@ private:
 	QTimer m_titleRollTimer;
 	// 标题栏内容;
 	QString m_titleContent;
+	// 标题栏内容;
+	QString m_titleContent2;
 	// 按钮类型;
 	ButtonType m_buttonType;
 	// 窗口边框宽度;
 	int m_windowBorderWidth;
 	// 标题栏是否透明;
 	bool m_isTransparent;
+
+	int nPos; //标题坐标
+	BOOL isChange; //标题是否转换方向
 };
 
 #endif

@@ -7,6 +7,9 @@
 #include <queue>
 #include <vector>
 //#include <condition_variable>
+#include <ctime>
+#include <chrono>
+#include <iomanip>
 using namespace std;
 
 
@@ -53,6 +56,18 @@ public:
 	Thread();
     virtual ~Thread();
 	void Start();		//运行;
+    /*
+    当前线程休眠多长时间
+    注意：使用sleep和wait的区别是,此sleep方法会将此线程的CPU的占用权撤销,且不会释放当前线程中所有已经获得拥有权的锁
+    而线程的thread::wait方法会在撤销CPU的占用权的同时释放当前线程中所有已获得拥有权的锁
+    */
+    void SleepFor(int milliseconds);
+    /*
+    当前线程休眠到
+    注意：使用sleep和wait的区别是,此sleep方法会将此线程的CPU的占用权撤销,且不会释放当前线程中所有已经获得拥有权的锁
+    而线程的thread::wait方法会在撤销CPU的占用权的同时释放当前线程中所有已获得拥有权的锁
+    */
+    void SleepUntil(time_t time);
 	void Stop();		//停止;
 	BOOL WaitExit();	//等待线程退出;
 };

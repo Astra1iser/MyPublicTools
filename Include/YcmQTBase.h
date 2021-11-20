@@ -1,5 +1,9 @@
 #pragma   once
 #include <YcmBase.h>
+#include <QTInclude\MyToolTip\MyToolTip.h> //优化的悬浮提示实现函数
+//#include <QTInclude\MyQHeaderView\MyQHeaderView.h> //优化的表格类
+//#include <QTInclude\MyQTTitleBar\MyTitleBar.h> //独立的标题栏
+
 using namespace Base;
 
 //#define CCS2QS(x,...)	CS2QS(x,__VA_ARGS__)

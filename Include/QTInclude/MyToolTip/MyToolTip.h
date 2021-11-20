@@ -2,10 +2,6 @@
 #ifndef MYTOOLTIP_H
 #define MYTOOLTIP_H
 
-
-
-
-
 //如何使用这个悬浮提示
 //首先获取字符大小
 //QFontMetrics fontWidth(ui.DirPath->font()); //获取字体大小 ui.DirPath是QString字符串
@@ -19,6 +15,16 @@
 //ui.DirPath->setText(elideNote);
 //ui.DirPath->setToolTip(ToolTipWrap(QStrbuffer,390) );
 
-QString ToolTipWrap(QString strSrc,int width);
+
+
+
+
+/*
+ 如何使用提示悬浮窗函数
+ 对于所有可设置setToolTip()的窗体对象来说
+ 使用setToolTip(ToolTipWrap(提示的文字,悬浮宽度,fontMetrics()));
+ 即可,注意参数3一定是一个固定函数fontMetrics()
+*/
+QString ToolTipWrap(QString strSrc,int width, const QFontMetrics& fontsize);
 
 #endif

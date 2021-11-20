@@ -1,17 +1,13 @@
 #pragma once
-
 #include <QHeaderView>
-
 #include <QPainter>
-
 #include <QMouseEvent>
+
 
 using namespace std;
 
 class MyQHeaderView : public QHeaderView
-
 {
-
 	Q_OBJECT
 
 public:
@@ -44,4 +40,3 @@ private:
 	mutable QRect m_RectHeaderCheckBox;//¸´Ñ¡¿òµÄÎ»ÖÃ
 
 };
-

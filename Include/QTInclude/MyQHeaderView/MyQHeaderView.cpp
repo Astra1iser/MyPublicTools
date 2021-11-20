@@ -1,21 +1,13 @@
+#pragma once
 #include "MyQHeaderView.h"
 
 
 
-	MyQHeaderView::MyQHeaderView(Qt::Orientation orientation, QWidget *parent)
-
-	: QHeaderView(orientation, parent)
-
-	, m_isOn(false)
-
+MyQHeaderView::MyQHeaderView(Qt::Orientation orientation, QWidget *parent): QHeaderView(orientation, parent), m_isOn(false)
 {
-
 	m_isOn = false;
-
 	m_mousePoint.setX(100);
-
 	m_mousePoint.setY(100);
-
 }
 
 
@@ -23,9 +15,7 @@
 /*绘制表头logicalIndex表示表头第几列，0表示第0列，也就是我们要画复选框的列，rect是表头第一列的大小*/
 
 void MyQHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const
-
 {
-
 	painter->save();
 
 	QHeaderView::paintSection(painter, rect, logicalIndex);
@@ -146,7 +136,7 @@ void MyQHeaderView::mouseMoveEvent(QMouseEvent *event)
 void MyQHeaderView::stdate(bool type)
 {
 
-	m_isOn=type;
+	m_isOn = type;
 	updateSection(0);//重绘表头复选框
 
 }
