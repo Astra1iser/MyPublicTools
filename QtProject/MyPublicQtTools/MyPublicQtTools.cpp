@@ -122,10 +122,16 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     m_titleBar = new MyTitleBar(this);
     
     m_titleBar->setTitleIcon("Image/QAXico.png");
-    m_titleBar->setTitleContent(QStringLiteral(" 这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题"),10);
+    //m_titleBar->setBackgroundColor(0, 0, 0, 1);
+    m_titleBar->setTitleContent(QStringLiteral(" 这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题"),20);
     m_titleBar->setButtonType(MIN_MAX_BUTTON);
     m_titleBar->setTitleRoll();
+    //m_titleBar->setWindowBorderWidth(150);
+    m_titleBar->setTitleHeight(10);
+
+
     //m_titleBar->setTitleWidth(1);
+
 
 
     //connect(m_titleBar, SIGNAL(signalButtonMinClicked()), this, SLOT(onButtonMinClicked()));

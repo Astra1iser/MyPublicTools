@@ -31,46 +31,14 @@ enum ButtonType
 
 //如何使用这个自定义标题栏?
 
-//首先需要在窗体中初始化自定义标题栏对象并重写某些函数
+//首先需要在窗体中初始化自定义标题栏对象
 /* 
 protected:
 	MyTitleBar* m_titleBar;
 	
 private:
-	void initTitleBar();									//初始化标题
+	void initTitleBar();									//初始化自定义标题栏
 	
-private slots:
-	void onButtonMinClicked();								//最小化槽函数
-	void onButtonRestoreClicked();							//还原键槽函数
-	void onButtonMaxClicked();								//最大化槽函数
-	void onButtonCloseClicked();							//关闭按钮槽函数 */
-
-//然后重新实现以下函数
-/* void QAXSafeCheckerTrustDlg::onButtonMinClicked()
-{
-	showMinimized();
-}
-
-void QAXSafeCheckerTrustDlg::onButtonRestoreClicked()
-{
-	QPoint windowPos;
-	QSize windowSize;
-	m_titleBar->getRestoreInfo(windowPos, windowSize);
-	this->setGeometry(QRect(windowPos, windowSize));
-}
-
-void QAXSafeCheckerTrustDlg::onButtonMaxClicked()
-{
-	m_titleBar->saveRestoreInfo(this->pos(), QSize(this->width(), this->height()));
-	QRect desktopRect = QApplication::desktop()->availableGeometry();
-	QRect FactRect = QRect(desktopRect.x() - 3, desktopRect.y() - 3, desktopRect.width() + 6, desktopRect.height() + 6);
-	setGeometry(FactRect);
-}
-
-void QAXSafeCheckerTrustDlg::onButtonCloseClicked()
-{
-	close();
-} 
 */
 
 
@@ -79,24 +47,14 @@ void QAXSafeCheckerTrustDlg::onButtonCloseClicked()
 //然后在主窗体中初始化这个方法(一定要在 ui.setupUi(this); 后)
 /* void QAXSafeCheckerTrustDlg ::initTitleBar()
 {
-	this->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-	
-	// 设置窗口背景透明;
-	this->setAttribute(Qt::WA_TranslucentBackground);
-
-
 	m_titleBar = new MyTitleBar(this);
-	m_titleBar->move(0, 0);
 	m_titleBar->setTitleIcon("../Image/QAXico.png");
 	m_titleBar->setTitleContent(QStringLiteral(" 这是标题"),10);
 	m_titleBar->setButtonType(ONLY_CLOSE_BUTTON);
 	m_titleBar->setTitleWidth(this->width());
 
 
-	connect(m_titleBar, SIGNAL(signalButtonMinClicked()), this, SLOT(onButtonMinClicked()));
-	connect(m_titleBar, SIGNAL(signalButtonRestoreClicked()), this, SLOT(onButtonRestoreClicked()));
-	connect(m_titleBar, SIGNAL(signalButtonMaxClicked()), this, SLOT(onButtonMaxClicked()));
-	connect(m_titleBar, SIGNAL(signalButtonCloseClicked()), this, SLOT(onButtonCloseClicked()));
+
 } */
 
 class MyTitleBar : public QDialog
@@ -114,20 +72,17 @@ public:
 	void setTitleIcon(QString filePath , QSize IconSize = QSize(25 , 25));
 	// 设置标题内容;
 	void setTitleContent(QString titleContent , int titleFontSize = 9, const char* ColorStyle = "color:white;");
-	// 设置标题内容;
-	void setTitleContent2(QString titleContent, int titleFontSize = 9, const char* ColorStyle = "color:white;");
 	// 设置标题栏长度;
 	void setTitleWidth(int width = 0);
+	// 设置标题栏高度;
+	void setTitleHeight(int height = 0);
 	// 设置标题栏上按钮类型;
 	void setButtonType(ButtonType buttonType);
-	// 设置标题栏中的标题是否会滚动;具体可以看效果;
+	// 设置标题栏中的标题是否会滚动;
 	void setTitleRoll();
-	// 设置窗口边框宽度;
+	// 设置窗口边框宽度(这里是填父窗体中边框的长度,设置后,标题栏的左右和上方会空出对应大小的宽度用于显示父窗口边框);
 	void setWindowBorderWidth(int borderWidth);
 
-	// 保存/获取 最大化前窗口的位置及大小;
-	void saveRestoreInfo(const QPoint point, const QSize size);
-	void getRestoreInfo(QPoint& point, QSize& size);
 
 private:
 	void paintEvent(QPaintEvent *event);
@@ -139,35 +94,33 @@ private:
 	// 初始化控件;
 	void initControl();
 	// 信号槽的绑定;
-	void initConnections(QWidget* parent);
+	void initConnections();
 	// 加载样式文件;
 	void loadStyleSheet(const QString &sheetName);
 
 signals:
 	// 按钮触发的信号;
-	void signalButtonMinClicked(QWidget* parent);
-	void signalButtonRestoreClicked(QWidget* parent);
-	void signalButtonMaxClicked(QWidget* parent);
-	void signalButtonCloseClicked(QWidget* parent);
+	void signalButtonMinClicked();
+	void signalButtonRestoreClicked();
+	void signalButtonMaxClicked();
+	void signalButtonCloseClicked();
 
-	private slots:
-		// 按钮触发的槽;
-		void onButtonMinClicked();
-		void onButtonRestoreClicked();
-		void onButtonMaxClicked();
-		void onButtonCloseClicked();
-		void onRollTitle();
+private slots:
+	// 按钮触发的槽;
+	void onButtonMinClicked();
+	void onButtonRestoreClicked();
+	void onButtonMaxClicked();
+	void onButtonCloseClicked();
+	void onRollTitle();
 
-
-		void onButtonMinClicked2(QWidget* parent);
-		void onButtonRestoreClicked2(QWidget* parent);
-		void onButtonMaxClicked2(QWidget* parent);
-		void onButtonCloseClicked2(QWidget* parent);
+	//每个按钮的具体实现
+	void onButtonMinClicked2();
+	void onButtonRestoreClicked2();
+	void onButtonMaxClicked2();
+	void onButtonCloseClicked2();
 
 
 private:
-	QWidget* parent;					//父窗口指针
-
 	QLabel* m_pIcon;                    // 标题栏图标;
 	QLabel* m_pTitleContent;            // 标题栏内容;
 	QLabel* m_pTitleContent2;            // 标题栏内容;
@@ -200,8 +153,16 @@ private:
 	// 标题栏是否透明;
 	bool m_isTransparent;
 
-	int nPos; //标题坐标
-	BOOL isChange; //标题是否转换方向
+	int m_nPos; //标题坐标
+	BOOL m_isChange; //标题是否转换方向
+	BOOL m_CanMove; //窗体是否在最大化时可移动
+//	int m_height;	//保存了当前标题的FixedHeight,该值至少为30,该值其实是相对于父窗体的Y轴坐标,并不是窗体高度
+
+
+	// 保存/获取 最大化前窗口的位置及大小;
+	void saveRestoreInfo(const QPoint point, const QSize size);
+	void getRestoreInfo(QPoint& point, QSize& size);
+
 };
 
 #endif

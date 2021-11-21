@@ -20,8 +20,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MyTitleBar_t {
-    QByteArrayData data[17];
-    char stringdata0[306];
+    QByteArrayData data[15];
+    char stringdata0[290];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -33,24 +33,22 @@ static const qt_meta_stringdata_MyTitleBar_t qt_meta_stringdata_MyTitleBar = {
 QT_MOC_LITERAL(0, 0, 10), // "MyTitleBar"
 QT_MOC_LITERAL(1, 11, 22), // "signalButtonMinClicked"
 QT_MOC_LITERAL(2, 34, 0), // ""
-QT_MOC_LITERAL(3, 35, 8), // "QWidget*"
-QT_MOC_LITERAL(4, 44, 6), // "parent"
-QT_MOC_LITERAL(5, 51, 26), // "signalButtonRestoreClicked"
-QT_MOC_LITERAL(6, 78, 22), // "signalButtonMaxClicked"
-QT_MOC_LITERAL(7, 101, 24), // "signalButtonCloseClicked"
-QT_MOC_LITERAL(8, 126, 18), // "onButtonMinClicked"
-QT_MOC_LITERAL(9, 145, 22), // "onButtonRestoreClicked"
-QT_MOC_LITERAL(10, 168, 18), // "onButtonMaxClicked"
-QT_MOC_LITERAL(11, 187, 20), // "onButtonCloseClicked"
-QT_MOC_LITERAL(12, 208, 11), // "onRollTitle"
-QT_MOC_LITERAL(13, 220, 19), // "onButtonMinClicked2"
-QT_MOC_LITERAL(14, 240, 23), // "onButtonRestoreClicked2"
-QT_MOC_LITERAL(15, 264, 19), // "onButtonMaxClicked2"
-QT_MOC_LITERAL(16, 284, 21) // "onButtonCloseClicked2"
+QT_MOC_LITERAL(3, 35, 26), // "signalButtonRestoreClicked"
+QT_MOC_LITERAL(4, 62, 22), // "signalButtonMaxClicked"
+QT_MOC_LITERAL(5, 85, 24), // "signalButtonCloseClicked"
+QT_MOC_LITERAL(6, 110, 18), // "onButtonMinClicked"
+QT_MOC_LITERAL(7, 129, 22), // "onButtonRestoreClicked"
+QT_MOC_LITERAL(8, 152, 18), // "onButtonMaxClicked"
+QT_MOC_LITERAL(9, 171, 20), // "onButtonCloseClicked"
+QT_MOC_LITERAL(10, 192, 11), // "onRollTitle"
+QT_MOC_LITERAL(11, 204, 19), // "onButtonMinClicked2"
+QT_MOC_LITERAL(12, 224, 23), // "onButtonRestoreClicked2"
+QT_MOC_LITERAL(13, 248, 19), // "onButtonMaxClicked2"
+QT_MOC_LITERAL(14, 268, 21) // "onButtonCloseClicked2"
 
     },
     "MyTitleBar\0signalButtonMinClicked\0\0"
-    "QWidget*\0parent\0signalButtonRestoreClicked\0"
+    "signalButtonRestoreClicked\0"
     "signalButtonMaxClicked\0signalButtonCloseClicked\0"
     "onButtonMinClicked\0onButtonRestoreClicked\0"
     "onButtonMaxClicked\0onButtonCloseClicked\0"
@@ -74,27 +72,27 @@ static const uint qt_meta_data_MyTitleBar[] = {
        4,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   79,    2, 0x06 /* Public */,
-       5,    1,   82,    2, 0x06 /* Public */,
-       6,    1,   85,    2, 0x06 /* Public */,
-       7,    1,   88,    2, 0x06 /* Public */,
+       1,    0,   79,    2, 0x06 /* Public */,
+       3,    0,   80,    2, 0x06 /* Public */,
+       4,    0,   81,    2, 0x06 /* Public */,
+       5,    0,   82,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       8,    0,   91,    2, 0x08 /* Private */,
-       9,    0,   92,    2, 0x08 /* Private */,
-      10,    0,   93,    2, 0x08 /* Private */,
-      11,    0,   94,    2, 0x08 /* Private */,
-      12,    0,   95,    2, 0x08 /* Private */,
-      13,    1,   96,    2, 0x08 /* Private */,
-      14,    1,   99,    2, 0x08 /* Private */,
-      15,    1,  102,    2, 0x08 /* Private */,
-      16,    1,  105,    2, 0x08 /* Private */,
+       6,    0,   83,    2, 0x08 /* Private */,
+       7,    0,   84,    2, 0x08 /* Private */,
+       8,    0,   85,    2, 0x08 /* Private */,
+       9,    0,   86,    2, 0x08 /* Private */,
+      10,    0,   87,    2, 0x08 /* Private */,
+      11,    0,   88,    2, 0x08 /* Private */,
+      12,    0,   89,    2, 0x08 /* Private */,
+      13,    0,   90,    2, 0x08 /* Private */,
+      14,    0,   91,    2, 0x08 /* Private */,
 
  // signals: parameters
-    QMetaType::Void, 0x80000000 | 3,    4,
-    QMetaType::Void, 0x80000000 | 3,    4,
-    QMetaType::Void, 0x80000000 | 3,    4,
-    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void,
@@ -102,10 +100,10 @@ static const uint qt_meta_data_MyTitleBar[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 3,    4,
-    QMetaType::Void, 0x80000000 | 3,    4,
-    QMetaType::Void, 0x80000000 | 3,    4,
-    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -116,113 +114,54 @@ void MyTitleBar::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         MyTitleBar *_t = static_cast<MyTitleBar *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->signalButtonMinClicked((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
-        case 1: _t->signalButtonRestoreClicked((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
-        case 2: _t->signalButtonMaxClicked((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
-        case 3: _t->signalButtonCloseClicked((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
+        case 0: _t->signalButtonMinClicked(); break;
+        case 1: _t->signalButtonRestoreClicked(); break;
+        case 2: _t->signalButtonMaxClicked(); break;
+        case 3: _t->signalButtonCloseClicked(); break;
         case 4: _t->onButtonMinClicked(); break;
         case 5: _t->onButtonRestoreClicked(); break;
         case 6: _t->onButtonMaxClicked(); break;
         case 7: _t->onButtonCloseClicked(); break;
         case 8: _t->onRollTitle(); break;
-        case 9: _t->onButtonMinClicked2((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
-        case 10: _t->onButtonRestoreClicked2((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
-        case 11: _t->onButtonMaxClicked2((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
-        case 12: _t->onButtonCloseClicked2((*reinterpret_cast< QWidget*(*)>(_a[1]))); break;
+        case 9: _t->onButtonMinClicked2(); break;
+        case 10: _t->onButtonRestoreClicked2(); break;
+        case 11: _t->onButtonMaxClicked2(); break;
+        case 12: _t->onButtonCloseClicked2(); break;
         default: ;
-        }
-    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        switch (_id) {
-        default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-        case 0:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
-        case 1:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
-        case 2:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
-        case 3:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
-        case 9:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
-        case 10:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
-        case 11:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
-        case 12:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWidget* >(); break;
-            }
-            break;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (MyTitleBar::*_t)(QWidget * );
+            typedef void (MyTitleBar::*_t)();
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&MyTitleBar::signalButtonMinClicked)) {
                 *result = 0;
                 return;
             }
         }
         {
-            typedef void (MyTitleBar::*_t)(QWidget * );
+            typedef void (MyTitleBar::*_t)();
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&MyTitleBar::signalButtonRestoreClicked)) {
                 *result = 1;
                 return;
             }
         }
         {
-            typedef void (MyTitleBar::*_t)(QWidget * );
+            typedef void (MyTitleBar::*_t)();
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&MyTitleBar::signalButtonMaxClicked)) {
                 *result = 2;
                 return;
             }
         }
         {
-            typedef void (MyTitleBar::*_t)(QWidget * );
+            typedef void (MyTitleBar::*_t)();
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&MyTitleBar::signalButtonCloseClicked)) {
                 *result = 3;
                 return;
             }
         }
     }
+    Q_UNUSED(_a);
 }
 
 const QMetaObject MyTitleBar::staticMetaObject = {
@@ -255,37 +194,33 @@ int MyTitleBar::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         _id -= 13;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         if (_id < 13)
-            qt_static_metacall(this, _c, _id, _a);
+            *reinterpret_cast<int*>(_a[0]) = -1;
         _id -= 13;
     }
     return _id;
 }
 
 // SIGNAL 0
-void MyTitleBar::signalButtonMinClicked(QWidget * _t1)
+void MyTitleBar::signalButtonMinClicked()
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+    QMetaObject::activate(this, &staticMetaObject, 0, Q_NULLPTR);
 }
 
 // SIGNAL 1
-void MyTitleBar::signalButtonRestoreClicked(QWidget * _t1)
+void MyTitleBar::signalButtonRestoreClicked()
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+    QMetaObject::activate(this, &staticMetaObject, 1, Q_NULLPTR);
 }
 
 // SIGNAL 2
-void MyTitleBar::signalButtonMaxClicked(QWidget * _t1)
+void MyTitleBar::signalButtonMaxClicked()
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 2, _a);
+    QMetaObject::activate(this, &staticMetaObject, 2, Q_NULLPTR);
 }
 
 // SIGNAL 3
-void MyTitleBar::signalButtonCloseClicked(QWidget * _t1)
+void MyTitleBar::signalButtonCloseClicked()
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 3, _a);
+    QMetaObject::activate(this, &staticMetaObject, 3, Q_NULLPTR);
 }
 QT_END_MOC_NAMESPACE
