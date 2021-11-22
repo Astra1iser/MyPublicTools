@@ -213,10 +213,10 @@ void MyTitleBar::setButtonType(ButtonType buttonType)
 
 // 设置标题栏中的标题是否会自动滚动，跑马灯的效果;
 // 一般情况下标题栏中的标题内容是不滚动的
-void MyTitleBar::setTitleRoll()
+void MyTitleBar::setTitleRoll(int timeInterval)
 {
 	connect(&m_titleRollTimer, SIGNAL(timeout()), this, SLOT(onRollTitle()));
-	m_titleRollTimer.start(5);
+	m_titleRollTimer.start(timeInterval);
 }
 
 // 设置窗口边框宽度;
@@ -290,9 +290,9 @@ void MyTitleBar::mouseDoubleClickEvent(QMouseEvent *event)
 		{
 			onButtonRestoreClicked();
 		}
-	}   
-	else
-		return QWidget::mouseDoubleClickEvent(event);
+	}
+
+	return QWidget::mouseDoubleClickEvent(event);
 }
 
 // 以下通过mousePressEvent、mouseMoveEvent、mouseReleaseEvent三个事件实现了鼠标拖动标题栏移动窗口的效果;
@@ -308,41 +308,47 @@ void MyTitleBar::mousePressEvent(QMouseEvent *event)
 	//}
 	//else
 	//{
-		m_isPressed = true;
-		m_startMovePos = event->globalPos();
+	//	m_isPressed = true;
+	//	m_startMovePos = event->globalPos();
 	//}
 
+	//bool dd = this->geometry().contains(this->mapFromGlobal(QCursor::pos()));
+
+	m_isPressed = true;
+	m_startMovePos = event->globalPos();
+
+	
 	return QWidget::mousePressEvent(event);
 }
 
 void MyTitleBar::mouseMoveEvent(QMouseEvent *event)
-{
+{	
 	//如果当前恢复按钮可用,证明点击过最大化或者双击过标题栏
-	if (m_pButtonRestore->isVisible() && !m_pButtonMax->isVisible())
-	{
-		//让当前的窗体标题终点移动到鼠标坐标上
-		m_CanMove = 1;
-	}
-	else
-	{
-		//不让当前的窗体标题终点移动到鼠标坐标上
-		m_CanMove = 0;
-	}
+	//if (m_pButtonRestore->isVisible() && !m_pButtonMax->isVisible() && this->geometry().contains(this->mapFromGlobal(QCursor::pos()))/*&& this->parentWidget()->windowState() == Qt::WindowMaximized*/ )
+	//{
+	//	//让当前的窗体标题终点移动到鼠标坐标上
+	//	m_CanMove = 1;
+	//}
+	//else
+	//{
+	//	//不让当前的窗体标题终点移动到鼠标坐标上
+	//	m_CanMove = 0;
+	//}
 
-	//如果鼠标移动时,发现当前窗体的恢复按钮存在,且可以拖动
-	if (m_pButtonRestore->isVisible()&& m_CanMove == 1)
+	//如果鼠标移动时,发现当前窗体的恢复按钮存在,且可以拖动则触发还原逻辑(仿微软设计)
+	if (m_pButtonRestore->isVisible() && this->geometry().contains(this->mapFromGlobal(QCursor::pos())) /* && m_CanMove == 1*/)
 	{
 		//本设计是还原微软窗体的动作,最大化移动窗体时,还原原始窗体并跟随鼠标移动
 		//触发一次窗体还原
 		onButtonRestoreClicked();
-		m_CanMove = 0;
+		//m_CanMove = 0;
 		QPoint movePoint = event->globalPos();
 		//让父窗口的标题中间对准鼠标
 		//this->parentWidget()->move(movePoint.x()- this->parentWidget()->width()/2,  movePoint.y()- this->height()/2);
-		this->parentWidget()->move(movePoint.x()- this->parentWidget()->width()/2,  movePoint.y()- m_windowBorderWidth- this->height()/2);
+		this->parentWidget()->move(movePoint.x() - this->parentWidget()->width() / 2, movePoint.y() - m_windowBorderWidth - this->height() / 2);
 	}
 
-	if (m_isPressed)
+	if (m_isPressed && this->geometry().contains(this->mapFromGlobal(QCursor::pos())))
 	{
 		QPoint movePoint = event->globalPos() - m_startMovePos;
 		QPoint widgetPos = this->parentWidget()->pos();
@@ -450,6 +456,7 @@ void MyTitleBar::onButtonMinClicked2()
 
 void MyTitleBar::onButtonRestoreClicked2()
 {
+	this->parentWidget()->setWindowState(Qt::WindowNoState);
 	//原始窗口可以扩展大小(仿windows设计)
 	this->parentWidget()->setMaximumHeight(16777215);
 	this->parentWidget()->setMaximumWidth(16777215);
@@ -477,6 +484,7 @@ void MyTitleBar::onButtonMaxClicked2()
 
 	//从当前进程屏幕上左上角位置开始，显示一个当前桌面客户分辨率大小(此分辨率比桌面分辨率小,因为去掉了任务栏的大小)的界面（宽desktopRect.width()，高esktopRect.height().
 	this->parentWidget()->setGeometry(FactRect);
+	//this->parentWidget()->setWindowState(Qt::WindowMaximized);
 
 	//最大化时禁止拉伸窗口(仿windows设计)
 	this->parentWidget()->setMinimumHeight(this->parentWidget()->height());

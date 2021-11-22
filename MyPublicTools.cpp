@@ -636,7 +636,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//cin >> a;
 
-
+OutputDebugString(L"---------------------------------");
 
 	system("pause");
 

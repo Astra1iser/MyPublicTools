@@ -8,7 +8,6 @@
 #include <QPushButton>
 #include <QTimer>
 
-
 enum ButtonType
 {
 	MIN_BUTTON = 0,         // 最小化和关闭按钮;
@@ -19,14 +18,7 @@ enum ButtonType
 
 
 
-
-
-
-
-
-
-
-
+//ps:我觉得我接下来要参考这个了https://blog.csdn.net/a844651990/article/details/106985554/
 
 
 //如何使用这个自定义标题栏?
@@ -78,8 +70,8 @@ public:
 	void setTitleHeight(int height = 0);
 	// 设置标题栏上按钮类型;
 	void setButtonType(ButtonType buttonType);
-	// 设置标题栏中的标题是否会滚动;
-	void setTitleRoll();
+	// 设置标题栏中的标题是否会滚动(值不要太小,会增加Cpu消耗);
+	void setTitleRoll(int timeInterval = 5);
 	// 设置窗口边框宽度(这里是填父窗体中边框的长度,设置后,标题栏的左右和上方会空出对应大小的宽度用于显示父窗口边框);
 	void setWindowBorderWidth(int borderWidth);
 
@@ -155,9 +147,9 @@ private:
 
 	int m_nPos; //标题坐标
 	BOOL m_isChange; //标题是否转换方向
-	BOOL m_CanMove; //窗体是否在最大化时可移动
-//	int m_height;	//保存了当前标题的FixedHeight,该值至少为30,该值其实是相对于父窗体的Y轴坐标,并不是窗体高度
-
+	//BOOL m_CanMove; //窗体是否在最大化时可移动
+	//BOOL m_CanMove2; //窗体是否在最大化时可移动
+	//int m_height;	//保存了当前标题的FixedHeight,该值至少为30,该值其实是相对于父窗体的Y轴坐标,并不是窗体高度
 
 	// 保存/获取 最大化前窗口的位置及大小;
 	void saveRestoreInfo(const QPoint point, const QSize size);

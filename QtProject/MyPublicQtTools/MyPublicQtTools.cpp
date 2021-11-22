@@ -27,6 +27,45 @@ BOOL zhengze(CString abc)
 }
 
 
+
+CString GetHostNameFromURL(const CString& strURL)
+{
+    static const TCHAR pszBeginPattern[] = _T("://");
+    static const TCHAR pszEndPattern[] = _T("/");
+
+    int iStart = strURL.Find(pszBeginPattern);
+    if (iStart <= 0)
+        return strURL;
+
+    iStart += _countof(pszBeginPattern) - 1;
+
+    int iEnd = strURL.Find(pszEndPattern, iStart);
+    if (iEnd <= 0)
+        return strURL.Mid(iStart);
+
+    return strURL.Mid(iStart, iEnd - iStart);
+}
+
+CString ReplaceDomainNameByIP(const CString& strURL, const CString& strIP)
+{
+    static const TCHAR pszStartPattern[] = _T("://");
+    static const TCHAR pszEndPattern[] = _T("/");
+
+    int iStart = strURL.Find(pszStartPattern);
+    if (iStart < 0)
+        return strURL;
+
+    int iEnd = strURL.Find(pszEndPattern, iStart + _countof(pszStartPattern) - 1);
+    if (iEnd > 0)
+    {
+        return strURL.Left(iStart + _countof(pszStartPattern) - 1) + strIP + strURL.Mid(iEnd);
+    }
+
+    return strURL.Left(iStart + _countof(pszStartPattern) - 1) + strIP;
+}
+
+
+
 MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -36,7 +75,6 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
 
     //bool ddd = zhengze(L"\\R1egistry\\Machine\\System\\ControlSet???\\Hardware Profiles\\????");
     //bool ddd = bijiao(L"\\Registry\\Machine\\System\\ControlSet???");
-
 
 
 
@@ -125,9 +163,9 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     //m_titleBar->setBackgroundColor(0, 0, 0, 1);
     m_titleBar->setTitleContent(QStringLiteral(" 这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题"),20);
     m_titleBar->setButtonType(MIN_MAX_BUTTON);
-    m_titleBar->setTitleRoll();
+    m_titleBar->setTitleRoll(100);
     //m_titleBar->setWindowBorderWidth(150);
-    m_titleBar->setTitleHeight(10);
+    m_titleBar->setTitleHeight(5);
 
 
     //m_titleBar->setTitleWidth(1);
