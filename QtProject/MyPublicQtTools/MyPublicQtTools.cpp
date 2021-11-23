@@ -163,7 +163,7 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     //m_titleBar->setBackgroundColor(0, 0, 0, 1);
     m_titleBar->setTitleContent(QStringLiteral(" 这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题"),20);
     m_titleBar->setButtonType(MIN_MAX_BUTTON);
-    m_titleBar->setTitleRoll(100);
+    m_titleBar->setTitleRoll(5);
     //m_titleBar->setWindowBorderWidth(150);
     m_titleBar->setTitleHeight(5);
 

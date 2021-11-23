@@ -15,7 +15,9 @@ enum ButtonType
 	ONLY_CLOSE_BUTTON       // 只有关闭按钮;
 };
 
-
+//待开发功能 贴边毛玻璃效果(这个貌似需要封装一个窗体类,不要在标题类上做了)
+//焦点问题
+//图标左右键菜单
 
 
 //ps:我觉得我接下来要参考这个了https://blog.csdn.net/a844651990/article/details/106985554/
@@ -90,26 +92,32 @@ private:
 	// 加载样式文件;
 	void loadStyleSheet(const QString &sheetName);
 
-signals:
-	// 按钮触发的信号;
-	void signalButtonMinClicked();
-	void signalButtonRestoreClicked();
-	void signalButtonMaxClicked();
-	void signalButtonCloseClicked();
+//signals:
+//	// 按钮触发的信号;
+//	void signalButtonMinClicked();
+//	void signalButtonRestoreClicked();
+//	void signalButtonMaxClicked();
+//	void signalButtonCloseClicked();
 
 private slots:
 	// 按钮触发的槽;
 	void onButtonMinClicked();
-	void onButtonRestoreClicked();
+	void onButtonMinPressed();
 	void onButtonMaxClicked();
+	void onButtonMaxPressed();
+	void onButtonRestoreClicked();
+	void onButtonRestorePressed();
 	void onButtonCloseClicked();
+	void onButtonClosePressed();
 	void onRollTitle();
 
-	//每个按钮的具体实现
-	void onButtonMinClicked2();
-	void onButtonRestoreClicked2();
-	void onButtonMaxClicked2();
-	void onButtonCloseClicked2();
+
+
+	////每个按钮的具体实现(已废弃)
+	//void onButtonMinClicked2();
+	//void onButtonRestoreClicked2();
+	//void onButtonMaxClicked2();
+	//void onButtonCloseClicked2();
 
 
 private:
@@ -154,7 +162,7 @@ private:
 	// 保存/获取 最大化前窗口的位置及大小;
 	void saveRestoreInfo(const QPoint point, const QSize size);
 	void getRestoreInfo(QPoint& point, QSize& size);
-
+	BOOL isTitleUnderMouse;
 };
 
 #endif
