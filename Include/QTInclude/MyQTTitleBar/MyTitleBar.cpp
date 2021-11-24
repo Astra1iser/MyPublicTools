@@ -5,10 +5,11 @@
 #include <QMouseEvent>
 
 #define BUTTON_HEIGHT 30        // 按钮高度;
-#define BUTTON_WIDTH 30         // 按钮宽度;
+//#define BUTTON_WIDTH 30         // 按钮宽度;
+#define BUTTON_WIDTH 42         // 按钮宽度;
 #define TITLE_HEIGHT 30         // 标题栏高度;
 
-MyTitleBar::MyTitleBar(QWidget *parent)
+MyTitleBar::MyTitleBar(QWidget* parent)
 	: QDialog(parent)
 	, m_colorR(0)
 	, m_colorG(120)
@@ -19,14 +20,13 @@ MyTitleBar::MyTitleBar(QWidget *parent)
 	, m_isTransparent(false)
 	, m_nPos(25)
 	, m_isChange(0)
-	//, m_CanMove(0)
-	//, m_height(30)
+	, m_nClickTimes(0)
 {
 	// 初始化;
 	initControl();
 	initConnections();
 	// 加载本地样式 MyTitle.css文件;
-	//loadStyleSheet(QString::fromLocal8Bit("信任区"));
+	//loadStyleSheet(QString::fromLocal8Bit(""));
 }
 
 MyTitleBar::~MyTitleBar()
@@ -77,6 +77,7 @@ void MyTitleBar::initControl()
 	mylayout->addWidget(m_pButtonClose);
 
 	//如何设置QSS https://blog.csdn.net/Andy_93/article/details/53100640?utm_source=blogxgwz9
+	//这里图标是我自己做的,如果有别的外观要求,我暂时没有提供外部方法,所以请改这里,其实也可以把这三个按钮放在public里,然后外部修改
 
 	m_pButtonMin->setStyleSheet("QPushButton{border: transparent; border-radius: none; background-color:none;}"
 		"QPushButton{border-image:url(image/Minimize.png) 0 84 0 0;}"
@@ -105,7 +106,7 @@ void MyTitleBar::initControl()
 	m_pTitleContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 
-	//设置父窗体图标点击,外框隐藏
+	//设置父窗体图标点击,外框隐藏,如果父窗体有需求,一定要改这里或者重新给父窗体设置属性
 	this->parentWidget()->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
 
 	//this->setWindowFlags(Qt::FramelessWindowHint);
@@ -117,6 +118,11 @@ void MyTitleBar::initControl()
 // 信号槽的绑定;
 void MyTitleBar::initConnections()
 {
+	//注意这个定时器绑定是用来判断单双击的,一定不要删除
+	connect(&m_cTimer, SIGNAL(timeout()), this, SLOT(slotTimerTimeOut()));
+
+	connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(_SlotPlayArgsMenu(QPoint)));
+
 	connect(m_pButtonMin, SIGNAL(pressed()), this, SLOT(onButtonMinPressed()));
 	connect(m_pButtonMin, SIGNAL(clicked()), this, SLOT(onButtonMinClicked()));
 	connect(m_pButtonMax, SIGNAL(pressed()), this, SLOT(onButtonMaxPressed()));
@@ -125,16 +131,6 @@ void MyTitleBar::initConnections()
 	connect(m_pButtonRestore, SIGNAL(clicked()), this, SLOT(onButtonRestoreClicked()));
 	connect(m_pButtonClose, SIGNAL(pressed()), this, SLOT(onButtonClosePressed()));
 	connect(m_pButtonClose, SIGNAL(clicked()), this, SLOT(onButtonCloseClicked()));
-
-
-
-
-
-	//以下响应已废弃
-	//connect(this, SIGNAL(signalButtonMinClicked()), this, SLOT(onButtonMinClicked2()));
-	//connect(this, SIGNAL(signalButtonRestoreClicked()), this, SLOT(onButtonRestoreClicked2()));
-	//connect(this, SIGNAL(signalButtonMaxClicked()), this, SLOT(onButtonMaxClicked2()));
-	//connect(this, SIGNAL(signalButtonCloseClicked()), this, SLOT(onButtonCloseClicked2()));
 }
 
 // 设置标题栏背景色,在paintEvent事件中进行绘制标题栏背景色;
@@ -154,7 +150,8 @@ void MyTitleBar::setTitleIcon(QString filePath, QSize IconSize)
 {
 	QPixmap titleIcon(filePath);
 	m_pIcon->setPixmap(titleIcon.scaled(IconSize));
-	m_nPos = m_pIcon->width();
+	//m_nPos = m_pIcon->width();
+
 }
 
 // 设置标题内容;
@@ -236,11 +233,34 @@ void MyTitleBar::setButtonType(ButtonType buttonType)
 // 一般情况下标题栏中的标题内容是不滚动的
 void MyTitleBar::setTitleRoll(int timeInterval)
 {
+	m_nPos = m_pIcon->width(); //设置滚动起始位置
 	connect(&m_titleRollTimer, SIGNAL(timeout()), this, SLOT(onRollTitle()));
 	m_titleRollTimer.start(timeInterval);
 }
 
+//设置右键菜单
+void MyTitleBar:: setRightClickMenu()
+{
+	this->setContextMenuPolicy(Qt::CustomContextMenu);//添加右键菜单策略
+	m_RightButtonMenu = new QMenu(this); //菜单
 
+	m_MenuRestore = new QAction(QIcon("image/restoreBlack_16.png"), YString("还原"), this); //还原
+	m_MenuMin = new QAction(QIcon("image/minimizeBtnBlack_16.png"), YString("最小化"), this); //最小化
+	m_MenuMax = new QAction(QIcon("image/maximizeBtnBlack_16.png"), YString("最大化"), this); //最大化
+	m_MenuClose = new QAction(QIcon("image/closeBtnBlack_16.png"), YString("关闭"), this); //关闭
+
+
+
+
+
+
+	////setContextMenuPolicy(Qt::ActionsContextMenu);
+	//addAction(new QAction(YString("还原"), this->m_pIcon));
+	//addAction(new QAction(YString("最小化"), this->m_pIcon));
+	//addAction(new QAction(YString("最大化"), this->m_pIcon));
+	//addAction(new QAction(YString("关闭"), this->m_pIcon));
+	////setContextMenuPolicy(Qt::NoContextMenu);
+}
 
 // 保存窗口最大化前窗口的位置以及大小;
 void MyTitleBar::saveRestoreInfo(const QPoint point, const QSize size)
@@ -317,13 +337,21 @@ void MyTitleBar::mouseDoubleClickEvent(QMouseEvent *event)
 	{
 		// 通过最大化按钮的状态判断当前窗口是处于最大化还是原始大小状态;
 		// 或者通过单独设置变量来表示当前窗口状态;
-		if (m_pButtonMax->isVisible())
+		if (m_pButtonMax->isVisible() && !this->m_pIcon->underMouse())
 		{
-			onButtonMaxClicked();
+			if (event->button() == Qt::LeftButton && DOUBLECLICK == m_nClickTimes+1)//这里加1是因为双击事件发生在单击前,此时m_nClickTimes还没被加1
+			{
+				onButtonMaxClicked();
+				return QWidget::mouseDoubleClickEvent(event);
+			}
 		}
-		else
+		else if (m_pButtonRestore->isVisible() && !this->m_pIcon->underMouse())
 		{
-			onButtonRestoreClicked();
+			if (event->button() == Qt::LeftButton && DOUBLECLICK == m_nClickTimes + 1)
+			{
+				onButtonRestoreClicked();
+				return QWidget::mouseDoubleClickEvent(event);
+			}
 		}
 	}
 
@@ -331,50 +359,49 @@ void MyTitleBar::mouseDoubleClickEvent(QMouseEvent *event)
 }
 
 
+
+
 // 以下通过mousePressEvent、mouseMoveEvent、mouseReleaseEvent三个事件实现了鼠标拖动标题栏移动窗口的效果;
 void MyTitleBar::mousePressEvent(QMouseEvent *event)
 {
-	//if (m_buttonType == MIN_MAX_BUTTON)
-	//{
-	//	if (m_pButtonMax->isVisible())
-	//	{
-	//		m_isPressed = true;
-	//		m_startMovePos = event->globalPos();
-	//	}
-	//}
-	//else
-	//{
-	//	m_isPressed = true;
-	//	m_startMovePos = event->globalPos();
-	//}
+	//点击计数器,每点一下加一,用于判断单击双击用
+	m_nClickTimes++;
+	//单双击计时器,详情请看slotTimerTimeOut()
+	m_cTimer.start(300);
 
-	//bool dd = this->geometry().contains(this->mapFromGlobal(QCursor::pos()));
+	if (event->button() == Qt::LeftButton && m_nClickTimes == 1)
+	{
+		isTitleUnderMouse = this->underMouse() && !this->m_pIcon->underMouse();
+		m_isPressed = true;
+		m_startMovePos = event->globalPos();
+		return QWidget::mousePressEvent(event);
+	}
+	else if(event->button() == Qt::LeftButton && m_nClickTimes != 1)
+	{
+		isTitleUnderMouse = FALSE;
+		m_isPressed = FALSE;
+		return QWidget::mousePressEvent(event);
+	}
 
-	isTitleUnderMouse = this->geometry().contains(this->mapFromGlobal(QCursor::pos()));
-	m_isPressed = true;
-	m_startMovePos = event->globalPos();
+	if (event->button() == Qt::RightButton && m_nClickTimes == 1 && !this->m_pButtonMin->underMouse() && !this->m_pButtonMax->underMouse() && !this->m_pButtonRestore->underMouse() && !this->m_pButtonClose->underMouse() && !this->m_pIcon->underMouse())
+	{
+		setContextMenuPolicy(Qt::CustomContextMenu);
+		isTitleUnderMouse = FALSE;
+		m_isPressed = FALSE;
+		return QWidget::mousePressEvent(event);
+	}
+	else
+	{
+		setContextMenuPolicy(Qt::NoContextMenu);
+		isTitleUnderMouse = FALSE;
+		m_isPressed = FALSE;
+	}
 
-	
 	return QWidget::mousePressEvent(event);
 }
 
 void MyTitleBar::mouseMoveEvent(QMouseEvent *event)
 {	
-	//如果当前恢复按钮可用,证明点击过最大化或者双击过标题栏
-	//if (m_pButtonRestore->isVisible() && !m_pButtonMax->isVisible() && this->geometry().contains(this->mapFromGlobal(QCursor::pos()))/*&& this->parentWidget()->windowState() == Qt::WindowMaximized*/ )
-	//{
-	//	//让当前的窗体标题终点移动到鼠标坐标上
-	//	m_CanMove = 1;
-	//}
-	//else
-	//{
-	//	//不让当前的窗体标题终点移动到鼠标坐标上
-	//	m_CanMove = 0;
-	//}
-
-	//BOOL isUnderMouse = this->geometry().contains(this->mapFromGlobal(QCursor::pos()));
-
-
 	//如果鼠标移动时,发现当前窗体的恢复按钮存在,且可以拖动则触发还原逻辑(仿微软设计)
 	if (m_pButtonRestore->isVisible() && isTitleUnderMouse  /* && m_CanMove == 1*/)
 	{
@@ -384,11 +411,9 @@ void MyTitleBar::mouseMoveEvent(QMouseEvent *event)
 		//m_CanMove = 0;
 		QPoint movePoint = event->globalPos();
 		//让父窗口的标题中间对准鼠标
-		//this->parentWidget()->move(movePoint.x()- this->parentWidget()->width()/2,  movePoint.y()- this->height()/2);
 		this->parentWidget()->move(movePoint.x() - this->parentWidget()->width() / 2, movePoint.y() - m_windowBorderWidth - this->height() / 2);
 	}
 
-	//if (m_isPressed && this->geometry().contains(this->mapFromGlobal(QCursor::pos())))
 	if (m_isPressed && isTitleUnderMouse)
 	{
 		QPoint movePoint = event->globalPos() - m_startMovePos;
@@ -396,7 +421,6 @@ void MyTitleBar::mouseMoveEvent(QMouseEvent *event)
 		m_startMovePos = event->globalPos();
 		this->parentWidget()->move(widgetPos.x() + movePoint.x(), widgetPos.y() + movePoint.y());
 	}
-
 
 	return QWidget::mouseMoveEvent(event);
 }
@@ -408,26 +432,54 @@ void MyTitleBar::mouseReleaseEvent(QMouseEvent *event)
 }
 
 
+//单双机计时器槽函数
+void MyTitleBar::slotTimerTimeOut()
+{
+	/*
+	* https://blog.csdn.net/beibeix2015/article/details/77488910
+	可以用 if (event->button() == Qt::LeftButton && m_nClickTimes == 1)
+	来判断鼠标左键单击,左键双击,左键多击,右键单击,右键双击,右键多击,具体怎么用见机行事
+	计时器停止, 结算计时器时间内的点击次数, 当点击次数为1时认为单位时间内点击了一次, 点击次数为2时认为单位时间内点击了两次
+	注意计时器的时间不要过短,不然对于窗体来说,太短会造成计数器总为1,在mousePressEvent()内判断单击时会一直成功,导致双击时触发单击
+	计时器的时间也不能太长,不然对于窗体来说,单击条件为判断点击数1时,你的下一次判断成功的单击延迟会被加长
+	这里推荐计时器时间设置为200-400内最好
+	*/
+	m_cTimer.stop();
+	//if (1 == m_nClickTimes)
+	//{
+	//	//单击 TODU
+	//	qDebug() < <YString("单击") << endl;
+	//}
+	//else if (2 == m_nClickTimes)
+	//{
+	//	//双击 TODU
+	//	qDebug() << YString("双击") << endl;
+	//}
+
+	//将计数器归零
+	m_nClickTimes = 0;
+
+}
+
 
 // 以下为按钮操作响应的槽;
 
 //最小化响应函数,点击时
 void MyTitleBar::onButtonMinPressed()
 {
-	isTitleUnderMouse = this->m_pButtonMin->geometry().contains(this->m_pButtonMin->mapFromGlobal(QCursor::pos()));
+	isTitleUnderMouse = FALSE;
 }
 
 //最小化响应函数,点击后
 void MyTitleBar::onButtonMinClicked()
 {
-	//emit signalButtonMinClicked();
 	this->parentWidget()->showMinimized();
 }
 
 //最大化响应函数,点击时
 void MyTitleBar::onButtonMaxPressed()
 {
-	isTitleUnderMouse = this->m_pButtonMax->geometry().contains(this->m_pButtonMax->mapFromGlobal(QCursor::pos()));
+	isTitleUnderMouse = FALSE;
 }
 
 //最大化响应函数,点击后
@@ -435,7 +487,7 @@ void MyTitleBar::onButtonMaxClicked()
 {
 	m_pButtonMax->setVisible(false);
 	m_pButtonRestore->setVisible(true);
-	//emit signalButtonMaxClicked();
+
 	//保存一下原始窗体大小,便于还原时用
 	this->saveRestoreInfo(this->parentWidget()->pos(), QSize(this->parentWidget()->width(), this->parentWidget()->height()));
 
@@ -460,7 +512,7 @@ void MyTitleBar::onButtonMaxClicked()
 //还原响应函数,点击时
 void MyTitleBar::onButtonRestorePressed()
 {
-	isTitleUnderMouse = this->m_pButtonRestore->geometry().contains(this->m_pButtonRestore->mapFromGlobal(QCursor::pos()));
+	isTitleUnderMouse = FALSE;
 }
 
 //还原响应函数,点击后
@@ -468,8 +520,7 @@ void MyTitleBar::onButtonRestoreClicked()
 {
 	m_pButtonRestore->setVisible(false);
 	m_pButtonMax->setVisible(true);
-	//emit signalButtonRestoreClicked();
-	this->parentWidget()->setWindowState(Qt::WindowNoState);
+
 	//原始窗口可以扩展大小(仿windows设计)
 	this->parentWidget()->setMaximumHeight(16777215);
 	this->parentWidget()->setMaximumWidth(16777215);
@@ -486,13 +537,12 @@ void MyTitleBar::onButtonRestoreClicked()
 //关闭响应函数,点击时
 void MyTitleBar::onButtonClosePressed()
 {
-	isTitleUnderMouse = this->m_pButtonClose->geometry().contains(this->m_pButtonClose->mapFromGlobal(QCursor::pos()));
+	isTitleUnderMouse = FALSE;
 }
 
 //关闭响应函数,点击后
 void MyTitleBar::onButtonCloseClicked()
 {
-	//emit signalButtonCloseClicked();
 	this->parentWidget()->close();
 }
 
@@ -500,17 +550,7 @@ void MyTitleBar::onButtonCloseClicked()
 // 该方法主要是让标题栏中的标题显示为滚动的效果;
 void MyTitleBar::onRollTitle()
 {
-	//static int nPos = 0;
 	//QString titleContent = m_titleContent;
-	//// 当截取的位置比字符串长时，从头开始;
-	//if (nPos > titleContent.length())
-	//	nPos = 0;
-
-	//m_pTitleContent->setText(titleContent.mid(nPos));
-	//nPos++;
-
-
-	QString titleContent = m_titleContent;
 	QFontMetrics fm(m_pTitleContent->font());
 	int textWidthInPxs = fm.width(m_titleContent);
 
@@ -534,70 +574,40 @@ void MyTitleBar::onRollTitle()
 		m_nPos++;
 	else
 		m_nPos--;
+}
 
 
+void MyTitleBar::onIconClicked()
+{
+	isTitleUnderMouse = !this->m_pIcon->underMouse();
+}
+void MyTitleBar::onIconPressed()
+{
+	isTitleUnderMouse = !this->m_pIcon->underMouse();
 }
 
 
 
+void MyTitleBar::contextMenuEvent(QContextMenuEvent* event)
+{
+	Q_UNUSED(event)
+	m_RightButtonMenu->clear();
+	m_RightButtonMenu->addAction(m_MenuRestore);
+	m_RightButtonMenu->addAction(m_MenuMin);
+	m_RightButtonMenu->addAction(m_MenuMax);
+	m_RightButtonMenu->addSeparator();    //分割线
+	m_RightButtonMenu->addAction(m_MenuClose);
+	m_RightButtonMenu->exec(QCursor::pos());  //在当前鼠标处堵住
+}
 
 
-
-
-
-
-
-
-
-
-
-
-//// 以下为按钮操作响应的槽;(已废弃)
-//void MyTitleBar::onButtonMinClicked2()
-//{
-//	this->parentWidget()->showMinimized();
-//}
-//
-//void MyTitleBar::onButtonRestoreClicked2()
-//{
-//	this->parentWidget()->setWindowState(Qt::WindowNoState);
-//	//原始窗口可以扩展大小(仿windows设计)
-//	this->parentWidget()->setMaximumHeight(16777215);
-//	this->parentWidget()->setMaximumWidth(16777215);
-//	this->parentWidget()->setMinimumHeight(0);
-//	this->parentWidget()->setMinimumWidth(0);
-//
-//	QPoint windowPos;
-//	QSize windowSize;
-//	//把之前保存的原始窗体大小取出来还原
-//	this->getRestoreInfo(windowPos, windowSize);
-//	this->parentWidget()->setGeometry(QRect(windowPos, windowSize));
-//}
-//
-//void MyTitleBar::onButtonMaxClicked2()
-//{
-//	//保存一下原始窗体大小,便于还原时用
-//	this->saveRestoreInfo(this->parentWidget()->pos(), QSize(this->parentWidget()->width(), this->parentWidget()->height()));
-//
-//	//此处为了兼容多屏幕,判断当前进程所在屏幕的序号
-//	QDesktopWidget* deskTop = QApplication::desktop();
-//	int curMonitor = deskTop->screenNumber(this); // 参数是一个QWidget*
-//	//取所在屏幕桌面的客户大小(去掉任务栏后的大小)
-//	QRect desktopRect = QApplication::desktop()->availableGeometry(curMonitor);
-//	QRect FactRect = QRect(desktopRect.x(), desktopRect.y(), desktopRect.width(), desktopRect.height());
-//
-//	//从当前进程屏幕上左上角位置开始，显示一个当前桌面客户分辨率大小(此分辨率比桌面分辨率小,因为去掉了任务栏的大小)的界面（宽desktopRect.width()，高esktopRect.height().
-//	this->parentWidget()->setGeometry(FactRect);
-//	//this->parentWidget()->setWindowState(Qt::WindowMaximized);
-//
-//	//最大化时禁止拉伸窗口(仿windows设计)
-//	this->parentWidget()->setMinimumHeight(this->parentWidget()->height());
-//	this->parentWidget()->setMinimumWidth(this->parentWidget()->width());
-//	this->parentWidget()->setMaximumHeight(this->parentWidget()->height());
-//	this->parentWidget()->setMaximumWidth(this->parentWidget()->width());
-//}
-//
-//void MyTitleBar::onButtonCloseClicked2()
-//{
-//	this->parentWidget()->close();
-//}
+void MyTitleBar::_SlotPlayArgsMenu(const QPoint pos)
+{
+	m_RightButtonMenu->clear();
+	m_RightButtonMenu->addAction(m_MenuRestore);
+	m_RightButtonMenu->addAction(m_MenuMin);
+	m_RightButtonMenu->addAction(m_MenuMax);
+	m_RightButtonMenu->addSeparator();    //分割线
+	m_RightButtonMenu->addAction(m_MenuClose);
+	m_RightButtonMenu->exec(QCursor::pos());  //在当前鼠标处堵住
+}

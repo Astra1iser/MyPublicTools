@@ -7,12 +7,20 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTimer>
-
+#include "stdafx.h"
 enum ButtonType
 {
 	MIN_BUTTON = 0,         // 最小化和关闭按钮;
 	MIN_MAX_BUTTON ,        // 最小化、最大化和关闭按钮;
 	ONLY_CLOSE_BUTTON       // 只有关闭按钮;
+};
+
+enum MouseClickTimes
+{
+	NOCLICK = 0,
+	SINGLECLICK,
+	DOUBLECLICK,
+	OTHERTIMESCLICK
 };
 
 //待开发功能 贴边毛玻璃效果(这个貌似需要封装一个窗体类,不要在标题类上做了)
@@ -76,7 +84,8 @@ public:
 	void setTitleRoll(int timeInterval = 5);
 	// 设置窗口边框宽度(这里是填父窗体中边框的长度,设置后,标题栏的左右和上方会空出对应大小的宽度用于显示父窗口边框);
 	void setWindowBorderWidth(int borderWidth);
-
+	//设置右键菜单
+	void setRightClickMenu();
 
 private:
 	void paintEvent(QPaintEvent *event);
@@ -92,14 +101,15 @@ private:
 	// 加载样式文件;
 	void loadStyleSheet(const QString &sheetName);
 
-//signals:
-//	// 按钮触发的信号;
-//	void signalButtonMinClicked();
-//	void signalButtonRestoreClicked();
-//	void signalButtonMaxClicked();
-//	void signalButtonCloseClicked();
+signals:
+
 
 private slots:
+	//判断单双击的计时器槽函数
+	void slotTimerTimeOut();
+
+	void _SlotPlayArgsMenu(const QPoint pos);
+
 	// 按钮触发的槽;
 	void onButtonMinClicked();
 	void onButtonMinPressed();
@@ -110,14 +120,11 @@ private slots:
 	void onButtonCloseClicked();
 	void onButtonClosePressed();
 	void onRollTitle();
+	void onIconClicked();
+	void onIconPressed();
 
 
 
-	////每个按钮的具体实现(已废弃)
-	//void onButtonMinClicked2();
-	//void onButtonRestoreClicked2();
-	//void onButtonMaxClicked2();
-	//void onButtonCloseClicked2();
 
 
 private:
@@ -144,25 +151,41 @@ private:
 	QTimer m_titleRollTimer;
 	// 标题栏内容;
 	QString m_titleContent;
-	// 标题栏内容;
-	QString m_titleContent2;
 	// 按钮类型;
 	ButtonType m_buttonType;
 	// 窗口边框宽度;
 	int m_windowBorderWidth;
 	// 标题栏是否透明;
 	bool m_isTransparent;
+	//标题开始坐标(其实就是图标的右侧)
+	int m_nPos;
 
-	int m_nPos; //标题坐标
-	BOOL m_isChange; //标题是否转换方向
-	//BOOL m_CanMove; //窗体是否在最大化时可移动
-	//BOOL m_CanMove2; //窗体是否在最大化时可移动
-	//int m_height;	//保存了当前标题的FixedHeight,该值至少为30,该值其实是相对于父窗体的Y轴坐标,并不是窗体高度
+	//当前鼠标是否在标题栏上
+	BOOL isTitleUnderMouse;
+	//标题是否转换方向
+
+	BOOL m_isChange;
+	//鼠标点击次数
+	int m_nClickTimes; 
+	//单双击计时器
+	QTimer m_cTimer; 
 
 	// 保存/获取 最大化前窗口的位置及大小;
 	void saveRestoreInfo(const QPoint point, const QSize size);
 	void getRestoreInfo(QPoint& point, QSize& size);
-	BOOL isTitleUnderMouse;
+
+
+
+
+
+private:
+	QMenu* m_RightButtonMenu; //右键菜单
+
+	QAction* m_MenuRestore; //还原
+	QAction* m_MenuMin; //最小化
+	QAction* m_MenuMax; //最大化
+	QAction* m_MenuClose; //关闭
+	void contextMenuEvent(QContextMenuEvent* event);
 };
 
 #endif

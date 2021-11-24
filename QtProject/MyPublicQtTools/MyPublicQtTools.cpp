@@ -164,8 +164,9 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     m_titleBar->setTitleContent(QStringLiteral(" 这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题"),20);
     m_titleBar->setButtonType(MIN_MAX_BUTTON);
     m_titleBar->setTitleRoll(5);
-    //m_titleBar->setWindowBorderWidth(150);
-    m_titleBar->setTitleHeight(5);
+    m_titleBar->setWindowBorderWidth(150);
+    //m_titleBar->setTitleHeight(80);
+    m_titleBar->setRightClickMenu();
 
 
     //m_titleBar->setTitleWidth(1);
