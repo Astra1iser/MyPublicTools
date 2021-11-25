@@ -67,12 +67,22 @@ CString ReplaceDomainNameByIP(const CString& strURL, const CString& strIP)
 
 
 MyPublicQtTools::MyPublicQtTools(QWidget *parent)
-    : QMainWindow(parent)
+    :MuCustomWindow(parent)
 {
+    QWidget* pClientWidget = new QWidget(this);
+    ui.setupUi(pClientWidget);
+
+
     ui.setupUi(this);
+
+
+
+    // 设置中心客户区域
+    setClientWidget(pClientWidget);
+
     int errorc = 0;
     initTitleBar();
-
+    //initShadow();
     //bool ddd = zhengze(L"\\R1egistry\\Machine\\System\\ControlSet???\\Hardware Profiles\\????");
     //bool ddd = bijiao(L"\\Registry\\Machine\\System\\ControlSet???");
 
@@ -164,7 +174,7 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     m_titleBar->setTitleContent(QStringLiteral(" 这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题这是标题"),20);
     m_titleBar->setButtonType(MIN_MAX_BUTTON);
     m_titleBar->setTitleRoll(5);
-    //m_titleBar->setWindowBorderWidth(150);
+    m_titleBar->setWindowBorderWidth(20);
     //m_titleBar->setTitleHeight(80);
     m_titleBar->setRightClickMenu();
 
@@ -178,3 +188,12 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     //connect(m_titleBar, SIGNAL(signalButtonMaxClicked()), this, SLOT(onButtonMaxClicked()));
     //connect(m_titleBar, SIGNAL(signalButtonCloseClicked()), this, SLOT(onButtonCloseClicked()));
 } 
+
+
+ //void MyPublicQtTools::initShadow()
+ //{
+ //    m_shadow = new MuShadowWindow<QMainWindow>(1,5,this);
+
+
+
+ //}
