@@ -5,7 +5,6 @@
 #include <QMouseEvent>
 
 #define BUTTON_HEIGHT 30        // 按钮高度;
-//#define BUTTON_WIDTH 30         // 按钮宽度;
 #define BUTTON_WIDTH 42         // 按钮宽度;
 #define TITLE_HEIGHT 30         // 标题栏高度;
 
@@ -21,6 +20,7 @@ MyTitleBar::MyTitleBar(QWidget* parent)
 	, m_nPos(25)
 	, m_isChange(0)
 	, m_nClickTimes(0)
+	, m_isRightClickMenuOn(0)
 {
 	// 初始化;
 	initControl();
@@ -50,10 +50,10 @@ void MyTitleBar::initControl()
 	//m_pButtonMax->setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT));
 	//m_pButtonClose->setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT));
 
-	m_pButtonMin->setFixedSize(QSize(42, BUTTON_HEIGHT));
-	m_pButtonRestore->setFixedSize(QSize(42, BUTTON_HEIGHT));
-	m_pButtonMax->setFixedSize(QSize(42, BUTTON_HEIGHT));
-	m_pButtonClose->setFixedSize(QSize(42, BUTTON_HEIGHT));
+	m_pButtonMin->setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT));
+	m_pButtonRestore->setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT));
+	m_pButtonMax->setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT));
+	m_pButtonClose->setFixedSize(QSize(BUTTON_WIDTH, BUTTON_HEIGHT));
 
 	m_pTitleContent->setObjectName("TitleContent");
 	m_pButtonMin->setObjectName("ButtonMin");
@@ -121,8 +121,6 @@ void MyTitleBar::initConnections()
 	//注意这个定时器绑定是用来判断单双击的,一定不要删除
 	connect(&m_cTimer, SIGNAL(timeout()), this, SLOT(slotTimerTimeOut()));
 
-	connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(_SlotPlayArgsMenu(QPoint)));
-
 	connect(m_pButtonMin, SIGNAL(pressed()), this, SLOT(onButtonMinPressed()));
 	connect(m_pButtonMin, SIGNAL(clicked()), this, SLOT(onButtonMinClicked()));
 	connect(m_pButtonMax, SIGNAL(pressed()), this, SLOT(onButtonMaxPressed()));
@@ -131,6 +129,9 @@ void MyTitleBar::initConnections()
 	connect(m_pButtonRestore, SIGNAL(clicked()), this, SLOT(onButtonRestoreClicked()));
 	connect(m_pButtonClose, SIGNAL(pressed()), this, SLOT(onButtonClosePressed()));
 	connect(m_pButtonClose, SIGNAL(clicked()), this, SLOT(onButtonCloseClicked()));
+
+
+
 }
 
 // 设置标题栏背景色,在paintEvent事件中进行绘制标题栏背景色;
@@ -241,25 +242,28 @@ void MyTitleBar::setTitleRoll(int timeInterval)
 //设置右键菜单
 void MyTitleBar:: setRightClickMenu()
 {
+	if (m_isRightClickMenuOn)
+	{
+		return;
+	}
+
+	m_isRightClickMenuOn = TRUE;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);//添加右键菜单策略
-	m_RightButtonMenu = new QMenu(this); //菜单
+	m_RightButtonMenu = new QMenu(this); //菜单实体的指针
 
 	m_MenuRestore = new QAction(QIcon("image/restoreBlack_16.png"), YString("还原"), this); //还原
 	m_MenuMin = new QAction(QIcon("image/minimizeBtnBlack_16.png"), YString("最小化"), this); //最小化
 	m_MenuMax = new QAction(QIcon("image/maximizeBtnBlack_16.png"), YString("最大化"), this); //最大化
 	m_MenuClose = new QAction(QIcon("image/closeBtnBlack_16.png"), YString("关闭"), this); //关闭
 
+	//https://blog.csdn.net/qq_33266987/article/details/54017072?utm_medium=distribute.pc_feed_404.none-task-blog-2~default~BlogCommendFromBaidu~default-8.test_5searchdownload&depth_1-utm_source=distribute.pc_feed_404.none-task-blog-2~default~BlogCommendFromBaidu~default-8.test_5searchdownloa
+	
+	connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotPlayArgsMenu(QPoint)));
 
-
-
-
-
-	////setContextMenuPolicy(Qt::ActionsContextMenu);
-	//addAction(new QAction(YString("还原"), this->m_pIcon));
-	//addAction(new QAction(YString("最小化"), this->m_pIcon));
-	//addAction(new QAction(YString("最大化"), this->m_pIcon));
-	//addAction(new QAction(YString("关闭"), this->m_pIcon));
-	////setContextMenuPolicy(Qt::NoContextMenu);
+	connect(m_MenuRestore, SIGNAL(triggered()), this, SLOT(onButtonRestoreClicked()));
+	connect(m_MenuMin, SIGNAL(triggered()), this, SLOT(onButtonMinClicked()));
+	connect(m_MenuMax, SIGNAL(triggered()), this, SLOT(onButtonMaxClicked()));
+	connect(m_MenuClose, SIGNAL(triggered()), this, SLOT(onButtonCloseClicked()));
 }
 
 // 保存窗口最大化前窗口的位置以及大小;
@@ -371,31 +375,29 @@ void MyTitleBar::mousePressEvent(QMouseEvent *event)
 
 	if (event->button() == Qt::LeftButton && m_nClickTimes == 1)
 	{
-		isTitleUnderMouse = this->underMouse() && !this->m_pIcon->underMouse();
-		m_isPressed = true;
-		m_startMovePos = event->globalPos();
-		return QWidget::mousePressEvent(event);
-	}
-	else if(event->button() == Qt::LeftButton && m_nClickTimes != 1)
-	{
-		isTitleUnderMouse = FALSE;
-		m_isPressed = FALSE;
-		return QWidget::mousePressEvent(event);
+		m_CursorIsLeftClick = TRUE;
+		if (this->m_pIcon->underMouse())
+		{
+			isTitleUnderMouse = FALSE;
+			m_isPressed = FALSE;
+			emit customContextMenuRequested(event->globalPos() + QPoint(0, 2));
+			return QWidget::mousePressEvent(event);
+		}
+		else
+		{
+			isTitleUnderMouse = !this->m_pButtonMin->underMouse()
+				&& !this->m_pButtonMax->underMouse()
+				&& !this->m_pButtonRestore->underMouse()
+				&& !this->m_pButtonClose->underMouse();
+			m_isPressed = true;
+			m_startMovePos = event->globalPos();
+			return QWidget::mousePressEvent(event);
+		}
 	}
 
-	if (event->button() == Qt::RightButton && m_nClickTimes == 1 && !this->m_pButtonMin->underMouse() && !this->m_pButtonMax->underMouse() && !this->m_pButtonRestore->underMouse() && !this->m_pButtonClose->underMouse() && !this->m_pIcon->underMouse())
-	{
-		setContextMenuPolicy(Qt::CustomContextMenu);
-		isTitleUnderMouse = FALSE;
-		m_isPressed = FALSE;
-		return QWidget::mousePressEvent(event);
-	}
-	else
-	{
-		setContextMenuPolicy(Qt::NoContextMenu);
-		isTitleUnderMouse = FALSE;
-		m_isPressed = FALSE;
-	}
+	m_CursorIsLeftClick = FALSE;
+	isTitleUnderMouse = FALSE;
+	m_isPressed = FALSE;
 
 	return QWidget::mousePressEvent(event);
 }
@@ -427,6 +429,14 @@ void MyTitleBar::mouseMoveEvent(QMouseEvent *event)
 
 void MyTitleBar::mouseReleaseEvent(QMouseEvent *event)
 {
+	if (this->m_pIcon->underMouse() && m_CursorIsLeftClick)
+	{
+		isTitleUnderMouse = FALSE;
+		m_isPressed = FALSE;
+		emit customContextMenuRequested(event->globalPos() + QPoint(0, 2));
+		return QWidget::mouseReleaseEvent(event);
+	}
+
 	m_isPressed = false;
 	return QWidget::mouseReleaseEvent(event);
 }
@@ -461,6 +471,60 @@ void MyTitleBar::slotTimerTimeOut()
 
 }
 
+//右键菜单的槽函数
+void MyTitleBar::slotPlayArgsMenu(const QPoint pos)
+{
+	if (m_isRightClickMenuOn)
+	{
+		BOOL isAllowdisplayarea = !this->m_pButtonMin->underMouse()
+			&& !this->m_pButtonMax->underMouse()
+			&& !this->m_pButtonRestore->underMouse()
+			&& !this->m_pButtonClose->underMouse();
+
+		if (isAllowdisplayarea)
+		{
+			m_RightButtonMenu->clear();
+			m_RightButtonMenu->addAction(m_MenuRestore);
+			m_RightButtonMenu->addAction(m_MenuMin);
+			m_RightButtonMenu->addAction(m_MenuMax);
+			m_RightButtonMenu->addSeparator();    //分割线
+			m_RightButtonMenu->addAction(m_MenuClose);
+
+			if (TRUE == m_pButtonMax->isVisible())
+			{
+				m_MenuRestore->setEnabled(FALSE);
+			}
+			else
+			{
+				m_MenuRestore->setEnabled(TRUE);
+			}
+			if (TRUE == m_pButtonRestore->isVisible())
+			{
+				m_MenuMax->setEnabled(FALSE);
+			}
+			else
+			{
+				m_MenuMax->setEnabled(TRUE);
+			}
+
+			if (!this->m_pIcon->underMouse())
+				m_RightButtonMenu->exec(QCursor::pos());  //在当前鼠标处堵住
+			else
+			{
+				if (m_CursorIsLeftClick)
+					m_RightButtonMenu->exec(pos);  //在特定坐标处堵住
+				else
+					m_RightButtonMenu->exec(QCursor::pos());  //在当前鼠标处堵住
+			}
+
+			isTitleUnderMouse = this->m_pIcon->underMouse()
+				&& !this->m_pButtonMin->underMouse()
+				&& !this->m_pButtonMax->underMouse()
+				&& !this->m_pButtonRestore->underMouse()
+				&& !this->m_pButtonClose->underMouse();
+		}
+	}
+}
 
 // 以下为按钮操作响应的槽;
 
@@ -574,40 +638,4 @@ void MyTitleBar::onRollTitle()
 		m_nPos++;
 	else
 		m_nPos--;
-}
-
-
-void MyTitleBar::onIconClicked()
-{
-	isTitleUnderMouse = !this->m_pIcon->underMouse();
-}
-void MyTitleBar::onIconPressed()
-{
-	isTitleUnderMouse = !this->m_pIcon->underMouse();
-}
-
-
-
-void MyTitleBar::contextMenuEvent(QContextMenuEvent* event)
-{
-	Q_UNUSED(event)
-	m_RightButtonMenu->clear();
-	m_RightButtonMenu->addAction(m_MenuRestore);
-	m_RightButtonMenu->addAction(m_MenuMin);
-	m_RightButtonMenu->addAction(m_MenuMax);
-	m_RightButtonMenu->addSeparator();    //分割线
-	m_RightButtonMenu->addAction(m_MenuClose);
-	m_RightButtonMenu->exec(QCursor::pos());  //在当前鼠标处堵住
-}
-
-
-void MyTitleBar::_SlotPlayArgsMenu(const QPoint pos)
-{
-	m_RightButtonMenu->clear();
-	m_RightButtonMenu->addAction(m_MenuRestore);
-	m_RightButtonMenu->addAction(m_MenuMin);
-	m_RightButtonMenu->addAction(m_MenuMax);
-	m_RightButtonMenu->addSeparator();    //分割线
-	m_RightButtonMenu->addAction(m_MenuClose);
-	m_RightButtonMenu->exec(QCursor::pos());  //在当前鼠标处堵住
 }

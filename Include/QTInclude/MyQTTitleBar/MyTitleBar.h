@@ -100,6 +100,9 @@ private:
 	void initConnections();
 	// 加载样式文件;
 	void loadStyleSheet(const QString &sheetName);
+	// 保存/获取 最大化前窗口的位置及大小;
+	void saveRestoreInfo(const QPoint point, const QSize size);
+	void getRestoreInfo(QPoint& point, QSize& size);
 
 signals:
 
@@ -108,7 +111,8 @@ private slots:
 	//判断单双击的计时器槽函数
 	void slotTimerTimeOut();
 
-	void _SlotPlayArgsMenu(const QPoint pos);
+	//右键菜单的槽函数
+	void slotPlayArgsMenu(const QPoint pos);
 
 	// 按钮触发的槽;
 	void onButtonMinClicked();
@@ -120,17 +124,11 @@ private slots:
 	void onButtonCloseClicked();
 	void onButtonClosePressed();
 	void onRollTitle();
-	void onIconClicked();
-	void onIconPressed();
-
-
-
 
 
 private:
 	QLabel* m_pIcon;                    // 标题栏图标;
 	QLabel* m_pTitleContent;            // 标题栏内容;
-	QLabel* m_pTitleContent2;            // 标题栏内容;
 	QPushButton* m_pButtonMin;          // 最小化按钮;
 	QPushButton* m_pButtonRestore;      // 最大化还原按钮;
 	QPushButton* m_pButtonMax;          // 最大化按钮;
@@ -163,29 +161,26 @@ private:
 	//当前鼠标是否在标题栏上
 	BOOL isTitleUnderMouse;
 	//标题是否转换方向
-
 	BOOL m_isChange;
-	//鼠标点击次数
-	int m_nClickTimes; 
+
+private:
 	//单双击计时器
-	QTimer m_cTimer; 
-
-	// 保存/获取 最大化前窗口的位置及大小;
-	void saveRestoreInfo(const QPoint point, const QSize size);
-	void getRestoreInfo(QPoint& point, QSize& size);
-
-
+	QTimer m_cTimer;
+	//鼠标点击次数
+	int m_nClickTimes;
+	//本次是左键点击
+	BOOL m_CursorIsLeftClick;
 
 
 
 private:
 	QMenu* m_RightButtonMenu; //右键菜单
-
+	BOOL m_isRightClickMenuOn;
 	QAction* m_MenuRestore; //还原
 	QAction* m_MenuMin; //最小化
 	QAction* m_MenuMax; //最大化
 	QAction* m_MenuClose; //关闭
-	void contextMenuEvent(QContextMenuEvent* event);
+
 };
 
 #endif
