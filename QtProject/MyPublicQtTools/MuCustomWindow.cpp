@@ -19,7 +19,7 @@
 #endif
 
 MuCustomWindow::MuCustomWindow(QWidget *parent)
-    : MuShadowWindow<QWidget>(true, 20, parent)
+    : MuShadowWindow<QWidget>(0, 10, parent)
 {
     //if (parent != nullptr) {
     //    setWindowTitle(parent->windowTitle());
@@ -28,8 +28,24 @@ MuCustomWindow::MuCustomWindow(QWidget *parent)
     //    this->setWindowTitle("Custom Window");
     //    this->setWindowIcon(QIcon(":/images/logo.jpg"));
     //}
-    resize(800, 600);
+    //resize(800, 1600);
 }
+
+bool MuCustomWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+    Q_UNUSED(eventType);
+    MSG* msg = static_cast<MSG*>(message);
+
+
+    switch (msg->message)
+    {
+    case WM_WININICHANGE:
+        delewindow();
+        return 1;
+    }
+    return false;
+}
+
 
 
 /*
@@ -51,16 +67,3 @@ MuCustomWindow::MuCustomWindow(QWidget *parent)
 
 
 
-
-void MuWinAeroShadowWindow::setClientWidget(QWidget *client)
-{
-    if (client == nullptr)
-        return;
-
-    m_pContainerLayout->removeWidget(m_pClientWidget);
-    m_pClientWidget->deleteLater();
-    m_pClientLayout->deleteLater();
-    m_pClientLayout = nullptr;
-    m_pClientWidget = client;
-    m_pContainerLayout->addWidget(m_pClientWidget);
-}

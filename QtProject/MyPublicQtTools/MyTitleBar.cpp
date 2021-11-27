@@ -32,7 +32,8 @@ MyTitleBar::MyTitleBar(QWidget* parent)
 
 MyTitleBar::~MyTitleBar()
 {
-
+	//if(jishiqi)
+	//	delete jishiqi;
 }
 
 // 初始化控件;
@@ -198,7 +199,7 @@ void MyTitleBar::setTitleHeight(int height)
 }
 
 // 设置窗口边框宽度;
-void MyTitleBar::setWindowBorderWidth(int borderWidth)
+void MyTitleBar::setWindowBorderWidth(int borderWidth,int &test)
 {
 	m_windowBorderWidth = borderWidth;
 }
@@ -331,6 +332,31 @@ void MyTitleBar::paintEvent(QPaintEvent *event)
 		this->setFixedHeight(TITLE_HEIGHT);
 	}
 	
+
+
+	//QPainterPath path;
+	//path.setFillRule(Qt::WindingFill);
+	//QRectF rect(10, 10, this->parentWidget()->width() - 20, this->parentWidget()->height() - 20);
+	//path.addRoundRect(rect, 8, 8);
+
+	//QPainter painter(this->parentWidget());
+	//painter.setRenderHint(QPainter::Antialiasing, true);
+	//painter.fillPath(path, QBrush(Qt::white));
+
+	//QColor color(0, 0, 0, 50);
+	//for (int i = 0; i < 10; i++) {
+	//	QPainterPath path;
+	//	path.setFillRule(Qt::WindingFill);
+	//	path.addRect(10 - i, 10 - i, this->parentWidget()->width() - (10 - i) * 2, this->parentWidget()->height() - (10 - i) * 2);
+	//	color.setAlpha(150 - qSqrt(i) * 50);
+	//	painter.setPen(color);
+	//	painter.drawPath(path);
+	//}
+
+
+
+
+
 	//设置了边框时左右和上方要腾出对应大小的边框位置
 	this->move(m_windowBorderWidth, m_windowBorderWidth);
 	QWidget::paintEvent(event);
@@ -565,11 +591,22 @@ void MyTitleBar::onButtonMaxClicked()
 	int curMonitor = deskTop->screenNumber(this); // 参数是一个QWidget*
 	//取所在屏幕桌面的客户大小(去掉任务栏后的大小)
 	QRect desktopRect = QApplication::desktop()->availableGeometry(curMonitor);
+
+
+	qDebug() << desktopRect;
+
 	QRect FactRect = QRect(desktopRect.x()- m_windowBorderWidth, desktopRect.y()- m_windowBorderWidth, desktopRect.width()+ m_windowBorderWidth*2, desktopRect.height()+ m_windowBorderWidth*2);
 
 	//从当前进程屏幕上左上角位置开始，显示一个当前桌面客户分辨率大小(此分辨率比桌面分辨率小,因为去掉了任务栏的大小)的界面（宽desktopRect.width()，高esktopRect.height().
-	this->parentWidget()->setGeometry(FactRect);
-	//this->parentWidget()->setWindowState(Qt::WindowMaximized);
+	//this->parentWidget()->setGeometry(FactRect);
+
+
+	//this->parentWidget()->move(FactRect.x(), FactRect.y());
+
+	/*jishiqi = new jianshiqi(this, desktopRect);
+	jishiqi->Start();*/
+
+	this->parentWidget()->setWindowState(Qt::WindowMaximized);
 
 	//最大化时禁止拉伸窗口(仿windows设计)
 	//this->parentWidget()->setMinimumHeight(this->parentWidget()->height());
@@ -577,6 +614,38 @@ void MyTitleBar::onButtonMaxClicked()
 	//this->parentWidget()->setMaximumHeight(this->parentWidget()->height());
 	//this->parentWidget()->setMaximumWidth(this->parentWidget()->width());
 }
+
+
+
+void MyTitleBar::test()
+{
+	//此处为了兼容多屏幕,判断当前进程所在屏幕的序号
+	QDesktopWidget* deskTop = QApplication::desktop();
+	int curMonitor = deskTop->screenNumber(this->parentWidget()); // 参数是一个QWidget*
+	//取所在屏幕桌面的客户大小(去掉任务栏后的大小)
+	QRect desktopRect = QApplication::desktop()->availableGeometry(curMonitor);
+
+
+	qDebug() << desktopRect;
+
+	QRect FactRect = QRect(desktopRect.x() - m_windowBorderWidth, desktopRect.y() - m_windowBorderWidth, desktopRect.width() + m_windowBorderWidth * 2, desktopRect.height() + m_windowBorderWidth * 2);
+
+	//从当前进程屏幕上左上角位置开始，显示一个当前桌面客户分辨率大小(此分辨率比桌面分辨率小,因为去掉了任务栏的大小)的界面（宽desktopRect.width()，高esktopRect.height().
+	//this->parentWidget()->setGeometry(FactRect);
+	//this->parentWidget()->move(FactRect.x(), FactRect.y());
+		this->parentWidget()->setWindowState(Qt::WindowMaximized);
+
+		//this->parentWidget()->setMinimumHeight(this->parentWidget()->height());
+		//this->parentWidget()->setMinimumWidth(this->parentWidget()->width());
+		//this->parentWidget()->setMaximumHeight(this->parentWidget()->height());
+		//this->parentWidget()->setMaximumWidth(this->parentWidget()->width());
+}
+
+
+
+
+
+
 
 //还原响应函数,点击时
 void MyTitleBar::onButtonRestorePressed()
@@ -601,6 +670,7 @@ void MyTitleBar::onButtonRestoreClicked()
 	//把之前保存的原始窗体大小取出来还原
 	this->getRestoreInfo(windowPos, windowSize);
 	this->parentWidget()->setGeometry(QRect(windowPos, windowSize));
+	this->parentWidget()->setWindowState(Qt::WindowActive);
 }
 
 //关闭响应函数,点击时
@@ -644,3 +714,4 @@ void MyTitleBar::onRollTitle()
 	else
 		m_nPos--;
 }
+

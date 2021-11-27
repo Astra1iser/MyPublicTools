@@ -251,7 +251,7 @@ void MuSkin9GridImage::drawBorder(QPainter *p, QRect rc) const
     }
 }
 
-MuShadowWidget::MuShadowWidget(int shadowSize, bool canResize, QWidget *parent)
+MuShadowWidget::MuShadowWidget(int shadowSize, bool BorderSize, QWidget *parent)
     : m_shadowSize(shadowSize)
     , QWidget(parent)
     , m_shadow(new MuSkin9GridImage())
@@ -260,7 +260,7 @@ MuShadowWidget::MuShadowWidget(int shadowSize, bool canResize, QWidget *parent)
     setWindowFlags(Qt::FramelessWindowHint);
     setMouseTracking(true);
     //
-    QImage image = MuMakeShadowImage(shadowSize, false);
+    QImage image = MuMakeShadowImage(shadowSize, false, BorderSize);
     m_shadow->setImage(image, QPoint(shadowSize + 1, shadowSize + 1));
 }
 

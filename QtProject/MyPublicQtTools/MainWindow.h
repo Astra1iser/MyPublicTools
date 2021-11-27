@@ -25,6 +25,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    bool nativeEvent(const QByteArray& eventType, void* message, long* result);
+
 private slots:
 
 

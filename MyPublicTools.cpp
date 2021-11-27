@@ -300,9 +300,9 @@ int func(int x)
 
 
 
-#include "stdafx.h"
-
-using namespace std;
+//#include "stdafx.h"
+//
+//using namespace std;
 
 //CString GetFileVersion(LPCSTR filename)
 //{
@@ -444,10 +444,10 @@ public:
 };
 
 
-
-#include <sstream>
-#include "stdafx.h"
-
+//
+//#include <sstream>
+//#include "stdafx.h"
+//
 
 
 
@@ -516,13 +516,37 @@ HANDLE SimpleShellExec(CString lpFileName, LPCWSTR lpParam, CString lpDirectory,
 }
 
 
+int TestLogic()
+{
+	throw;
+	return 0;
+}
 
+void MyQuit()
+{
+	cout << "lalalalalal" << endl;
+	abort();
+}
+
+void fun2(int b);
+
+void fun1( int b)
+{
+	int a = b;
+	fun2(a);
+}
+
+void fun2(int b)
+{
+	int a = b;
+	fun1(a);
+}
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 
-	Wcout(WhoIsUser(684));
+	Wcout(WhoIsUser(getpid()));
 
 	//WORD wVersionRequested;
 	//WSADATA wsaData;
@@ -636,10 +660,174 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//cin >> a;
 
-OutputDebugString(L"---------------------------------");
 
-	system("pause");
+	//Example1* exa = new Example1();
+	//exa = NULL;
+	//exa->Run();
+	
 
+	//set_terminate(MyQuit);
+	//TestLogic();
+
+	//CString abc("111111应用程序错误了");
+
+	//int a = abc.Find(L"应用程序错误");
+
+	//WCHAR aa[] = L"应用程序错误";
+	//
+	//if (StrStrIW(aa, L"1程序")!=NULL)
+	//{
+	//	cout << "行"<<endl;
+	//}
+	//else
+	//{
+	//	cout << "不行"<<endl;
+	//}
+
+
+	//system("pause");
+
+	
+fun1(3);
+system("pause");
 
 	return 0;
 }
+
+
+
+
+//#include <windows.h>
+//#include <Tlhelp32.h>
+//#include <iostream>
+//#include <vector>
+//#include <string>
+//using namespace std;
+//typedef basic_string<TCHAR, char_traits<TCHAR>, allocator<TCHAR> > tstring;
+//
+//
+//int ProcessModule(DWORD);
+//int CheckProcessModule(DWORD pid);
+//BOOL IsModuleValid(tstring szModuleName);
+//int dwCount = 0;
+//vector<tstring> patch;
+//vector<tstring> checkpatch;
+//
+//int main(void)
+//{
+//
+//
+//	//进程创建完毕后的模块快照
+//	ProcessModule(GetCurrentProcessId());
+//	cout << "******************当前模块*****************" << endl;
+//	for (int i = 0; i < patch.size(); i++)
+//	{
+//		cout << patch[i].c_str() << endl;
+//	}
+//	cout << endl << endl;
+//
+//	LoadLibrary(TEXT("user32.dll"));//加载user32.dll测试
+//
+//
+//	HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+//	SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+//
+//	//检测是否存在不同的模块
+//	CheckProcessModule(GetCurrentProcessId());
+//	cout << "******************检测模块*****************" << endl;
+//	for (int j = 0; j < checkpatch.size(); j++)
+//	{
+//		cout << checkpatch[j].c_str() << endl;;
+//	}
+//	cout << endl << endl;
+//	if (patch.size() == checkpatch.size())
+//	{
+//		cout << "没有检测到注入模块" << endl;
+//	}
+//
+//
+//
+//	system("pause");
+//	return 0;
+//}
+//
+//
+////获取进程模块
+//int ProcessModule(DWORD pid)
+//{
+//
+//	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
+//	if (hProcessSnap)
+//	{
+//		MODULEENTRY32 me32;
+//		me32.dwSize = sizeof(MODULEENTRY32);
+//		Module32First(hProcessSnap, &me32);//获取进程第一个模块信息
+//		do
+//		{
+//			patch.push_back(me32.szModule);
+//			//printf("模块路径:%s\n",me32.szExePath);
+//			//printf("模块名:%s\n",me32.szModule);
+//			//printf("模块基址:0x%08X\n",(DWORD)me32.modBaseAddr);
+//
+//		} while (Module32Next(hProcessSnap, &me32));
+//		CloseHandle(hProcessSnap);
+//		return 0;
+//	}
+//	else
+//	{
+//		cout << "获取进程快照失败" << endl;;
+//		return 0;
+//	}
+//	return 0;
+//}
+//
+//int CheckProcessModule(DWORD pid)
+//{
+//
+//	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
+//	if (hProcessSnap)
+//	{
+//		MODULEENTRY32 me32;
+//		me32.dwSize = sizeof(MODULEENTRY32);
+//		Module32First(hProcessSnap, &me32);//获取进程第一个模块信息
+//		do
+//		{
+//			checkpatch.push_back(me32.szModule);
+//			if (!IsModuleValid(me32.szModule))
+//			{
+//				cout << "[可疑模块]:" << me32.szExePath << endl;
+//				dwCount++;
+//			}
+//
+//			//printf("模块路径:%s\n",me32.szExePath);
+//			//printf("模块名:%s\n",me32.szModule);
+//			//printf("模块基址:0x%08X\n",(DWORD)me32.modBaseAddr);
+//
+//		} while (Module32Next(hProcessSnap, &me32));
+//		CloseHandle(hProcessSnap);
+//		if (dwCount)
+//		{
+//			cout << "可疑模块数:" << dwCount << endl;
+//		}
+//		return 0;
+//	}
+//	else
+//	{
+//		cout << "获取进程快照失败" << endl;
+//		return 0;
+//	}
+//	return 0;
+//}
+//
+//
+//BOOL IsModuleValid(tstring szModuleName)
+//{
+//	// 遍历起始状态的模块列表
+//	for (int i = 0; i < patch.size(); i++)
+//	{
+//		if (patch[i] == szModuleName)
+//			return TRUE;
+//	}
+//	return FALSE;
+//
+//}

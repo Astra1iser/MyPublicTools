@@ -12,16 +12,10 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
-//#include <QIcon>
 #include <QDebug>
-//#include <QPushButton>
 #include <QDialog>
-//#include <QMessageBox>
 #include "MuShadowWidget.h"
-//#include "FramelessWindow_Global.h"
-//#include "MuTitleBar.h"
-//#include "MuFramelessHelper.h"
-
+#include "MyTitleBar.h"
 class QPainter;
 class QLineEdit;
 class QLabel;
@@ -56,12 +50,54 @@ public:
         , m_pShadowWidget(nullptr)
         , m_pClientWidget(nullptr)
     {
-        Base *pT = this;
+
+        pT = this;
         pT->setAttribute(Qt::WA_TranslucentBackground, true);
         pT->setWindowFlags(Qt::FramelessWindowHint);
         pT->setContentsMargins(0, 0, 0, 0);
+        this->canResize = canResize;
 
-        QVBoxLayout *pWindowLayout = new QVBoxLayout(pT);
+        testwindow();
+        //Base *pT = this;
+        //pT->setAttribute(Qt::WA_TranslucentBackground, true);
+        //pT->setWindowFlags(Qt::FramelessWindowHint);
+        //pT->setContentsMargins(0, 0, 0, 0);
+
+        //QVBoxLayout *pWindowLayout = new QVBoxLayout(pT);
+        //pWindowLayout->setContentsMargins(0, 0, 0, 0);
+        //pWindowLayout->setSpacing(0);
+
+        //// 边框阴影widget
+        //m_pShadowWidget = new MuShadowWidget(m_shadowSize, canResize, this);
+        //m_pShadowWidget->setContentsMargins(m_shadowSize, m_shadowSize, m_shadowSize, m_shadowSize);
+        //m_pShadowWidget->setAutoFillBackground(true);
+        //pWindowLayout->addWidget(m_pShadowWidget);
+
+        //QVBoxLayout *pRootLayout = new QVBoxLayout(m_pShadowWidget);
+        //pRootLayout->setContentsMargins(0, 0, 0, 0);
+        //pRootLayout->setSpacing(0);
+
+        //// 窗口主要区域
+        //QWidget *pShadowClientWidget = new QWidget(m_pShadowWidget);
+        //pRootLayout->addWidget(pShadowClientWidget);
+        //pShadowClientWidget->setAutoFillBackground(true);
+        //m_pShadowClientLayout = new QVBoxLayout(pShadowClientWidget);
+        //m_pShadowClientLayout->setContentsMargins(0, 0, 0, 0);
+        //m_pShadowClientLayout->setSpacing(0);
+
+
+
+        //m_pClientWidget = new QWidget(pShadowClientWidget);
+        //m_pShadowClientLayout->addWidget(m_pClientWidget);
+
+        ////m_pClientLayout = new QVBoxLayout;
+        ////m_pClientWidget->setLayout(m_pClientLayout);
+    }
+
+
+    void testwindow()
+    {
+        pWindowLayout = new QVBoxLayout(pT);
         pWindowLayout->setContentsMargins(0, 0, 0, 0);
         pWindowLayout->setSpacing(0);
 
@@ -71,58 +107,69 @@ public:
         m_pShadowWidget->setAutoFillBackground(true);
         pWindowLayout->addWidget(m_pShadowWidget);
 
-        QVBoxLayout *pRootLayout = new QVBoxLayout(m_pShadowWidget);
+        pRootLayout = new QVBoxLayout(m_pShadowWidget);
         pRootLayout->setContentsMargins(0, 0, 0, 0);
         pRootLayout->setSpacing(0);
 
         // 窗口主要区域
-        QWidget *pShadowClientWidget = new QWidget(m_pShadowWidget);
+        pShadowClientWidget = new QWidget(m_pShadowWidget);
         pRootLayout->addWidget(pShadowClientWidget);
         pShadowClientWidget->setAutoFillBackground(true);
         m_pShadowClientLayout = new QVBoxLayout(pShadowClientWidget);
         m_pShadowClientLayout->setContentsMargins(0, 0, 0, 0);
         m_pShadowClientLayout->setSpacing(0);
 
-        //m_titleBar =  new MuTitleBar(pShadowClientWidget, this, m_pShadowWidget, canResize);
-        //this->installEventFilter(m_titleBar);
-        //m_pShadowClientLayout->addWidget(m_titleBar);
-        //m_titleBar->setObjectName("titleBar1");
+
 
         m_pClientWidget = new QWidget(pShadowClientWidget);
         m_pShadowClientLayout->addWidget(m_pClientWidget);
 
-        m_pClientLayout = new QVBoxLayout;
-        m_pClientWidget->setLayout(m_pClientLayout);
-
-        //m_pHelper = new MuFramelessHelper(this);
-        //m_pHelper->setShadowWidth(m_shadowSize);
-        //m_pHelper->activateOn(this, m_pShadowWidget);
-        //m_pHelper->setTitleHeight(m_titleBar->height());
-        //m_pHelper->setWidgetResizable(true);
-        //m_pHelper->setWidgetMovable(true);
-        //m_pHelper->setRubberBandOnMove(false);
-        //m_pHelper->setRubberBandOnResize(false);
-
-        //QObject::connect(m_titleBar, &MuTitleBar::HeightChanged, [this](const int &height) { m_pHelper->setTitleHeight(height); });
+        //m_pClientLayout = new QVBoxLayout;
+        //m_pClientWidget->setLayout(m_pClientLayout);
     }
+
+    void delewindow()
+    {
+        //if (m_titleBar->m_pButtonRestore->isVisible())
+        if (0)
+        {
+            m_shadowSize = 0;
+            m_pShadowWidget->setContentsMargins(0, 0, 0, 0);
+            //m_titleBar->setWindowBorderWidth(this->m_shadowSize, this->m_shadowSize);
+
+            //m_titleBar->test();
+
+        }
+
+
+
+        //delete pShadowClientWidget;
+        //pShadowClientWidget = nullptr;
+
+        //delete pRootLayout;
+        //pRootLayout = nullptr;
+
+        //delete m_pClientWidget;
+        //m_pClientWidget = nullptr;
+
+        //delete m_pShadowClientLayout;
+        //m_pShadowClientLayout = nullptr;
+    }
+
+
 
 public:
-    QWidget* rootWidget() const { return m_pShadowWidget; }
-    QWidget *clientWidget() const { return m_pClientWidget; }
-    QLayout* clientLayout() const { return m_pClientLayout; }
-    //MuTitleBar *titleBar() const { return m_titleBar; }
-    QSize oldSize() const { return m_titleBar->oldSize(); }
-    void setRubberBandOnMove(bool enable) { m_pHelper->setRubberBandOnMove(enable); }
-    void setRubberBandOnResize(bool enable) { m_pHelper->setRubberBandOnResize(enable); }
-    void setTitleBarHeight(int height)
-    {
-        if (height < 0)
-            return;
+    //QWidget* rootWidget() const { return m_pShadowWidget; }
+    //QWidget *clientWidget() const { return m_pClientWidget; }
+    //QLayout* clientLayout() const { return m_pClientLayout; }
 
-        m_titleBar->setFixedHeight(height);
-        m_pHelper->setTitleHeight(height);
-    }
+    Base* pT;
+    
 
+    QVBoxLayout* pWindowLayout;
+    QVBoxLayout* pRootLayout;
+    QWidget* pShadowClientWidget;
+    bool canResize;
 
     /**
      * @brief setClientWidget
@@ -137,23 +184,57 @@ public:
 
         m_pShadowClientLayout->removeWidget(m_pClientWidget);
         m_pClientWidget->deleteLater();
-        m_pClientLayout->deleteLater();
-        m_pClientLayout = nullptr;
+        //m_pClientLayout->deleteLater();
+        //m_pClientLayout = nullptr;
         m_pClientWidget = client;
         m_pShadowClientLayout->addWidget(m_pClientWidget);
     }
 
-    void setResizable(bool resizable) { m_pHelper->setWidgetResizable(resizable); }
-    void setMovable(bool movable) {m_pHelper->setWidgetMovable(movable); }
+    int m_shadowSize;
+
+    void setfather(QWidget* father)
+    {
+        mparent = father;
+        //initTitleBar();
+    }
+
+
+protected:
+    //MyTitleBar* m_titleBar;
+
 
 private:
-    int m_shadowSize;
+    //void initTitleBar()									//初始化标题
+    //{
+    //    {
+    //        //this->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    //        //this->setWindowFlags(Qt::FramelessWindowHint);
+
+    //        // 设置窗口背景透明;
+    //        //this->setAttribute(Qt::WA_TranslucentBackground);
+
+
+    //        m_titleBar = new MyTitleBar(mparent);
+
+    //        m_titleBar->setTitleIcon("Image/QAXico.png");
+    //        //m_titleBar->setBackgroundColor(0, 0, 0, 1);
+    //        m_titleBar->setTitleContent(QStringLiteral(" 这是标题"), 20);
+    //        m_titleBar->setButtonType(MIN_MAX_BUTTON);
+    //        m_titleBar->setTitleRoll(5);
+    //        m_titleBar->setWindowBorderWidth(this->m_shadowSize,this->m_shadowSize);
+    //        //m_titleBar->setTitleHeight(80);
+    //        m_titleBar->setRightClickMenu();
+
+    //    }
+    //}
+
+
+private:
     MuShadowWidget *m_pShadowWidget;
     QWidget *m_pClientWidget;
     QVBoxLayout *m_pClientLayout;
     QVBoxLayout *m_pShadowClientLayout;
-    //MuFramelessHelper *m_pHelper;
-    //MuTitleBar *m_titleBar;
+    QWidget* mparent;
 };
 
 typedef MuShadowWindow<QWidget> MuCustomWindowWidget;

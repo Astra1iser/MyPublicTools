@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     
 
     // 设置中心客户区域
-    setClientWidget(pClientWidget);
+    //setClientWidget(pClientWidget);
 
     
 
@@ -40,3 +40,16 @@ MainWindow::~MainWindow()
 }
 
 
+bool MainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+    qDebug() << "触发";
+    Q_UNUSED(eventType);
+    MSG* msg = static_cast<MSG*>(message);
+    switch (msg->message)
+    {
+    case WM_DISPLAYCHANGE:
+        qDebug() << "改变了大小";
+        return 1;
+    }
+    return false;
+}

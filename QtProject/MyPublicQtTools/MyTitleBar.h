@@ -7,7 +7,13 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTimer>
+#include <QtMath>
+
 #include "stdafx.h"
+//#include "MuShadowWindow.h"
+
+
+
 enum ButtonType
 {
 	MIN_BUTTON = 0,         // 最小化和关闭按钮;
@@ -59,6 +65,7 @@ private:
 
 } */
 
+
 class MyTitleBar : public QDialog
 {
 	Q_OBJECT
@@ -83,9 +90,14 @@ public:
 	// 设置标题栏中的标题是否会滚动(值不要太小,会增加Cpu消耗);
 	void setTitleRoll(int timeInterval = 5);
 	// 设置窗口边框宽度(这里是填父窗体中边框的长度,设置后,标题栏的左右和上方会空出对应大小的宽度用于显示父窗口边框);
-	void setWindowBorderWidth(int borderWidth);
+	void setWindowBorderWidth(int borderWidth, int &test);
 	//设置右键菜单
 	void setRightClickMenu();
+
+	// 窗口边框宽度;
+	int m_windowBorderWidth;
+	QPushButton* m_pButtonRestore;      // 最大化还原按钮;
+	void test();
 
 private:
 	void paintEvent(QPaintEvent *event);
@@ -93,6 +105,7 @@ private:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
+
 
 	// 初始化控件;
 	void initControl();
@@ -130,7 +143,7 @@ private:
 	QLabel* m_pIcon;                    // 标题栏图标;
 	QLabel* m_pTitleContent;            // 标题栏内容;
 	QPushButton* m_pButtonMin;          // 最小化按钮;
-	QPushButton* m_pButtonRestore;      // 最大化还原按钮;
+	//QPushButton* m_pButtonRestore;      // 最大化还原按钮;
 	QPushButton* m_pButtonMax;          // 最大化按钮;
 	QPushButton* m_pButtonClose;        // 关闭按钮;
 
@@ -151,8 +164,8 @@ private:
 	QString m_titleContent;
 	// 按钮类型;
 	ButtonType m_buttonType;
-	// 窗口边框宽度;
-	int m_windowBorderWidth;
+	//// 窗口边框宽度;
+	//int m_windowBorderWidth;
 	// 标题高度;
 	int m_TitleBarHeight;
 	// 标题栏是否透明;
@@ -164,6 +177,9 @@ private:
 	BOOL isTitleUnderMouse;
 	//标题是否转换方向
 	BOOL m_isChange;
+
+
+
 
 private:
 	//单双击计时器
@@ -178,10 +194,10 @@ private:
 private:
 	QMenu* m_RightButtonMenu; //右键菜单
 	BOOL m_isRightClickMenuOn;
-	QAction* m_MenuRestore; //还原
-	QAction* m_MenuMin; //最小化
-	QAction* m_MenuMax; //最大化
-	QAction* m_MenuClose; //关闭
+	QAction* m_MenuRestore; //右键菜单还原选项
+	QAction* m_MenuMin; //右键菜单最小化选项
+	QAction* m_MenuMax; //右键菜单最大化选项
+	QAction* m_MenuClose; //右键菜单关闭选项
 
 };
 

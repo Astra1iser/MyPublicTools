@@ -108,7 +108,7 @@
     <ClCompile Include="main.cpp" />
     <QtMoc Include="MyTitleBar.h" />
     <QtMoc Include="MuShadowWidget.h" />
-    <QtMoc Include="MuCustomWindow.h" />
+    <ClInclude Include="MuCustomWindow.h" />
     <QtMoc Include="MainWindow.h" />
     <ClInclude Include="MuShadowWindow.h" />
     <ClInclude Include="stdafx.h" />
