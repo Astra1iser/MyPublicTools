@@ -98,19 +98,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="MyPublicQtTools.qrc" />
-    <QtUic Include="MainWindow.ui" />
     <QtUic Include="MyPublicQtTools.ui" />
     <QtMoc Include="MyPublicQtTools.h" />
-    <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="MuCustomWindow.cpp" />
-    <ClCompile Include="MuShadowWidget.cpp" />
     <ClCompile Include="MyPublicQtTools.cpp" />
     <ClCompile Include="main.cpp" />
     <QtMoc Include="MyTitleBar.h" />
-    <QtMoc Include="MuShadowWidget.h" />
-    <ClInclude Include="MuCustomWindow.h" />
-    <QtMoc Include="MainWindow.h" />
-    <ClInclude Include="MuShadowWindow.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="MyTitleBar.cpp" />
     <ClCompile Include="stdafx.cpp">

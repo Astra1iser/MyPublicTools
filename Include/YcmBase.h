@@ -18,6 +18,7 @@
 //#include <afxwin.h>
 #include <atlstr.h>
 #include <windows.h>
+#include <windowsx.h>
 #include <assert.h>
 #include <atlconv.h>
 #include <wininet.h>
