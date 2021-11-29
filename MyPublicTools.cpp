@@ -687,9 +687,10 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//system("pause");
 
+//abort();
 	
 fun1(3);
-system("pause");
+
 
 	return 0;
 }

@@ -13,12 +13,11 @@ MyTitleBar::MyTitleBar(QWidget* parent)
 	, m_buttonType(MIN_MAX_BUTTON)
 	, m_windowBorderWidth(0)
 	, m_isTransparent(false)
-	, m_nPos(25)
+	, m_nPos(30) //30是由25+5构成的 // 图标宽度是25,+5是因为布局时设置了5的左边距
 	, m_isChange(0)
 	, m_nClickTimes(0)
 	, m_isRightClickMenuOn(0)
 	, m_TitleBarHeight(TITLE_HEIGHT)
-	, m_CurrentFactRect(getDesktopRect())
 	, m_CorrectionType(0)
 	, m_TitleMonitor(new TitleMonitor(this))
 	, m_isStretch(TRUE)
@@ -118,7 +117,6 @@ void MyTitleBar::initControl()
 	mylayout->setContentsMargins(5, 0, 0, 0);
 	mylayout->setSpacing(0);
 
-
 	m_pTitleContent->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	// 让标题栏透明,不要遮盖下方的标题颜色
 	m_pTitleContent->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -127,15 +125,30 @@ void MyTitleBar::initControl()
 	this->parentWidget()->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
 
 	/*
-	此处代码可以实现标题栏和边框,在nativeEvent()会再次去掉标题栏
-	主要的关键是WS_THICKFRAME
+	//此处代码可以实现标题栏和边框,在nativeEvent()会再次去掉标题栏
+	//主要的关键是WS_THICKFRAME
 	*/
 	HWND m_ParentHwnd = (HWND)this->parentWidget()->winId();
 	DWORD style = ::GetWindowLong(m_ParentHwnd, GWL_STYLE);
 	::SetWindowLong(m_ParentHwnd, GWL_STYLE, style | WS_THICKFRAME);
 	//保留一个像素的边框宽度，否则系统不会绘制边框阴影
 	const MARGINS shadow = { 1, 1, 1, 1 };
+	//绘制平面阴影win10以下不支持
 	DwmExtendFrameIntoClientArea(m_ParentHwnd, &shadow);
+	//绘制立体阴影全系统支持
+	SetClassLong(m_ParentHwnd, GCL_STYLE, GetClassLong(m_ParentHwnd, GCL_STYLE) | CS_DROPSHADOW);//窗体阴影
+
+	//BOOL bEnable = false;
+	//::DwmIsCompositionEnabled(&bEnable);
+
+	//if (bEnable)
+	//{
+	//	DWMNCRENDERINGPOLICY ncrp = DWMNCRP_ENABLED;
+	//	::DwmSetWindowAttribute(m_ParentHwnd, DWMWA_NCRENDERING_POLICY, &ncrp, sizeof(ncrp));
+	//	MARGINS margins = { -1 };
+	//	//绘制平面阴影win10以下不支持
+	//	::DwmExtendFrameIntoClientArea(m_ParentHwnd, &margins);
+	//}
 
 	//this->setWindowFlags(Qt::FramelessWindowHint);
 	this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
@@ -277,7 +290,7 @@ void MyTitleBar::setButtonType(ButtonType buttonType)
 // 一般情况下标题栏中的标题内容是不滚动的
 void MyTitleBar::setTitleRoll(int timeInterval)
 {
-	m_nPos = m_pIcon->width(); //设置滚动起始位置
+	m_nPos = m_pIcon->width() + 5; //设置滚动起始位置 +5是因为布局时设置了5的左边距
 	connect(&m_titleRollTimer, SIGNAL(timeout()), this, SLOT(onRollTitle()));
 	m_titleRollTimer.start(timeInterval);
 }
@@ -684,9 +697,9 @@ void MyTitleBar::onRollTitle()
 		m_isChange = TRUE;
 	}
 
-	if (m_nPos <= m_pIcon->width())
+	if (m_nPos <= m_pIcon->width() + 5)	// +5是因为布局时设置了5的左边距
 	{
-		m_nPos = m_pIcon->width();
+		m_nPos = m_pIcon->width() + 5;	// +5是因为布局时设置了5的左边距
 		m_isChange = FALSE;
 	}
 
@@ -702,17 +715,28 @@ void MyTitleBar::onRollTitle()
 void MyTitleBar::CorrectionWindow()
 {
 	//这里设置标志的原因是进行了性能优化,不然一直刷新桌面信息性能消耗过大
-	if (m_CorrectionType == TRUE && m_isMaximize)
-	{
-		m_CurrentFactRect = getDesktopRect();
-		if (m_CurrentFactRect != m_PreviousFactRect)
-		{
-			//从当前进程屏幕上左上角位置开始，显示一个当前桌面客户分辨率大小(此分辨率比桌面分辨率小,因为去掉了任务栏的大小)的界面（宽desktopRect.width()，高esktopRect.height().
-			this->parentWidget()->setGeometry(m_CurrentFactRect);
-			m_CorrectionType = FALSE;
-			m_PreviousFactRect = m_CurrentFactRect;
-		}
-	}
+	//if (m_CorrectionType == TRUE && m_isMaximize)
+	//if (m_isMaximize)
+	//{
+		//m_CurrentFactRect = getDesktopRect();
+
+		//if (m_CurrentFactRect == m_PreviousFactRect)
+		//{
+		//	//从当前进程屏幕上左上角位置开始，显示一个当前桌面客户分辨率大小(此分辨率比桌面分辨率小,因为去掉了任务栏的大小)的界面（宽desktopRect.width()，高esktopRect.height().
+		//	this->parentWidget()->setGeometry(m_CurrentFactRect);
+		//	m_CorrectionType = FALSE;
+		//}
+		//else
+		//{
+		//	//从当前进程屏幕上左上角位置开始，显示一个当前桌面客户分辨率大小(此分辨率比桌面分辨率小,因为去掉了任务栏的大小)的界面（宽desktopRect.width()，高esktopRect.height().
+		//	this->parentWidget()->setGeometry(m_CurrentFactRect);
+		//	m_CorrectionType = FALSE;
+		//	m_PreviousFactRect = m_CurrentFactRect;
+		//}
+
+		this->parentWidget()->setGeometry(m_CurrentFactRect);
+		m_PreviousFactRect = m_CurrentFactRect;
+	//}
 }
 
 

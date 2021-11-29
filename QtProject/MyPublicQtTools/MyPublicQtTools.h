@@ -13,9 +13,6 @@
 #include <QWidget>
 
 
-
-
-
 class MyPublicQtTools : public QMainWindow
 {
     Q_OBJECT
@@ -36,7 +33,6 @@ protected:
 
 private:
 	void initTitleBar();									//初始化标题
-
 
 
 private:

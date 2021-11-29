@@ -62,6 +62,21 @@ CString ReplaceDomainNameByIP(const CString& strURL, const CString& strIP)
 }
 
 
+void fun2(int b);
+
+void fun1(int b)
+{
+    int a = b;
+    fun2(a);
+}
+
+void fun2(int b)
+{
+    int a = b;
+    fun1(a);
+}
+
+
 
 MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     :QMainWindow(parent)
@@ -73,36 +88,63 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
 
 
 
-    resize(800, 600);
+    resize(600, 200);
 
     int errorc = 0;
+    setWindowIcon(QIcon("Helmet.ico"));//设置状态栏图标
 
 
-    QTimer* timer = new QTimer(this);
+
+//    QTimer* timer = new QTimer(this);
+//    connect
+//    (
+//        ui.loopbutton, &QPushButton::clicked, this, [=]()
+//        {
+//            if (timer->isActive())
+//            {
+//                timer->stop();
+//                ui.loopbutton->setText(YString("开启时间"));
+//                return;
+//            }
+//            //ui.curtime->setText(CS2QS(L"%s,%d",WhoIsUser(GetCurrentProcessId()),222));
+//            ui.loopbutton->setText(YString("关闭时间"));
+//            timer->start(1000);
+//        }
+//    );
+//
+//    connect
+//    (
+//        timer, &QTimer::timeout, this, [=]()
+//        {
+//            ui.curtime->setText(QTime::currentTime().toString());
+//            ui.curtime->setToolTip(ToolTipWrap(QTime::currentTime().toString(), 100, fontMetrics()));
+//        }
+//    );
+//
+
+    ui.C_collapse_Button->setText(YString("C++崩溃"));
+    ui.Win_collapse_Button->setText(YString("Windows崩溃"));
+
+
     connect
-    (
-        ui.loopbutton, &QPushButton::clicked, this, [=]()
+    (ui.C_collapse_Button, &QPushButton::clicked, this, [=]()
         {
-            if (timer->isActive())
-            {
-                timer->stop();
-                ui.loopbutton->setText(YString("开启时间"));
-                return;
-            }
-            //ui.curtime->setText(CS2QS(L"%s,%d",WhoIsUser(GetCurrentProcessId()),222));
-            ui.loopbutton->setText(YString("关闭时间"));
-            timer->start(1000);
+            HANDLE myHandle;
+            StartPrograme(L"MyPublicTools.exe", myHandle,L"",1,0);
         }
     );
 
     connect
-    (
-        timer, &QTimer::timeout, this, [=]()
+    (ui.Win_collapse_Button, &QPushButton::clicked, this, [=]()
         {
-            ui.curtime->setText(QTime::currentTime().toString());
-            ui.curtime->setToolTip(ToolTipWrap(QTime::currentTime().toString(), 100, fontMetrics()));
+            //HANDLE myHandle;
+            //StartPrograme(L"MyPublicTools2.exe", myHandle, L"", 1, 0);
+            fun1(2);
         }
     );
+
+
+
 
 }
 
@@ -113,10 +155,10 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     m_titleBar = new MyTitleBar(this);
     m_titleBar->setTitleIcon("Image/QAXico.png");
     //m_titleBar->setBackgroundColor(0, 0, 0, 1);
-    m_titleBar->setTitleContent(QStringLiteral(" 这是标题"),15);
+    m_titleBar->setTitleContent(QStringLiteral("天擎客户端开发二组---崩溃触发工具"),15);
     m_titleBar->setButtonType(MIN_MAX_BUTTON);
     //m_titleBar->setButtonType(ONLY_CLOSE_BUTTON);
-    m_titleBar->setTitleRoll(5);
+    m_titleBar->setTitleRoll(20);
     //m_titleBar->setWindowBorderWidth(20);
     //m_titleBar->setTitleHeight(80);
     m_titleBar->setRightClickMenu();
@@ -151,14 +193,22 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
      Q_UNUSED(eventType);
      MSG* msg = static_cast<MSG*>(message);
 
+
+     //QWidget* widget = QWidget::find(reinterpret_cast<WId>(msg->hwnd));
+     //if (!widget)
+     //    return false;
+
+
      switch (msg->message)
      {
-     case WM_NCCALCSIZE: {
+     case WM_NCCALCSIZE:
+     {
          /*
          此消息用于处理非客户区域，比如边框的绘制
          返回false,就是按系统的默认处理，如果返回true,而不做任何绘制，则非客户区域
          就不会被绘制，就相当于没有绘制非客户区域，所以就会看不到非客户区域的效果
-         */
+         */       
+         *result = 0;
          return true;
      }
      case WM_NCHITTEST:
@@ -233,17 +283,43 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
          return QWidget::nativeEvent(eventType, message, result);
      }
 
+
+
+
+     //case WM_GETMINMAXINFO:
+     //{
+     //    if (::IsZoomed(msg->hwnd)) {
+     //        //isMaximized_ = true;
+     //        RECT frame = { 0, 0, 0, 0 };
+     //        AdjustWindowRectEx(&frame, WS_OVERLAPPEDWINDOW, FALSE, 0);
+     //        frame.left = abs(frame.left);
+     //        frame.top = abs(frame.bottom);
+     //        widget->setContentsMargins(frame.left, frame.top, frame.right, frame.bottom);
+     //    }
+     //    else {
+     //        widget->setContentsMargins(0, 0, 0, 0);
+     //        //isMaximized_ = false;
+     //    }
+
+     //    *result = ::DefWindowProc(msg->hwnd, msg->message, msg->wParam, msg->lParam);
+     //    return true;
+     //}
+
+
+
+
     //客户区发生变化时windows发送过来的消息
-     case WM_WININICHANGE:
-     {
-         if (m_titleBar->m_isMaximize)
-         {
-             m_titleBar->m_PreviousFactRect = m_titleBar->getDesktopRect();
-             m_titleBar->m_CorrectionType = TRUE;
-             //我们只是触发一个消息,并不想重写此消息处理,所以返回false,让QT后续去处理
-             return false;
-         }
-     }
+     //case WM_WININICHANGE:
+     //{
+     //    if (m_titleBar->m_isMaximize)
+     //    {
+     //        m_titleBar->m_PreviousFactRect = m_titleBar->getDesktopRect();
+     //        m_titleBar->m_CorrectionType = TRUE;
+     //        //我们只是触发一个消息,并不想重写此消息处理,所以返回false,让QT后续去处理
+     //        //return false;
+     //        return QWidget::nativeEvent(eventType, message, result);
+     //    }
+     //}
      }
 
      return QWidget::nativeEvent(eventType, message, result);

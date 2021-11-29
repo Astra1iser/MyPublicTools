@@ -12,7 +12,6 @@
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 
-
 class TitleMonitor;
 
 enum ButtonType
@@ -126,6 +125,7 @@ public:
 public:
 	BOOL m_CorrectionType;				// 桌面分辨率改变标识符,windows事件发送到此窗口时自动改变为1,处理完数据后置0
 	QRect m_PreviousFactRect;			// 客桌面户区变化前的桌面客户区布局
+	QRect m_CurrentFactRect;			// 保存客桌面户区变化后的(当前的)桌面客户区布局
 	BOOL m_isStretch;					// 用户设置的窗体是否可拉伸属性
 	BOOL m_isMaximize;					// 当前是否是最大化
 
@@ -187,7 +187,6 @@ private:
 	int m_windowBorderWidth;			// 窗口边框宽度;
 	HWND m_ParentHwnd;					// 父窗体句柄
 	BOOL isTitleUnderMouse;				// 当前鼠标是否在标题栏上
-	QRect m_CurrentFactRect;			// 保存客桌面户区变化后的(当前的)桌面客户区布局
 	TitleMonitor* m_TitleMonitor;		// 监控者线程指针
 	BOOL m_isStretch_buffer;			// 用户设置的窗体是否可拉伸属性的内部备份,用于内布切换属性和还原
 
@@ -244,7 +243,15 @@ public:
 	{
 		while (this->bRun)
 		{
-			mtb->sendMonitormessage();
+			//性能优化,对比前后数据总比一直刷新窗口大小的性能占用低得多
+			if (mtb->m_isMaximize)
+			{
+				mtb->m_CurrentFactRect = mtb->getDesktopRect();
+				if (mtb->m_CurrentFactRect != mtb->m_PreviousFactRect)
+				{
+					mtb->sendMonitormessage();
+				}
+			}
 			Sleep(100);
 		}
 		return;
