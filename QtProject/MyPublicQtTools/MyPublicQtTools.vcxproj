@@ -100,9 +100,11 @@
     <QtRcc Include="MyPublicQtTools.qrc" />
     <QtUic Include="MyPublicQtTools.ui" />
     <QtMoc Include="MyPublicQtTools.h" />
+    <ClCompile Include="MyFrame.cpp" />
     <ClCompile Include="MyPublicQtTools.cpp" />
     <ClCompile Include="main.cpp" />
     <QtMoc Include="MyTitleBar.h" />
+    <QtMoc Include="MyFrame.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="MyTitleBar.cpp" />

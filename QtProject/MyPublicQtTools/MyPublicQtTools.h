@@ -10,6 +10,7 @@
 #include "MyTitleBar.h"
 
 
+
 #include <QWidget>
 
 
@@ -27,6 +28,7 @@ public:
 
 protected:
 	MyTitleBar* m_titleBar;
+    MyFrame* m_frame;
     void paintEvent(QPaintEvent* event);
     bool nativeEvent(const QByteArray& eventType, void* message, long* result);
 

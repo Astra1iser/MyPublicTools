@@ -88,7 +88,13 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
 
 
 
+
+
+
     resize(600, 200);
+
+
+
 
     int errorc = 0;
     setWindowIcon(QIcon("Helmet.ico"));//设置状态栏图标
@@ -162,7 +168,7 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     //m_titleBar->setWindowBorderWidth(20);
     //m_titleBar->setTitleHeight(80);
     m_titleBar->setRightClickMenu();
-    m_titleBar->setStretch(TRUE);
+    m_titleBar->setStretch(FALSE);
 
 } 
 
@@ -208,7 +214,6 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
          返回false,就是按系统的默认处理，如果返回true,而不做任何绘制，则非客户区域
          就不会被绘制，就相当于没有绘制非客户区域，所以就会看不到非客户区域的效果
          */       
-         *result = 0;
          return true;
      }
      case WM_NCHITTEST:

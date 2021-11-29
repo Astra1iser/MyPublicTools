@@ -35,6 +35,7 @@ MyTitleBar::MyTitleBar(QWidget* parent)
 MyTitleBar::~MyTitleBar()
 {
 	//以下指针指向的区域为必定申请的
+	delete m_frame;
 	delete m_TitleMonitor;
 	delete m_pIcon;
 	delete m_pTitleContent;
@@ -58,6 +59,8 @@ MyTitleBar::~MyTitleBar()
 // 初始化控件;
 void MyTitleBar::initControl()
 {
+	m_frame = new MyFrame(this->parentWidget());	//边框
+
 	m_pIcon = new QLabel;
 	m_pTitleContent = new QLabel;
 
@@ -154,6 +157,51 @@ void MyTitleBar::initControl()
 	this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
 	this->setTitleWidth();
 	this->setTitleHeight();
+}
+
+//设置(更新)父窗体边框
+void  MyTitleBar::setFrame()
+{
+	if (m_isMaximize)
+	{	
+		m_frame->m_Top_Horizontal_Line->setVisible(FALSE);
+		m_frame->m_Bottom_Horizontal_Line->setVisible(FALSE);
+		m_frame->m_Left_Vertical_Line->setVisible(FALSE);
+		m_frame->m_Right_Vertical_Line->setVisible(FALSE);
+		return;
+	}
+	else
+	{
+		m_frame->m_Top_Horizontal_Line->setVisible(TRUE);
+		m_frame->m_Bottom_Horizontal_Line->setVisible(TRUE);
+		m_frame->m_Left_Vertical_Line->setVisible(TRUE);
+		m_frame->m_Right_Vertical_Line->setVisible(TRUE);
+	}
+
+	if (m_windowBorderWidth != 0)
+	{
+		//上边界
+		m_frame->m_Top_Horizontal_Line->setGeometry(QRect(-1, 0, this->parentWidget()->width()+2, 2));
+		//下边界
+		m_frame->m_Bottom_Horizontal_Line->setGeometry(QRect(0, this->parentWidget()->height()-1, this->parentWidget()->width()+2, 2));
+		//左边界
+		m_frame->m_Left_Vertical_Line->setGeometry(QRect(0, 0, 2, this->parentWidget()->height()));
+		//右边界
+		m_frame->m_Right_Vertical_Line->setGeometry(QRect(this->parentWidget()->width()-1, -1, 2, this->parentWidget()->height()+2));
+		return;
+	}
+	else
+	{	
+		//上边界
+		m_frame->m_Top_Horizontal_Line->setGeometry(QRect(-1, 0, this->parentWidget()->width()+2, 0));
+		//下边界
+		m_frame->m_Bottom_Horizontal_Line->setGeometry(QRect(0, this->parentWidget()->height() - 1, this->parentWidget()->width()+2, 2));
+		//左边界
+		m_frame->m_Left_Vertical_Line->setGeometry(QRect(0, m_TitleBarHeight, 2, this->parentWidget()->height()- m_TitleBarHeight));
+		//右边界
+		m_frame->m_Right_Vertical_Line->setGeometry(QRect(this->parentWidget()->width() - 1, -1, 2, this->parentWidget()->height() + 2));
+		return;
+	}
 }
 
 // 信号槽的绑定;
@@ -390,6 +438,7 @@ void MyTitleBar::paintEvent(QPaintEvent *event)
 	}
 	//设置了边框时左右和上方要腾出对应大小的边框位置
 	this->move(m_windowBorderWidth, m_windowBorderWidth);
+	setFrame();
 	QWidget::paintEvent(event);
 }
 
@@ -631,22 +680,20 @@ void MyTitleBar::onButtonMaxPressed()
 void MyTitleBar::onButtonMaxClicked()
 {
 	m_pButtonMax->setVisible(false);
-	m_pButtonRestore->setVisible(true);
-	m_isMaximize = TRUE;
 
 	//保存一下用户设置的拉伸属性,windows的逻辑是最大化禁止拉伸,这里在最大化时也临时设置不能拉伸
 	m_isStretch_buffer = m_isStretch;
 	m_isStretch = FALSE;
 
-
-
 	//保存一下原始窗体大小,便于还原时用
 	this->saveRestoreInfo(this->parentWidget()->pos(), QSize(this->parentWidget()->width(), this->parentWidget()->height()));
 
-	
 	QRect desktopRect = getDesktopRect();
 	//从当前进程屏幕上左上角位置开始，显示一个当前桌面客户分辨率大小(此分辨率比桌面分辨率小,因为去掉了任务栏的大小)的界面（宽desktopRect.width()，高esktopRect.height().
 	this->parentWidget()->setGeometry(desktopRect);
+
+	m_isMaximize = TRUE;
+	m_pButtonRestore->setVisible(true);
 }
 
 //还原响应函数,点击时
@@ -659,8 +706,6 @@ void MyTitleBar::onButtonRestorePressed()
 void MyTitleBar::onButtonRestoreClicked()
 {
 	m_pButtonRestore->setVisible(false);
-	m_pButtonMax->setVisible(true);
-	m_isMaximize = FALSE;
 
 	//让拉伸选项还原
 	m_isStretch = m_isStretch_buffer;
@@ -671,6 +716,9 @@ void MyTitleBar::onButtonRestoreClicked()
 	this->getRestoreInfo(windowPos, windowSize);
 	this->parentWidget()->setGeometry(QRect(windowPos, windowSize));
 	//this->parentWidget()->setWindowState(Qt::WindowActive);
+
+	m_isMaximize = FALSE;
+	m_pButtonMax->setVisible(true);
 }
 
 //关闭响应函数,点击时

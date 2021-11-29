@@ -12,6 +12,8 @@
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
 
+#include "MyFrame.h"
+
 class TitleMonitor;
 
 enum ButtonType
@@ -133,6 +135,8 @@ public:
 private:
 	// 初始化控件;
 	void initControl();
+	//设置边框
+	void setFrame();
 	// 信号槽的绑定;
 	void initConnections();
 	// 加载样式文件;
@@ -189,6 +193,7 @@ private:
 	BOOL isTitleUnderMouse;				// 当前鼠标是否在标题栏上
 	TitleMonitor* m_TitleMonitor;		// 监控者线程指针
 	BOOL m_isStretch_buffer;			// 用户设置的窗体是否可拉伸属性的内部备份,用于内布切换属性和还原
+	MyFrame* m_frame;					//边框类指针
 
 
 //重写基类事件函数
