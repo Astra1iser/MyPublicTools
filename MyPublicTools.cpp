@@ -542,8 +542,38 @@ void fun2(int b)
 	fun1(a);
 }
 
+void myquit()
+{
+	for (int i = 0; i < 100; i++)
+	{
+		cout << "i'm exit:" <<i<< endl;
+		Sleep(500);
+	}
+	
+}
 
-int _tmain(int argc, _TCHAR* argv[])
+
+
+void func()
+{
+	__try
+	{
+		//abort();
+		int a;
+		cin >> a;
+		int b = 5 / a;
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		cout << "触发了";
+		MessageBox(NULL, L"11", L"111", 0);
+	}
+
+}
+
+typedef BOOL(*pFun)(LPCTSTR);
+
+int main(int argc, _TCHAR* argv[])
 {
 
 	Wcout(WhoIsUser(getpid()));
@@ -689,10 +719,60 @@ int _tmain(int argc, _TCHAR* argv[])
 
 //abort();
 	
-fun1(3);
+//fun1(3);
+	//set_terminate(myquit);
+	////func();
+	//char str[80] = "This is - www.runoob.com - website";
+	//const char s[2] = "-";
+	//char* token;
+
+	///* 获取第一个子字符串 */
+	//token = strtok(str, s);
+
+	///* 继续获取其他的子字符串 */
+	//while (token != NULL) {
+	//	printf("%s\n", token);
+
+	//	token = strtok(NULL, s);
+	//}
+
+	//string aa;
+	//CString a;
+
+	//HMODULE  hDll;
+	//hDll = LoadLibrary((L"LeakDetect.dll"));
+	//if (NULL == hDll)
+	//{
+	//	cout << "error1" << endl;
+	//}
+	//else
+	//{
+	//	cin >> aa;
+	//	a= string2LPTSTR(aa);
+	//	pFun myfunc;
+	//	myfunc = (pFun)GetProcAddress(hDll, "IsPatchInstalled");
 
 
-	return 0;
+	//	if (!myfunc)
+	//	{
+	//		FreeLibrary(hDll);
+	//		cout << "error2" << endl;
+	//	}
+	//	else
+	//	{
+	//		cout<<myfunc(a);
+	//	}
+	//}
+
+
+MutexLock* aaa = new MutexLock(L"123",TRUE);
+
+aaa->Lock();
+system("pause");
+aaa->Lock();
+
+
+	system("pause");
 }
 
 

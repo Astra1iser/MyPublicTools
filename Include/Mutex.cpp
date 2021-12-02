@@ -96,41 +96,102 @@
 
 BOOL  MutexLock::Lock(BOOL Waitting)
 {
-	if (FALSE == Waitting && NULL == g_hMutex && TRUE == MutexReleased)
-	{
-		g_hMutex = CreateMutex(NULL, TRUE, this->MutexName);
-		MutexReleased = FALSE;
-	}
+	//if (FALSE == Waitting && NULL == g_hMutex && TRUE == MutexReleased)
+	//{
+	//	g_hMutex = CreateMutex(NULL, TRUE, this->MutexName);
+	//	MutexReleased = FALSE;
+	//}
 
-	if (NULL != g_hMutex)
+	//if (NULL != g_hMutex)
+	//{
+	//	if (GetLastError() == ERROR_ALREADY_EXISTS && FALSE == Waitting)
+	//	{
+	//		if (TRUE == NeedWait)
+	//		{
+	//			WaitForSingleObject(g_hMutex, INFINITE);
+	//			if (Lock(TRUE))
+	//			{
+	//				return TRUE;
+	//			}
+	//		}
+	//		else
+	//		{
+	//			Unlock();
+	//			return FALSE;
+	//			//exit(0);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		return TRUE;
+	//	}
+	//}
+	//return FALSE;
+
+
+
+	m_hMutex = NULL;
+
+	if (FALSE == NeedWait)
 	{
-		if (GetLastError() == ERROR_ALREADY_EXISTS && FALSE == Waitting)
+		if (NULL == g_hMutex && TRUE == MutexReleased)
 		{
-			if (TRUE == NeedWait)
-			{
-				WaitForSingleObject(g_hMutex, INFINITE);
-				if (Lock(TRUE))
-				{
-					return TRUE;
-				}
-			}
-			else
-			{
-				Unlock();
-				return FALSE;
-				//exit(0);
-			}
+			g_hMutex = CreateMutex(NULL, TRUE, this->MutexName);
+			m_hMutex = g_hMutex;
+			MutexReleased = FALSE;
+		}
+		if (NULL == m_hMutex)
+		{
+			return FALSE;
 		}
 		else
 		{
 			return TRUE;
 		}
 	}
-	return FALSE;
+
+	if (TRUE == NeedWait)
+	{
+		m_hMutex = CreateMutex(NULL, TRUE, this->MutexName);
+		if (GetLastError() == ERROR_ALREADY_EXISTS)
+		{
+			if (WaitForSingleObject(m_hMutex, INFINITE) == WAIT_OBJECT_0)
+			{
+				Unlock(m_hMutex);
+				return FALSE;
+			}
+			else
+			{
+				g_hMutex = m_hMutex;
+				MutexReleased = FALSE;
+				return TRUE;
+			}
+		}
+		else
+		{
+			if (NULL == m_hMutex)
+			{
+				return FALSE;
+			}
+			else
+			{
+				g_hMutex = m_hMutex;
+				MutexReleased = FALSE;
+				return TRUE;
+			}
+		}
+	}
 }
 
-BOOL  MutexLock::Unlock()
+BOOL  MutexLock::Unlock(HANDLE hd)
 {
+	if (NULL != hd)
+	{
+		ReleaseMutex(hd);
+		CloseHandle(hd);
+		return TRUE;
+	}
+
 	if (NULL != g_hMutex && FALSE == MutexReleased)
 	{
 		ReleaseMutex(g_hMutex);
@@ -140,6 +201,7 @@ BOOL  MutexLock::Unlock()
 		return TRUE;
 	}
 	return FALSE;
+
 }
 
 MutexLock::~MutexLock()

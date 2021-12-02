@@ -105,6 +105,7 @@
     <ClCompile Include="main.cpp" />
     <QtMoc Include="MyTitleBar.h" />
     <QtMoc Include="MyFrame.h" />
+    <ClInclude Include="Release\uic\ui_MyPublicQtTools.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="MyTitleBar.cpp" />

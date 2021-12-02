@@ -79,7 +79,7 @@ void fun2(int b)
 
 
 MyPublicQtTools::MyPublicQtTools(QWidget *parent)
-    :QMainWindow(parent)
+    :QWidget(parent)
 {
 
     ui.setupUi(this);

@@ -14,7 +14,7 @@
 #include <QWidget>
 
 
-class MyPublicQtTools : public QMainWindow
+class MyPublicQtTools : public QWidget
 {
     Q_OBJECT
 
