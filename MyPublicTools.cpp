@@ -573,10 +573,64 @@ void func()
 
 typedef BOOL(*pFun)(LPCTSTR);
 
+
+
+enum list
+{
+	a = 0,
+	b,
+	c,
+	d
+};
+
+
+
+int _EnablePrivilege(LPCWSTR lpszPrivilegeName, BOOL bEnable)
+{
+	int nResult = FALSE;
+	int nRetCode = FALSE;
+	HANDLE hToken = NULL;
+	TOKEN_PRIVILEGES tkp = { 0 };
+
+	do
+	{
+		nRetCode = ::OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken);
+		if (!nRetCode)
+			break;
+
+		nRetCode = ::LookupPrivilegeValue(NULL, lpszPrivilegeName, &tkp.Privileges[0].Luid);
+		if (!nRetCode)
+			break;
+
+		tkp.PrivilegeCount = 1;
+		tkp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
+		nRetCode = ::AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(tkp), NULL, NULL);
+		if (!nRetCode)
+			break;
+
+		nResult = TRUE;
+	} while (FALSE);
+
+	if (hToken != NULL)
+	{
+		CloseHandle(hToken);
+	}
+
+	return nResult;
+}
+
+
+
+
+
+
+
 int main(int argc, _TCHAR* argv[])
 {
 
-	Wcout(WhoIsUser(getpid()));
+	//Wcout(WhoIsUser(getpid()));
+
+	//cout << "C++异常"<<endl;
 
 	//WORD wVersionRequested;
 	//WSADATA wsaData;
@@ -747,8 +801,7 @@ int main(int argc, _TCHAR* argv[])
 	//}
 	//else
 	//{
-	//	cin >> aa;
-	//	a= string2LPTSTR(aa);
+	//	
 	//	pFun myfunc;
 	//	myfunc = (pFun)GetProcAddress(hDll, "IsPatchInstalled");
 
@@ -760,16 +813,38 @@ int main(int argc, _TCHAR* argv[])
 	//	}
 	//	else
 	//	{
-	//		cout<<myfunc(a);
+	//		while (TRUE)
+	//		{
+	//			cout << "请输入补丁号(带KB/kb/Kb/kB开头)按回车结束:";
+	//			cin >> aa;
+	//			a = string2LPTSTR(aa);
+	//			if (myfunc(a))
+	//			{
+	//				cout << "查询结果为: 存在"<< endl;
+	//			}
+	//			else
+	//			{
+	//				cout << "查询结果为: 不存在" << endl;
+	//			}
+	//			cout << endl;	
+	//		}
 	//	}
 	//}
 
+//fun2(3);
 
-MutexLock* aaa = new MutexLock(L"123",TRUE);
+	//throw("C++异常");
+	//abort();
+//#include "stdio.h"
+//
+//	FILE* fp;
+//
+//	fp = fopen("1111.txt", "w+");
+//
+//	fclose(fp);
 
-aaa->Lock();
-system("pause");
-aaa->Lock();
+	_EnablePrivilege(SE_DEBUG_NAME, TRUE);
+//CHttpDownload httpp;
 
 
 	system("pause");

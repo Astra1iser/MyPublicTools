@@ -181,6 +181,8 @@ BOOL  MutexLock::Lock(BOOL Waitting)
 			}
 		}
 	}
+
+	return FALSE;
 }
 
 BOOL  MutexLock::Unlock(HANDLE hd)

@@ -571,10 +571,16 @@ BOOL Base::EasyDownLoadFile(LPCTSTR lpcszURL, LPCTSTR localFilePath)
 }
 
 
-void Base::Wcout(CString cstring)
+void Base::Wcout(CString cstring, ...)
 {
+	CString var_str;
+	va_list	ap;
+	va_start(ap, cstring);
+	var_str.FormatV(cstring, ap);
+	va_end(ap);
+
 	wcout.imbue(std::locale("chs"));
-	wcout << cstring.GetBuffer()<<endl;
+	wcout << var_str.GetBuffer()<<endl;
 }
 
 

@@ -73,8 +73,16 @@ BOOL Thread::WaitExit()
 		return TRUE;
 	if (hThread == NULL)
 		return TRUE;
-	WaitForSingleObject(hThread, INFINITE);
+	if (WAIT_OBJECT_0 == WaitForSingleObject(hThread, INFINITE))
+	{
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
 }
+
 
 
 DWORD __stdcall Thread::WThreadFunctionLinek(IN LPVOID Param)

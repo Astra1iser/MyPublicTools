@@ -39,7 +39,7 @@
 #include <LogWriter.h>//日志输出类
 #include <Socket.h>//Socket连接类
 #include <HttpPost.h>//实现http的post操作
-#include <httpdown.h>
+#include <httpdown.h>//实现简单的HTTP下载
 
 
 using namespace std;
@@ -56,6 +56,7 @@ using namespace FIFO;
 #define SetAttribute_UTF8(x) SetAttribute(G2U(x))
 
 #define WRITE_LOG(x,...)	g_logger.Write(x,__VA_ARGS__)
+#define WCOUT(x,...)		Wcout(x,__VA_ARGS__)
 
 #ifndef _YCMBASE_H
 #define _YCMBASE_H
@@ -265,7 +266,7 @@ namespace Base
 
 
 	//输出CString字符串,最后带个换行
-	void Wcout(CString string);
+	void Wcout(CString string, ...);
 
 
 	// 这是一个返回值后置的例子
@@ -322,7 +323,7 @@ namespace Base
 
 
 	//时间戳转换,系统时间转换时间戳(美国夏令时)
-	//SYSTEMTIME 格式:年月周(0为周一6为周六)日时分秒毫秒
+	//SYSTEMTIME 格式:年月周(0为周一6为周日)日时分秒毫秒
 	void SystemTimeToTimet(SYSTEMTIME st, time_t* pt);
 
 	//时间戳转换,时间戳转换为系统时间(美国夏令时)

@@ -79,7 +79,7 @@ void fun2(int b)
 
 
 MyPublicQtTools::MyPublicQtTools(QWidget *parent)
-    :QWidget(parent)
+    :QMainWindow(parent)
 {
 
     ui.setupUi(this);
@@ -136,7 +136,8 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     (ui.C_collapse_Button, &QPushButton::clicked, this, [=]()
         {
             HANDLE myHandle;
-            StartPrograme(L"MyPublicTools.exe", myHandle,L"",1,0);
+            //StartPrograme(L"MyPublicTools.exe", myHandle,L"",0,0);
+            abort();
         }
     );
 
@@ -144,7 +145,7 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     (ui.Win_collapse_Button, &QPushButton::clicked, this, [=]()
         {
             //HANDLE myHandle;
-            //StartPrograme(L"MyPublicTools2.exe", myHandle, L"", 1, 0);
+            //StartPrograme(L"MyPublicTools2.exe", myHandle, L"", 0, 0);
             fun1(2);
         }
     );
