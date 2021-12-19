@@ -15,7 +15,7 @@
 #include <map>
 #include <csignal>
 
-//#include <afxwin.h>
+#include <afxwin.h>
 #include <atlstr.h>
 #include <windows.h>
 #include <windowsx.h>
