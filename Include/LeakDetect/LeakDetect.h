@@ -1,47 +1,29 @@
-#pragma once
+ï»¿#pragma once
 #include "stdafx.h"
 
-typedef struct tagInstallVul
+// å·²å®‰è£…è¡¥ä¸ä¿¡æ¯
+typedef struct _InstalledItem
 {
-	DWORD	dwKey;
-	DWORD	dwRegKey64;
-
-	CString	strDisplayName;
-	CString	strUninstallString;
-
-	tagInstallVul()
+	_InstalledItem()
+		: dwKey(0)
 	{
-		dwKey = 0;
-		dwRegKey64 = 0;
+
 	}
 
-}INSTALLVUL, *LPINSTALLVUL;
+	DWORD dwKey;
+	CString strKBID;				// ID
+	CString strName;				// æ¼æ´åç§°
+	CString strDate;				// å‘å¸ƒæ—¶é—´
 
-map<CString, INSTALLVUL> m_mapInstVul;
-__declspec(selectany) BOOL g_SomGlobal_bWin64 = IsOS(OS_WOW6432);
-__declspec(selectany) BOOL g_bSomKBIDVersion = FALSE;		// ÊÇ·ñ´¦Àí KBID µÄĞ¡°æ±¾ºÅ£¬Ä¿Ç°µÄÂß¼­ÊÇÄ¬ÈÏ´¦ÀíĞ¡°æ±¾ºÅ£¬Èç¹û·¢ÏÖ¼ÓÔØÂ©¶´¿âºóÉÙÓÚ 3 ¸ö²¹¶¡ÌîÁËĞ¡°æ±¾ºÅ£¬¾Í¸Ä³É²»´¦ÀíĞ¡°æ±¾ºÅ£¬±ÜÃâ¶ÁÈ¡ÒÑ°²×°µÄ²¹¶¡Êı¾İºÍÂ©¶´¿âµÄÊı¾İ²»Æ¥Åä
+} INSTALLEDITEM, * LPINSTALLEDITEM;
+
+
+vector<INSTALLEDITEM> vecInstalled;
 
 DWORD LPCTSTR2DWORD(LPCTSTR lpctsrt);
 
-BOOL EntIsWin7AndLater();
-BOOL EntIsWin10AndLater();
-
-void ConvertGuidToProuctCode(LPWSTR szMsiKey, LPWSTR szProductCode, DWORD dwProductCodeSize);
-BOOL ConvertSid(PSID pSid, LPWSTR TextualSid, LPDWORD lpdwBufferLen);
-
-BOOL GetLocalSid(LPWSTR szSid, DWORD dwSize);
-BOOL GetLocalSid(LPWSTR szSid, DWORD dwSize);
-
-DWORD FormatKBID(LPCWSTR lpKBID, LPCWSTR* lppKBIDFirst = NULL, LPCWSTR* lppKBIDLast = NULL, BOOL bRequireKBPrefix = FALSE);
-
-BOOL IsXPHotfix(LPCWSTR szUninstallString);
-BOOL IsXPHotfix(LPCWSTR szDisplayName, LPCWSTR szUninstallString);
-
-BOOL EnumAllInstallVul();
-BOOL EnumFromInstaller(map<CString, INSTALLVUL> &mapInstVul);
-BOOL EnumFromRegUninstall(map<CString, INSTALLVUL> &mapInstVul);
-BOOL EnumFromPackages(map<CString, INSTALLVUL> &mapInstVul);
 BOOL IsVulInstall(DWORD dwKey);
 
-//µ¼³öº¯Êı
+
+//å¯¼å‡ºå‡½æ•°
 extern "C" __declspec(dllexport) BOOL IsPatchInstalled(LPCTSTR lpKBNumber);

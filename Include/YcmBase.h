@@ -24,6 +24,8 @@
 #include <wininet.h>
 #include <atlfile.h>
 #include <comutil.h>
+#include <Psapi.h>
+#include <tlhelp32.h>
 
 #include <ScopeLock.h>//互斥锁（临界区）封装类
 #include <PathManager.h>//路径相关函数
@@ -46,6 +48,7 @@ using namespace std;
 using namespace PathManager;
 using namespace RegeditManager;
 using namespace FIFO;
+
 
 //这个宏是为了规避windows自带的XMLDocument类重定义
 #define XMLDocument tinyxml2::XMLDocument
@@ -98,10 +101,15 @@ namespace Base
 
 
 	/*
-	3.一个快捷启动进程的方法,参数1:路径 参数2:启动参数 参数3:是否管理员权限启动 参数4:是否阻塞线程
+	一个快捷启动进程的方法
+	参数1:进程全路径
+	参数2:返回启动成功的进程句柄(失败则句柄不变)
+	参数3:启动参数
+	参数4:是否管理员权限启动
+	参数5:是否阻塞线程,就是启动进程后调用此函数的进程进入wait状态,直到启动的进程的句柄被释放或改变
 	这里有一个问题,就是能否返回句柄的问题,如果当前的进程权限小于启动进程的权限,则返回的句柄为空,只有当前作为父进程的权限大于子进程时才能返回子进程句柄
 	*/
-	BOOL StartPrograme(LPCTSTR Path, _Out_opt_ HANDLE& ProgrameHandle, LPCTSTR Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = TRUE);
+	BOOL StartPrograme(CString Path, _Out_opt_ HANDLE& ProgrameHandle, CString Parameters = L"", BOOL IsAdmin =FALSE, BOOL IsWaitForSingle = FALSE);
 
 
 	//4.获得数组的元素个数,参数为任意数组的引用
@@ -303,8 +311,6 @@ namespace Base
 
 
 	
-
-
 	//获取文件版本号
 	CString GetFileVersion(LPCSTR filename);
 	
@@ -329,51 +335,68 @@ namespace Base
 	//时间戳转换,时间戳转换为系统时间(美国夏令时)
 	void TimetToSystemTime(time_t t, LPSYSTEMTIME pst);
 
+	//查看对应pid的进程的用户名和完整性级别
 	CString GetProcessUserNameAndIntegrity(DWORD dwPid, DWORD* pdwLevel);
 
+	//查看对应pid的用户名
 	CString WhoIsUser(DWORD dwPid);
 
+	//将dos路径转换为windows路径
+	BOOL DosPathToNtPath(LPTSTR pszDosPath, LPTSTR pszNtPath);
+
+	//获取对应pid的进程的全路径
+	BOOL GetProcessFullPath(DWORD dwPID, TCHAR* pszFullPath);
+
+	/*
+	* 进程权限修改,包括uac等权限
+	* 参数1:权限名 如:SE_DEBUG_NAME,详情参考 NT Defined Privileges (winnt.h)
+	* 参数2:启用还是关闭
+	*/
+	int EnablePrivilege(LPCWSTR lpszPrivilegeName, BOOL bEnable);
+
+	//office系列软件是否运行中
+	BOOL IsOfficeProcRuning();
+
+	//关闭所有office进程
+	BOOL KillOfficeProc();
+
+	//根据pid获取子进程pid
+	vector<DWORD> GetProceeIDfromParentID(DWORD& dwParentProcessId);
+
+	/*
+	* 根据pid关闭某进程
+	* 参数1:要关闭的进程的pid
+	* 参数2:是否要关闭这个进程的子进程,默认为不关闭
+	*/
+	void TerminateProcessByPid(DWORD dwPid, BOOL andChildProcess = FALSE);
+
+	/*
+	* 根据进程名关闭某进程
+	* 参数1:要关闭的进程的名称(带后缀)
+	* 参数2:是否要关闭这个进程的子进程,默认为关闭
+	*/
+	BOOL TerminateProcessByName(CString ProcName, BOOL andChildProcess = TRUE);
+
+	//判断字符串是否为数字,若是数字则转化这个数字并传出,否则传入的引用的初始值不变
+	BOOL Str2Int(_In_ string str, _Out_ int& resNum);
 
 
+	//查询当前环境中又几块桌面(桌面总数=主屏幕+虚拟桌面个数)
+	int GetCurrScreenNmber();
 
-
-
-	////这是一个内核锁
-	//HANDLE g_hMutex = NULL;
-	//#define MUTEX_NAME	_T("Global//Q360LeakRepairMutex")
-	//#define	WINDOW_CLASS			L"360EntNoticeMainClass"
-
-	//BOOL IsInstanceExist()
-	//{
-	//	g_hMutex = CreateMutex(NULL, TRUE, MUTEX_NAME);
-	//	WaitForSingleObject(g_hMutex, INFINITE);
-
-
-
-
-
-
-
-
-	//	if (NULL != g_hMutex)
-	//	{
-	//		if (GetLastError() == ERROR_ALREADY_EXISTS)
-	//		{
-	//			HWND hWnd = ::FindWindow(WINDOW_CLASS, NULL);
-	//			if (hWnd)
-	//			{
-	//				::ShowWindow(hWnd, SW_RESTORE);
-	//				::SetForegroundWindow(hWnd);
-	//			}
-	//			return TRUE;
-	//		}
-	//	}
-
-	//	return FALSE;
-	//}
-
-
-	
+	/*
+	* 获取进程加载的模块名(里面也可以返回模块名, 模块路径, 模块地址, 具体使用时按需使用)
+	*	//模块快照
+		vector<tstring> patch;
+		ProcessModule(GetCurrentProcessId(),patch);
+		cout << "******************当前模块*****************" << endl;
+		for (int i = 0; i < patch.size(); i++)
+		{
+			Wcout(patch[i].c_str());
+		}
+	*/
+	typedef basic_string<TCHAR, char_traits<TCHAR>, allocator<TCHAR> > tstring;
+	BOOL ProcessModule(DWORD pid, _Out_ vector<tstring>& vtTstring);
 }
 
 #endif

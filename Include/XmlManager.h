@@ -1,4 +1,9 @@
 //XML解析
+
+//{   //https://blog.csdn.net/qq_40945965/article/details/86831178
+//    //https://www.cnblogs.com/happykoukou/p/6307257.html
+//    //https://www.cnblogs.com/whwywzhj/p/8478628.html
+
 #pragma once
 #include <tinyxml2.h>//XML操作一次封装
 using namespace tinyxml2;

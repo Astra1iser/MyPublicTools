@@ -162,7 +162,7 @@ CString Base::SetLangaueSyncOS()
 //}
 
 
-BOOL Base::StartPrograme(LPCTSTR Path, _Out_opt_ HANDLE& ProgrameHandle, LPCTSTR Parameters, BOOL IsAdmin, BOOL IsWaitForSingle)
+BOOL Base::StartPrograme(CString Path, _Out_opt_ HANDLE& ProgrameHandle, CString Parameters, BOOL IsAdmin, BOOL IsWaitForSingle)
 {
 
 	//if (!PathIsDirectory(Path))
@@ -202,8 +202,9 @@ BOOL Base::StartPrograme(LPCTSTR Path, _Out_opt_ HANDLE& ProgrameHandle, LPCTSTR
 	//指明工作目录的名字，成员没有说明，则默认为当前目录
 	ShExecInfo.lpDirectory = NULL;
 
-	//设置窗口显示(SW_SHOW)和不显示(SW_HIDE)，当然还有其他的
+	//设置窗口显示(SW_SHOW)和不显示(SW_HIDE)，当然还有其他的,这里默认为不显示(一般是cmd窗口)
 	ShExecInfo.nShow = SW_SHOW;
+	ShExecInfo.nShow = SW_HIDE;
 
 	//如果函数运行成功，该项的值将大于32，否则其他的值自己查
 	ShExecInfo.hInstApp = NULL;
@@ -303,7 +304,6 @@ string Base::ReadFileCoding(CString FilePath)
 }
 
 
-
 wstring Base::UTF8ToUnicode(const char* strSrc)
 {
 	std::wstring wstrRet;
@@ -348,6 +348,7 @@ string Base::UTF8ToAnsi(const char* strSrc)
 {
 	return UnicodeToAnsi(UTF8ToUnicode(strSrc).c_str());
 }
+
 
 char* Base::U2G(const char* utf8)
 {
@@ -688,7 +689,6 @@ BOOL Base::IsDirectoryWritable(CString lpwszPath)
 }
 
 
-
 void Base:: SystemTimeToTimet(SYSTEMTIME st, time_t* pt)
 {
 	FILETIME ft;
@@ -716,6 +716,7 @@ void Base::TimetToSystemTime(time_t t, LPSYSTEMTIME pst)
 
 	FileTimeToSystemTime(&ft, pst);
 }
+
 
 CString Base:: GetProcessUserNameAndIntegrity(DWORD dwPid, DWORD* pdwLevel)
 {
@@ -839,6 +840,7 @@ _exit:
 	return strUserName;
 }
 
+
 CString Base::WhoIsUser(DWORD dwPid)
 {
 	DWORD dwIntegrityLevel = 0;
@@ -850,4 +852,407 @@ CString Base::WhoIsUser(DWORD dwPid)
 	//}
 
 	return strUsername;
+}
+
+
+BOOL Base::DosPathToNtPath(LPTSTR pszDosPath, LPTSTR pszNtPath)
+{
+	TCHAR			szDriveStr[500];
+	TCHAR			szDrive[3];
+	TCHAR			szDevName[100];
+	INT				cchDevName;
+	INT				i;
+
+	//检查参数
+	if (!pszDosPath || !pszNtPath)
+		return FALSE;
+
+	//获取本地磁盘字符串
+	if (GetLogicalDriveStrings(sizeof(szDriveStr), szDriveStr))
+	{
+		for (i = 0; szDriveStr[i]; i += 4)
+		{
+			if (!lstrcmpi(&(szDriveStr[i]), _T("A:\\")) || !lstrcmpi(&(szDriveStr[i]), _T("B:\\")))
+				continue;
+
+			szDrive[0] = szDriveStr[i];
+			szDrive[1] = szDriveStr[i + 1];
+			szDrive[2] = '\0';
+			if (!QueryDosDevice(szDrive, szDevName, 100))//查询 Dos 设备名
+				return FALSE;
+
+			cchDevName = lstrlen(szDevName);
+			if (_tcsnicmp(pszDosPath, szDevName, cchDevName) == 0)//命中
+			{
+				lstrcpy(pszNtPath, szDrive);//复制驱动器
+				lstrcat(pszNtPath, pszDosPath + cchDevName);//复制路径
+
+				return TRUE;
+			}
+		}
+	}
+
+	lstrcpy(pszNtPath, pszDosPath);
+
+	return FALSE;
+}
+
+
+BOOL Base::GetProcessFullPath(DWORD dwPID, TCHAR* pszFullPath)
+{
+	TCHAR       szImagePath[MAX_PATH];
+	HANDLE      hProcess;
+
+	if (!pszFullPath)
+		return FALSE;
+
+	pszFullPath[0] = '\0';
+	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, 0, dwPID);
+	if (!hProcess)
+		return FALSE;
+
+	if (!GetProcessImageFileName(hProcess, szImagePath, MAX_PATH))
+	{
+		CloseHandle(hProcess);
+		return FALSE;
+	}
+
+	if (!DosPathToNtPath(szImagePath, pszFullPath))
+	{
+		CloseHandle(hProcess);
+		return FALSE;
+	}
+
+	CloseHandle(hProcess);
+
+	return TRUE;
+}
+
+
+int Base::EnablePrivilege(LPCWSTR lpszPrivilegeName, BOOL bEnable)
+{
+	int nResult = FALSE;
+	int nRetCode = FALSE;
+	HANDLE hToken = NULL;
+	TOKEN_PRIVILEGES tkp = { 0 };
+
+	do
+	{
+		nRetCode = ::OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken);
+		if (!nRetCode)
+			break;
+
+		nRetCode = ::LookupPrivilegeValue(NULL, lpszPrivilegeName, &tkp.Privileges[0].Luid);
+		if (!nRetCode)
+			break;
+
+		tkp.PrivilegeCount = 1;
+		tkp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
+		nRetCode = ::AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(tkp), NULL, NULL);
+		if (!nRetCode)
+			break;
+
+		nResult = TRUE;
+	} while (FALSE);
+
+	if (hToken != NULL)
+	{
+		CloseHandle(hToken);
+	}
+
+	return nResult;
+}
+
+
+BOOL Base::IsOfficeProcRuning()
+{
+	BOOL bRet = FALSE;
+
+	LPCWSTR lpwszOfficeProc[] = { L"WINWORD.EXE", L"EXCEL.EXE", L"MSACCESS.EXE", L"POWERPNT.EXE", L"OUTLOOK.EXE", L"GROOVE.EXE", L"INFOPATH.EXE", L"MSPUB.EXE", L"ONENOTE.EXE", L"VISIO.EXE" };
+
+	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnapShot != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe = { 0 };
+		memset(&pe, 0, sizeof(pe));
+		pe.dwSize = sizeof(pe);
+		if (Process32First(hSnapShot, &pe))
+		{
+			do
+			{
+				CString strName = pe.szExeFile;
+				strName.Trim();
+				strName.MakeLower();
+
+				if (strName.GetLength() > 0)
+				{
+					int nCount = sizeof(lpwszOfficeProc) / sizeof(lpwszOfficeProc[0]);
+					for (int i = 0; i < nCount; i++)
+					{
+						if (lstrcmpi(strName, lpwszOfficeProc[i]) == 0)
+						{
+							bRet = TRUE;
+							break;
+						}
+					}
+				}
+
+				if (bRet)
+				{
+					break;
+				}
+
+				memset(&pe, 0, sizeof(pe));
+				pe.dwSize = sizeof(pe);
+
+			} while (Process32Next(hSnapShot, &pe));
+		}
+
+		CloseHandle(hSnapShot);
+	}
+
+	return bRet;
+}
+
+
+BOOL Base::KillOfficeProc()
+{
+	BOOL bRet = FALSE;
+
+	LPCWSTR lpwszOfficeProc[] = { L"WINWORD.EXE", L"EXCEL.EXE", L"MSACCESS.EXE", L"POWERPNT.EXE", L"OUTLOOK.EXE", L"GROOVE.EXE", L"INFOPATH.EXE", L"MSPUB.EXE", L"ONENOTE.EXE", L"VISIO.EXE" };
+
+	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnapShot != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe = { 0 };
+		memset(&pe, 0, sizeof(pe));
+		pe.dwSize = sizeof(pe);
+		if (Process32First(hSnapShot, &pe))
+		{
+			do
+			{
+				CString strName = pe.szExeFile;
+				strName.Trim();
+				strName.MakeLower();
+
+				if (strName.GetLength() > 0)
+				{
+					int nCount = sizeof(lpwszOfficeProc) / sizeof(lpwszOfficeProc[0]);
+					for (int i = 0; i < nCount; i++)
+					{
+						if (lstrcmpi(strName, lpwszOfficeProc[i]) == 0)
+						{
+							TerminateProcessByPid(pe.th32ProcessID);
+							break;
+						}
+					}
+				}
+
+				memset(&pe, 0, sizeof(pe));
+				pe.dwSize = sizeof(pe);
+
+			} while (Process32Next(hSnapShot, &pe));
+		}
+
+		CloseHandle(hSnapShot);
+	}
+
+	return bRet;
+}
+
+
+vector<DWORD> Base::GetProceeIDfromParentID(DWORD& dwParentProcessId)
+{
+	vector<DWORD> parent_id_vec;
+	DWORD dwProcessID = 0;
+
+	//进行一个进程快照
+	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hProcessSnap == INVALID_HANDLE_VALUE)
+	{
+		cout << ("进程快照失败");
+		return parent_id_vec;
+	}
+
+	PROCESSENTRY32 pe;
+	TCHAR procID[100] = { 0 };
+	pe.dwSize = sizeof(pe);
+	BOOL bProcess = Process32First(hProcessSnap, &pe);
+	//遍历所有进程
+	while (bProcess)
+	{
+		if (pe.th32ParentProcessID == dwParentProcessId)//判断如果父id与其pid相等，
+		{
+
+			dwProcessID = pe.th32ProcessID;
+			parent_id_vec.push_back(dwProcessID);
+		}
+		bProcess = Process32Next(hProcessSnap, &pe);
+	}
+	CloseHandle(hProcessSnap);
+	return parent_id_vec;
+}
+
+
+void Base::TerminateProcessByPid(DWORD dwPid, BOOL andChildProcess)
+{
+	HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, dwPid);
+	if (hProc)
+	{
+		if (andChildProcess)
+		{
+			vector<DWORD> dwChildrenPid = GetProceeIDfromParentID(dwPid);
+			if (!dwChildrenPid.empty())
+			{
+				auto atChildrenPid = dwChildrenPid.begin();
+				for (int i = 0; atChildrenPid != dwChildrenPid.end(); atChildrenPid++, i++)
+				{
+					TerminateProcessByPid(atChildrenPid[i]);
+				}
+			}
+		}
+		TerminateProcess(hProc, 0);
+		CloseHandle(hProc);
+	}
+}
+
+
+BOOL Base::TerminateProcessByName(CString ProcName, BOOL andChildProcess)
+{
+	BOOL bRet = FALSE;
+
+	LPCWSTR lpwszProc[] = { ProcName };
+
+	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnapShot != INVALID_HANDLE_VALUE)
+	{
+		PROCESSENTRY32 pe = { 0 };
+		memset(&pe, 0, sizeof(pe));
+		pe.dwSize = sizeof(pe);
+		if (Process32First(hSnapShot, &pe))
+		{
+			do
+			{
+				CString strName = pe.szExeFile;
+				strName.Trim();
+				strName.MakeLower();
+
+				if (strName.GetLength() > 0)
+				{
+					int nCount = sizeof(lpwszProc) / sizeof(lpwszProc[0]);
+					for (int i = 0; i < nCount; i++)
+					{
+						if (lstrcmpi(strName, lpwszProc[i]) == 0)
+						{
+							if (TRUE == andChildProcess)
+							{
+								vector<DWORD> dwChildrenPid = GetProceeIDfromParentID(pe.th32ProcessID);
+								if (!dwChildrenPid.empty())
+								{
+									auto atChildrenPid = dwChildrenPid.begin();
+									for (int i =0; atChildrenPid != dwChildrenPid.end(); atChildrenPid++,i++)
+									{
+										TerminateProcessByPid(atChildrenPid[i]);
+									}
+								}
+							}
+							TerminateProcessByPid(pe.th32ProcessID);
+							break;
+						}
+					}
+				}
+
+				memset(&pe, 0, sizeof(pe));
+				pe.dwSize = sizeof(pe);
+
+			} while (Process32Next(hSnapShot, &pe));
+		}
+		CloseHandle(hSnapShot);
+	}
+
+	return bRet;
+}
+
+
+BOOL Base::Str2Int(_In_ string str, _Out_ int& resNum)
+{
+	//stringstream sin(str);
+	//double d;
+	//char c;
+	//int e;
+	//if (!(sin >> d))
+	//{
+	//	/*解释：
+	//		sin>>t表示把sin转换成double的变量（其实对于int和float型的都会接收），
+	//		如果转换成功，则值为非0，如果转换不成功就返回为0
+	//	*/
+	//	cout << "请别输入字符!" << endl;
+	//	return false;
+	//}
+	//if (sin >> c)
+	//{
+	//	/*解释：
+	//	此部分用于检测错误输入中，数字加字符串的输入形式（例如：34.f），在上面的的部分（sin>>t）
+	//	已经接收并转换了输入的数字部分，在stringstream中相应也会把那一部分给清除，
+	//	此时接收的是.f这部分，所以条件成立，返回false
+	//	  */
+	//	cout << "请别输入字符!" << endl;
+	//	return false;
+	//}
+	//sin >> e;
+	//nLoop = e;
+	//return true;
+
+	int buffer = 0;
+	try
+	{
+		buffer = stoi(str);
+	}
+	catch (...)
+	{
+		return FALSE;
+	}
+
+	resNum = buffer;
+	return TRUE;
+}
+
+
+int Base:: GetCurrScreenNmber()
+{
+	int screenNum = 0;
+	screenNum = GetSystemMetrics(SM_CMONITORS);
+	return screenNum;
+}
+
+
+int Base::ProcessModule(DWORD pid, _Out_ vector<tstring>& vtTstring)
+{
+	vector<tstring> patch;
+
+	HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
+	if (hProcessSnap)
+	{
+		MODULEENTRY32 me32;
+		me32.dwSize = sizeof(MODULEENTRY32);
+		Module32First(hProcessSnap, &me32);//获取进程第一个模块信息
+		do
+		{
+			//printf("模块路径:%s\n",me32.szExePath);
+			// patch.push_back(me32.szExePath);
+			//printf("模块名:%s\n",me32.szModule);
+			patch.push_back(me32.szModule);
+			//printf("模块基址:0x%08X\n",(DWORD)me32.modBaseAddr);
+
+		} while (Module32Next(hProcessSnap, &me32));
+		CloseHandle(hProcessSnap);
+		vtTstring = patch;
+		return TRUE;
+	}
+	else
+	{
+		cout << "获取进程快照失败" << endl;;
+		return FALSE;
+	}
+	return FALSE;
 }
