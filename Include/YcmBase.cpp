@@ -12,9 +12,11 @@
 #include <XmlManager.cpp>
 #include <LogWriter.cpp>
 #include <Socket.cpp>
-
 #include <HttpPost.cpp>
 #include <httpdown.cpp>
+#include <WinFirewallControler.cpp>
+#include <SvcHelper.cpp>
+#include <SystemternlHelper.cpp>
 
 BOOL Base::IsAdmin() {
 	#define ACCESS_READ		1  
@@ -855,47 +857,47 @@ CString Base::WhoIsUser(DWORD dwPid)
 }
 
 
-BOOL Base::DosPathToNtPath(LPTSTR pszDosPath, LPTSTR pszNtPath)
-{
-	TCHAR			szDriveStr[500];
-	TCHAR			szDrive[3];
-	TCHAR			szDevName[100];
-	INT				cchDevName;
-	INT				i;
-
-	//检查参数
-	if (!pszDosPath || !pszNtPath)
-		return FALSE;
-
-	//获取本地磁盘字符串
-	if (GetLogicalDriveStrings(sizeof(szDriveStr), szDriveStr))
-	{
-		for (i = 0; szDriveStr[i]; i += 4)
-		{
-			if (!lstrcmpi(&(szDriveStr[i]), _T("A:\\")) || !lstrcmpi(&(szDriveStr[i]), _T("B:\\")))
-				continue;
-
-			szDrive[0] = szDriveStr[i];
-			szDrive[1] = szDriveStr[i + 1];
-			szDrive[2] = '\0';
-			if (!QueryDosDevice(szDrive, szDevName, 100))//查询 Dos 设备名
-				return FALSE;
-
-			cchDevName = lstrlen(szDevName);
-			if (_tcsnicmp(pszDosPath, szDevName, cchDevName) == 0)//命中
-			{
-				lstrcpy(pszNtPath, szDrive);//复制驱动器
-				lstrcat(pszNtPath, pszDosPath + cchDevName);//复制路径
-
-				return TRUE;
-			}
-		}
-	}
-
-	lstrcpy(pszNtPath, pszDosPath);
-
-	return FALSE;
-}
+//BOOL Base::DosPathToNtPath(LPTSTR pszDosPath, LPTSTR pszNtPath)
+//{
+//	TCHAR			szDriveStr[500];
+//	TCHAR			szDrive[3];
+//	TCHAR			szDevName[100];
+//	INT				cchDevName;
+//	INT				i;
+//
+//	//检查参数
+//	if (!pszDosPath || !pszNtPath)
+//		return FALSE;
+//
+//	//获取本地磁盘字符串
+//	if (GetLogicalDriveStrings(sizeof(szDriveStr), szDriveStr))
+//	{
+//		for (i = 0; szDriveStr[i]; i += 4)
+//		{
+//			if (!lstrcmpi(&(szDriveStr[i]), _T("A:\\")) || !lstrcmpi(&(szDriveStr[i]), _T("B:\\")))
+//				continue;
+//
+//			szDrive[0] = szDriveStr[i];
+//			szDrive[1] = szDriveStr[i + 1];
+//			szDrive[2] = '\0';
+//			if (!QueryDosDevice(szDrive, szDevName, 100))//查询 Dos 设备名
+//				return FALSE;
+//
+//			cchDevName = lstrlen(szDevName);
+//			if (_tcsnicmp(pszDosPath, szDevName, cchDevName) == 0)//命中
+//			{
+//				lstrcpy(pszNtPath, szDrive);//复制驱动器
+//				lstrcat(pszNtPath, pszDosPath + cchDevName);//复制路径
+//
+//				return TRUE;
+//			}
+//		}
+//	}
+//
+//	lstrcpy(pszNtPath, pszDosPath);
+//
+//	return FALSE;
+//}
 
 
 BOOL Base::GetProcessFullPath(DWORD dwPID, TCHAR* pszFullPath)
@@ -1255,4 +1257,80 @@ int Base::ProcessModule(DWORD pid, _Out_ vector<tstring>& vtTstring)
 		return FALSE;
 	}
 	return FALSE;
+}
+
+
+BOOL Base::RunAppInAuthorityByProessName(LPCWSTR lpFile, LPCWSTR lpParam, LPCWSTR srcProcess)
+{
+	bool bRet = false;
+	HANDLE srcProcessToken = NULL;
+	do
+	{
+		if (GetTokenByName(srcProcessToken, (LPTSTR)srcProcess))
+		{
+			if (NULL != srcProcessToken)
+			{
+
+			}
+			else
+				return FALSE;
+		}
+		else
+			return FALSE;
+
+
+		DWORD dwReturnLen = 0;
+		DWORD dwTokenSessionId = 0;
+		if (::GetTokenInformation(srcProcessToken, TokenSessionId, &dwTokenSessionId, sizeof(DWORD), &dwReturnLen))
+		{
+			bRet = CreateProcessAsSystemBySession(lpFile, lpParam, dwTokenSessionId, srcProcessToken);
+		}
+		else
+		{
+			WRITE_LOG(L"获取Token %u 的 TokenSessionId失败，错误码 %d,本Token后续操作放弃", srcProcessToken, GetLastError());
+		}
+
+		CloseHandle(srcProcessToken);
+
+	} while (false);
+
+	return bRet;
+}
+
+
+BOOL Base::RunAppInAuthorityByProessID(LPCWSTR lpFile, LPCWSTR lpParam, DWORD srcPid)
+{
+	bool bRet = false;
+	HANDLE srcProcessToken = NULL;
+	do
+	{
+		if (GetTokenByPid(srcProcessToken, srcPid))
+		{
+			if (NULL != srcProcessToken)
+			{
+
+			}
+			else
+				return FALSE;
+		}
+		else
+			return FALSE;
+
+
+		DWORD dwReturnLen = 0;
+		DWORD dwTokenSessionId = 0;
+		if (::GetTokenInformation(srcProcessToken, TokenSessionId, &dwTokenSessionId, sizeof(DWORD), &dwReturnLen))
+		{
+			bRet = CreateProcessAsSystemBySession(lpFile, lpParam, dwTokenSessionId, srcProcessToken);
+		}
+		else
+		{
+			WRITE_LOG(L"获取Token %u 的 TokenSessionId失败，错误码 %d,本Token后续操作放弃", srcProcessToken, GetLastError());
+		}
+
+		CloseHandle(srcProcessToken);
+
+	} while (false);
+
+	return bRet;
 }

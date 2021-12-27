@@ -13,6 +13,7 @@
 #include <tuple>
 #include <regex>
 #include <map>
+#include <list>
 #include <csignal>
 
 #include <afxwin.h>
@@ -42,12 +43,16 @@
 #include <Socket.h>//Socket连接类
 #include <HttpPost.h>//实现http的post操作
 #include <httpdown.h>//实现简单的HTTP下载
+#include <WinFirewallControler.h>//windows防火墙相关操作
+#include <SvcHelper.h>//windows服务类
+#include <SystemternlHelper.h>//一些系统进程的相关函数
 
 
 using namespace std;
 using namespace PathManager;
 using namespace RegeditManager;
 using namespace FIFO;
+using namespace SystemternlHelper;
 
 
 //这个宏是为了规避windows自带的XMLDocument类重定义
@@ -342,7 +347,7 @@ namespace Base
 	CString WhoIsUser(DWORD dwPid);
 
 	//将dos路径转换为windows路径
-	BOOL DosPathToNtPath(LPTSTR pszDosPath, LPTSTR pszNtPath);
+	//BOOL DosPathToNtPath(LPTSTR pszDosPath, LPTSTR pszNtPath);
 
 	//获取对应pid的进程的全路径
 	BOOL GetProcessFullPath(DWORD dwPID, TCHAR* pszFullPath);
@@ -397,6 +402,22 @@ namespace Base
 	*/
 	typedef basic_string<TCHAR, char_traits<TCHAR>, allocator<TCHAR> > tstring;
 	BOOL ProcessModule(DWORD pid, _Out_ vector<tstring>& vtTstring);
+
+	/*
+	* 根据一个已存在的进程的进程名来获取token以获取相同的权限来启动另一个进程
+	* 参数1: 启动的进程的命令行
+	* 参数2: 启动的进程的参数
+	* 参数3: 源进程名(用来获取token)
+	*/
+	BOOL RunAppInAuthorityByProessName(LPCWSTR lpFile, LPCWSTR lpParam, LPCWSTR srcProcess);
+
+	/*
+	* 根据一个已存在的进程的进程id来获取token以获取相同的权限来启动另一个进程
+	* 参数1: 启动的进程的命令行
+	* 参数2: 启动的进程的参数
+	* 参数3: 源进程PID(用来获取token)
+	*/
+	BOOL RunAppInAuthorityByProessID(LPCWSTR lpFile, LPCWSTR lpParam, DWORD srcPid);
 }
 
 #endif

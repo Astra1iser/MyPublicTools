@@ -3,7 +3,9 @@
 
 2.使用时请添加Lib\vc141\Json为附加库目录
 
-3.添加附加包含目录后
+3.项目,右键,属性,C/C++,预处理器,预处理器定义,增加一个: _WIN32_WINNT=0x0502
+
+4.添加附加包含目录后
 如果当前是普通C++项目,请:
 
   (1)在预编译文件stdafx.h中 添加 #include <YcmBase.h>,打开Base空间 using namespace Base;
