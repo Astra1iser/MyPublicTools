@@ -112,7 +112,7 @@ BOOL Base::IsAdmin() {
 }
 
 
-CString Base::SetLangaueSyncOS()
+CString Base::GetLangaueSyncOS()
 {
 	CString strLanguage = L"zh_cn";
 
@@ -1333,4 +1333,46 @@ BOOL Base::RunAppInAuthorityByProessID(LPCWSTR lpFile, LPCWSTR lpParam, DWORD sr
 	} while (false);
 
 	return bRet;
+}
+
+
+void Base::SplitString(CString strLine, std::vector<CString>& vec_rlt, const CString& strSep /* = T("|")*/)
+{
+	vec_rlt.clear();
+	strLine.Trim();
+	while (!strLine.IsEmpty())
+	{
+		int nPos = strLine.Find(strSep);
+		if (-1 != nPos)
+		{
+			vec_rlt.push_back(strLine.Left(nPos));
+			strLine = strLine.Mid(nPos + strSep.GetLength());
+		}
+		else
+		{
+			vec_rlt.push_back(strLine);
+			strLine = _T("");
+		}
+	}
+}
+
+
+void Base::SplitString(CString strLine, std::list<CString>& vec_rlt, const CString& strSep /* = T("|")*/)
+{
+	vec_rlt.clear();
+	strLine.Trim();
+	while (!strLine.IsEmpty())
+	{
+		int nPos = strLine.Find(strSep);
+		if (-1 != nPos)
+		{
+			vec_rlt.push_back(strLine.Left(nPos));
+			strLine = strLine.Mid(nPos + strSep.GetLength());
+		}
+		else
+		{
+			vec_rlt.push_back(strLine);
+			strLine = _T("");
+		}
+	}
 }

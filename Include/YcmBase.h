@@ -16,7 +16,7 @@
 #include <list>
 #include <csignal>
 
-#include <afxwin.h>
+//#include <afxwin.h> //MFC的头文件,一般不要添加
 #include <atlstr.h>
 #include <windows.h>
 #include <windowsx.h>
@@ -46,6 +46,7 @@
 #include <WinFirewallControler.h>//windows防火墙相关操作
 #include <SvcHelper.h>//windows服务类
 #include <SystemternlHelper.h>//一些系统进程的相关函数
+#include <Singleton.h>//类的单实例模板
 
 
 using namespace std;
@@ -102,7 +103,7 @@ namespace Base
 
 
 	//2.返回当前系统语言
-	CString SetLangaueSyncOS();
+	CString GetLangaueSyncOS();
 
 
 	/*
@@ -418,6 +419,22 @@ namespace Base
 	* 参数3: 源进程PID(用来获取token)
 	*/
 	BOOL RunAppInAuthorityByProessID(LPCWSTR lpFile, LPCWSTR lpParam, DWORD srcPid);
+
+	/*
+	* 从一个有规律的字符串中分割出子字符串并存放至vector容器
+	* 参数1:要分割的字符串
+	* 参数2:要存放的容器的引用
+	* 参数3:分隔符是什么
+	*/
+	void SplitString(CString strLine, std::vector<CString>& vec_rlt, const CString& strSep /* = T("|")*/);
+
+	/*
+	* 从一个有规律的字符串中分割出子字符串并存放至list容器
+	* 参数1:要分割的字符串
+	* 参数2:要存放的列表的引用
+	* 参数3:分隔符是什么
+	*/
+	void SplitString(CString strLine, std::list<CString>& vec_rlt, const CString& strSep /* = T("|")*/);
 }
 
 #endif

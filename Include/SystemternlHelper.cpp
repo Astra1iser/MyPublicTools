@@ -326,14 +326,27 @@ BOOL SystemternlHelper::GetProcessCmdLine(const DWORD dwPID,CString &strCmdLine)
 				dwBufferSize = peb_upp.CommandLine.Length;
 
 			// Copy CommandLine to our structure variable
-#if defined(UNICODE) || (_UNICODE)
+
+#if defined(__AFXWIN_H__)	//如果包含了MFC
+	#if defined(_UNICODE)
 			StringCbCopyN(szCmdLine, sizeof(szCmdLine),
 				pwszBuffer, dwBufferSize);
-#else
+	#else
 			WideCharToMultiByte(CP_ACP, 0, pwszBuffer,
 				(int)(dwBufferSize / sizeof(WCHAR)),
 				szCmdLine, sizeof(szCmdLine),
 				NULL, NULL);
+	#endif
+#else	//如果没包含MFC
+	#if defined(UNICODE)
+				StringCbCopyN(szCmdLine, sizeof(szCmdLine),
+					pwszBuffer, dwBufferSize);
+	#else
+				WideCharToMultiByte(CP_ACP, 0, pwszBuffer,
+					(int)(dwBufferSize / sizeof(WCHAR)),
+					szCmdLine, sizeof(szCmdLine),
+					NULL, NULL);
+	#endif
 #endif
 
 			bRet = TRUE;
