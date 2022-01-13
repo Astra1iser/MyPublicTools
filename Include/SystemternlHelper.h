@@ -134,16 +134,4 @@ namespace SystemternlHelper
 	HANDLE GetProcessFullNameList(LPCTSTR lpcszName, list<CString>& strFullNameLst);
 	int GetAllTokensByNameAndPId(LPCTSTR lpcszName, HANDLE* pTokens, int nMax, DWORD dwPid);
 };
-
-
-
-
-
-
-
-
-
-
-
-
 #endif

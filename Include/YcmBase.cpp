@@ -4,6 +4,7 @@
 #include <Pathmanager.cpp>
 #include <RegeditManager.cpp>
 #include <MyOperFile.cpp>
+#include <DiretoryOperation.cpp>
 #include <Thread.cpp>
 #include <Mutex.cpp>
 #include <FIFO.cpp>
@@ -17,6 +18,10 @@
 #include <WinFirewallControler.cpp>
 #include <SvcHelper.cpp>
 #include <SystemternlHelper.cpp>
+#include <MakeCab.cpp>
+#include <zip.cpp>
+#include <unzip.cpp>
+
 
 BOOL Base::IsAdmin() {
 	#define ACCESS_READ		1  
@@ -1375,4 +1380,16 @@ void Base::SplitString(CString strLine, std::list<CString>& vec_rlt, const CStri
 			strLine = _T("");
 		}
 	}
+}
+
+
+DWORD Base::SomGetSystemRebootTime()
+{
+	return _time32(NULL) - (GetTickCount() / 1000);
+}
+
+
+DWORD Base::SomGetCurrentTime()
+{
+	return _time32(NULL);
 }

@@ -32,6 +32,7 @@
 #include <PathManager.h>//路径相关函数
 #include <RegeditManager.h>//注册表操作相关函数
 #include <MyOperFile.h>//文件读写和文件信息相关函数
+#include <DiretoryOperation.h>//提供更复杂的文件操作
 #include <Thread.h>//线程类/线程池
 #include <JsonHelper.h>//json解析库
 #include <Mutex.h>//系统全局锁 Mutex(可作为线程锁和文件锁)
@@ -47,6 +48,10 @@
 #include <SvcHelper.h>//windows服务类
 #include <SystemternlHelper.h>//一些系统进程的相关函数
 #include <Singleton.h>//类的单实例模板
+#include <MakeCab.h>//cab制作类
+#include <zip.h>//文件压缩方法
+#include <unzip.h>//文件解压缩方法
+#include <Guard.h>
 
 
 using namespace std;
@@ -435,6 +440,18 @@ namespace Base
 	* 参数3:分隔符是什么
 	*/
 	void SplitString(CString strLine, std::list<CString>& vec_rlt, const CString& strSep /* = T("|")*/);
+
+
+	/*
+	* 获取系统上次启动时间(时间戳)
+	*/
+	DWORD SomGetSystemRebootTime();
+
+	/*
+	* 获取当前系统时间(时间戳)
+	*/
+	DWORD SomGetCurrentTime();
+
 }
 
 #endif

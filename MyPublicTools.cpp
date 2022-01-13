@@ -436,144 +436,145 @@ int main(int argc, _TCHAR* argv[])
 	//	UnhookWindowsHookEx(g_hHook);
 
 
-	CString srcIni = MyExePath(L"360EntExt.ini");
-	CString tgtIni = MyExePath(L"data\\inst\\360EntExt.ini");
-	if ((_waccess(srcIni.GetBuffer(), 0)) != -1)
-	{
-		//取出模块
-		WCHAR wch_srcmodules_buf[MAX_PATH * 10] = { 0 };
-		WCHAR wch_tgtmodules_buf[MAX_PATH * 10] = { 0 };
-		GetPrivateProfileString(_T("ext"), _T("modules"), _T(""), wch_srcmodules_buf, MAX_PATH * 10, srcIni);
-		GetPrivateProfileString(_T("ext"), _T("modules"), _T(""), wch_tgtmodules_buf, MAX_PATH * 10, tgtIni);
-		CString s_srcmodules_buf = wch_srcmodules_buf;
-		CString s_tgtmodules_buf = wch_tgtmodules_buf;
-		vector<CString> strSrcModuleArray;	//用户的自定义ini文件的模块
-		vector<CString> strTgtModuleArray;	//默认ini文件中的模块
-		vector<CString> strNeedPushArray;	//需要添加的模块
-		vector<CString> strNeedEraseArray;	//需要删除的模块
+	//CString srcIni = MyExePath(L"360EntExt.ini");
+	//CString tgtIni = MyExePath(L"data\\inst\\360EntExt.ini");
+	//if ((_waccess(srcIni.GetBuffer(), 0)) != -1)
+	//{
+	//	//取出模块
+	//	WCHAR wch_srcmodules_buf[MAX_PATH * 10] = { 0 };
+	//	WCHAR wch_tgtmodules_buf[MAX_PATH * 10] = { 0 };
+	//	GetPrivateProfileString(_T("ext"), _T("modules"), _T(""), wch_srcmodules_buf, MAX_PATH * 10, srcIni);
+	//	GetPrivateProfileString(_T("ext"), _T("modules"), _T(""), wch_tgtmodules_buf, MAX_PATH * 10, tgtIni);
+	//	CString s_srcmodules_buf = wch_srcmodules_buf;
+	//	CString s_tgtmodules_buf = wch_tgtmodules_buf;
+	//	vector<CString> strSrcModuleArray;	//用户的自定义ini文件的模块
+	//	vector<CString> strTgtModuleArray;	//默认ini文件中的模块
+	//	vector<CString> strNeedPushArray;	//需要添加的模块
+	//	vector<CString> strNeedEraseArray;	//需要删除的模块
 
-		SplitString(s_srcmodules_buf, strSrcModuleArray, ',');
-		SplitString(s_tgtmodules_buf, strTgtModuleArray, ',');
+	//	SplitString(s_srcmodules_buf, strSrcModuleArray, ',');
+	//	SplitString(s_tgtmodules_buf, strTgtModuleArray, ',');
 
-		vector<CString> strSrcModuleArray_Refactor = strSrcModuleArray; //删减过用户添加的新模块后的用户自定义模块(此时的元素为:默认ini中的模块-用户添加的模块)
-		vector<CString> strFinalArray = strTgtModuleArray;	//最终的模块(结果:默认ini文件中的模块-用户删除的模块+用户添加的模块)
+	//	vector<CString> strSrcModuleArray_Refactor = strSrcModuleArray; //删减过用户添加的新模块后的用户自定义模块(此时的元素为:默认ini中的模块-用户添加的模块)
+	//	vector<CString> strFinalArray = strTgtModuleArray;	//最终的模块(结果:默认ini文件中的模块-用户删除的模块+用户添加的模块)
 
-		//取出需要添加的元素
-		for (vector<CString>::const_iterator iter = strSrcModuleArray.begin(); iter != strSrcModuleArray.end(); iter++)
-		{
-			CString buffer = *iter;
-			vector<CString>::iterator result = find(strTgtModuleArray.begin(), strTgtModuleArray.end(), buffer); //查找
+	//	//取出需要添加的元素
+	//	for (vector<CString>::const_iterator iter = strSrcModuleArray.begin(); iter != strSrcModuleArray.end(); iter++)
+	//	{
+	//		CString buffer = *iter;
+	//		vector<CString>::iterator result = find(strTgtModuleArray.begin(), strTgtModuleArray.end(), buffer); //查找
 
-			if (result == strTgtModuleArray.end()) //没找到,证明用户添加了一个新的模块
-			{
-				strNeedPushArray.push_back(buffer);
-			}
-		}
+	//		if (result == strTgtModuleArray.end()) //没找到,证明用户添加了一个新的模块
+	//		{
+	//			strNeedPushArray.push_back(buffer);
+	//		}
+	//	}
 
-		//接下来先去掉用户的ini中用户定义的新增模块,得到的数据与自带的ini中的模块比较,再从自带的ini中去除用户删除的模块
-		for (vector<CString>::const_iterator iter = strNeedPushArray.begin(); iter != strNeedPushArray.end(); iter++)
-		{
-			CString buffer = *iter;
-			vector<CString>::iterator result = find(strSrcModuleArray_Refactor.begin(), strSrcModuleArray_Refactor.end(), buffer); //查找
-			if (result != strSrcModuleArray_Refactor.end())
-			{
-				strSrcModuleArray_Refactor.erase(result);
-			}
-			
-		}
+	//	//接下来先去掉用户的ini中用户定义的新增模块,得到的数据与自带的ini中的模块比较,再从自带的ini中去除用户删除的模块
+	//	for (vector<CString>::const_iterator iter = strNeedPushArray.begin(); iter != strNeedPushArray.end(); iter++)
+	//	{
+	//		CString buffer = *iter;
+	//		vector<CString>::iterator result = find(strSrcModuleArray_Refactor.begin(), strSrcModuleArray_Refactor.end(), buffer); //查找
+	//		if (result != strSrcModuleArray_Refactor.end())
+	//		{
+	//			strSrcModuleArray_Refactor.erase(result);
+	//		}
+	//		
+	//	}
 
-		//获取需要删除的元素
-		for (vector<CString>::const_iterator iter = strTgtModuleArray.begin(); iter != strTgtModuleArray.end(); iter++)
-		{
-			CString buffer = *iter;
-			vector<CString>::iterator result = find(strSrcModuleArray_Refactor.begin(), strSrcModuleArray_Refactor.end(), buffer); //查找
+	//	//获取需要删除的元素
+	//	for (vector<CString>::const_iterator iter = strTgtModuleArray.begin(); iter != strTgtModuleArray.end(); iter++)
+	//	{
+	//		CString buffer = *iter;
+	//		vector<CString>::iterator result = find(strSrcModuleArray_Refactor.begin(), strSrcModuleArray_Refactor.end(), buffer); //查找
 
-			if (result == strSrcModuleArray_Refactor.end()) //没找到,证明用户删除了一个旧的模块
-			{
-				strNeedEraseArray.push_back(buffer);
-			}
-		}
+	//		if (result == strSrcModuleArray_Refactor.end()) //没找到,证明用户删除了一个旧的模块
+	//		{
+	//			strNeedEraseArray.push_back(buffer);
+	//		}
+	//	}
 
-		//合成最终的结果
-		//删除元素
-		for (vector<CString>::const_iterator iter = strNeedEraseArray.begin(); iter != strNeedEraseArray.end(); iter++)
-		{
-			CString buffer = *iter;
-			vector<CString>::iterator result = find(strFinalArray.begin(), strFinalArray.end(), buffer); //查找
-			if (result != strFinalArray.end())
-			{
-				strFinalArray.erase(result);
-			}
+	//	//合成最终的结果
+	//	//删除元素
+	//	for (vector<CString>::const_iterator iter = strNeedEraseArray.begin(); iter != strNeedEraseArray.end(); iter++)
+	//	{
+	//		CString buffer = *iter;
+	//		vector<CString>::iterator result = find(strFinalArray.begin(), strFinalArray.end(), buffer); //查找
+	//		if (result != strFinalArray.end())
+	//		{
+	//			strFinalArray.erase(result);
+	//		}
 
-		}
-		//添加元素
-		for (vector<CString>::const_iterator iter = strNeedPushArray.begin(); iter != strNeedPushArray.end(); iter++)
-		{
-			CString buffer = *iter;
-			strFinalArray.push_back(buffer);
-		}
+	//	}
+	//	//添加元素
+	//	for (vector<CString>::const_iterator iter = strNeedPushArray.begin(); iter != strNeedPushArray.end(); iter++)
+	//	{
+	//		CString buffer = *iter;
+	//		strFinalArray.push_back(buffer);
+	//	}
 
-		CString finalvalue;
+	//	CString finalvalue;
 
-		for (vector<CString>::const_iterator iter = strFinalArray.begin(); iter != strFinalArray.end(); iter++)
-		{
-			SetIniValue(*iter, L"ver", L"1.0.0.1", srcIni);
-			SetIniValue(*iter, L"lib", L"0", srcIni);
+	//	for (vector<CString>::const_iterator iter = strFinalArray.begin(); iter != strFinalArray.end(); iter++)
+	//	{
+	//		SetIniValue(*iter, L"ver", L"1.0.0.1", srcIni);
+	//		SetIniValue(*iter, L"lib", L"0", srcIni);
 
-			finalvalue += *iter;
-			if (iter != strFinalArray.end() - 1)
-				finalvalue += ',';
-		}
+	//		finalvalue += *iter;
+	//		if (iter != strFinalArray.end() - 1)
+	//			finalvalue += ',';
+	//	}
 
-		for (vector<CString>::const_iterator iter = strNeedEraseArray.begin(); iter != strNeedEraseArray.end(); iter++)
-		{
-			SetIniValue(*iter, NULL, NULL, srcIni);
-		}
+	//	for (vector<CString>::const_iterator iter = strNeedEraseArray.begin(); iter != strNeedEraseArray.end(); iter++)
+	//	{
+	//		SetIniValue(*iter, NULL, NULL, srcIni);
+	//	}
 
-		SetIniValue(L"ext", L"modules", finalvalue, srcIni);
+	//	SetIniValue(L"ext", L"modules", finalvalue, srcIni);
 
 
-		LPWSTR pSecNames = new WCHAR[2048];
+	//	LPWSTR pSecNames = new WCHAR[2048];
 
-		int nSectionNum = 0;
-		wstring strSecName;
+	//	int nSectionNum = 0;
+	//	wstring strSecName;
 
-		DWORD retVal = GetPrivateProfileSectionNames(pSecNames, 2048, srcIni);
+	//	DWORD retVal = GetPrivateProfileSectionNames(pSecNames, 2048, srcIni);
 
-		if (retVal)
-		{
-			strSecName.assign(pSecNames, retVal);
-		}
-		delete pSecNames;
+	//	if (retVal)
+	//	{
+	//		strSecName.assign(pSecNames, retVal);
+	//	}
+	//	delete pSecNames;
 
-		CString allsession;
-		for (int i = 0; i < strSecName.size(); i++)
-		{
-			if (strSecName[i] == '\0')
-				allsession += ',';
-			else
-				allsession += strSecName[i];
-		}
+	//	CString allsession;
+	//	for (int i = 0; i < strSecName.size(); i++)
+	//	{
+	//		if (strSecName[i] == '\0')
+	//			allsession += ',';
+	//		else
+	//			allsession += strSecName[i];
+	//	}
 
-		vector<CString> strNeedCheckArray;
-		SplitString(allsession, strNeedCheckArray, ',');
+	//	vector<CString> strNeedCheckArray;
+	//	SplitString(allsession, strNeedCheckArray, ',');
 
-		for (vector<CString>::const_iterator iter = strNeedCheckArray.begin(); iter != strNeedCheckArray.end(); iter++)
-		{
-			CString buffer = *iter;
-			if (L"ext" == buffer)
-			{
-				continue;
-			}
-			vector<CString>::iterator result = find(strFinalArray.begin(), strFinalArray.end(), buffer); //查找
+	//	for (vector<CString>::const_iterator iter = strNeedCheckArray.begin(); iter != strNeedCheckArray.end(); iter++)
+	//	{
+	//		CString buffer = *iter;
+	//		if (L"ext" == buffer)
+	//		{
+	//			continue;
+	//		}
+	//		vector<CString>::iterator result = find(strFinalArray.begin(), strFinalArray.end(), buffer); //查找
 
-			if (result == strFinalArray.end()) //没找到,证明用户已经删除了他之前自定义的模块,但是节点还没删掉
-			{
-				SetIniValue(*iter, NULL, NULL, srcIni);
-			}
-			
-		}
+	//		if (result == strFinalArray.end()) //没找到,证明用户已经删除了他之前自定义的模块,但是节点还没删掉
+	//		{
+	//			SetIniValue(*iter, NULL, NULL, srcIni);
+	//		}
+	//		
+	//	}
+	//}
 
-	}
+
 }
 

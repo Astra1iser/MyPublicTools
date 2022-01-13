@@ -160,7 +160,10 @@ BOOL MySocket::InitReceiver(u_short port)
 	ReceiveUdpServ.sin_family = AF_INET;
 	ReceiveUdpServ.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
 	ReceiveUdpServ.sin_port = htons(port);
-	if (bind(sock_type, (SOCKADDR*)&ReceiveUdpServ, sizeof(ReceiveUdpServ)) != 0)
+
+	bind(sock_type, (SOCKADDR*)&ReceiveUdpServ, sizeof(ReceiveUdpServ));
+	err = WSAGetLastError();
+	if (0 != err)
 	{
 		err = WSAGetLastError();
 		printf("Bind error:%d\n", err);
