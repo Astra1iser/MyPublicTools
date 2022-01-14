@@ -5,6 +5,10 @@
 #pragma warning(disable:4267)
 #pragma warning(disable:4311)
 #pragma warning(disable:4302)
+#pragma warning(disable:4018)//屏蔽符号不匹配警告
+#pragma warning(disable:4834)//屏蔽函数返回值类型被忽略警告
+#pragma warning(disable:4244)//屏蔽强制类型转换可能丢失数据的警告
+
 
 
 #include <iostream>
@@ -51,7 +55,11 @@
 #include <MakeCab.h>//cab制作类
 #include <zip.h>//文件压缩方法
 #include <unzip.h>//文件解压缩方法
-#include <Guard.h>
+#include <Guard.h>//程序崩溃处理类
+#include <strconv.h>//字符编码类型转换类
+#include <TxtReader.h>//用于按行读写文件文本
+#include <XORFileEncrypt.h>//文件加解密类
+#include <md5.h>
 
 
 using namespace std;

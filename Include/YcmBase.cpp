@@ -21,6 +21,9 @@
 #include <MakeCab.cpp>
 #include <zip.cpp>
 #include <unzip.cpp>
+#include <TxtReader.cpp>
+#include <XORFileEncrypt.cpp>
+#include <md5.cpp>
 
 
 BOOL Base::IsAdmin() {

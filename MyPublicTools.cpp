@@ -384,6 +384,7 @@ LRESULT CALLBACK HookCallWndProcForCrashWindow(int nCode, WPARAM wParam, LPARAM 
 
 
 
+
 int main(int argc, _TCHAR* argv[])
 {
 
@@ -574,6 +575,7 @@ int main(int argc, _TCHAR* argv[])
 	//		
 	//	}
 	//}
+
 
 
 }
