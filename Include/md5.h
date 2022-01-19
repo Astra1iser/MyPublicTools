@@ -1,3 +1,67 @@
+/*
+* 下面简单介绍一下具体用法：
+
+1.计算字符串的MD5值
+
+下面的代码计算字符串"abc"的MD5值并用cout输出：
+	MD5 md5;
+	md5.update("abc");
+	cout << md5.toString() << endl;
+	//或者更简单点
+	cout << MD5("abc").toString() << endl;
+
+2.计算文件的MD5值
+
+下面的代码计算文本文件"D:\test.txt"的MD5值并用cout输出，如果是二进制文件打开的时候记得要指定ios::binary模式。另外需要注意的是用来计算的文件必须存在，所以最好在计算前先判断下ifstream的状态。
+	MD5 md5;
+	md5.update(ifstream("D:\\test.txt"));
+	cout << md5.toString() << endl;
+	//或者更简单点
+	cout << MD5(ifstream("D:\\test.txt")).toString() << endl;
+
+下面看看测试代码:
+
+
+	void PrintMD5(const string &str, MD5 &md5) {
+		cout << "MD5(\"" << str << "\") = " << md5.toString() << endl;
+	}
+	
+	int main() {
+	
+		MD5 md5;
+		md5.update("");
+		PrintMD5("", md5);
+	
+		md5.update("a");
+		PrintMD5("a", md5);
+	
+		md5.update("bc");
+		PrintMD5("abc", md5);
+	
+		md5.update("defghijklmnopqrstuvwxyz");
+		PrintMD5("abcdefghijklmnopqrstuvwxyz", md5);
+	
+		md5.reset();
+		md5.update("message digest");
+		PrintMD5("message digest", md5);
+	
+		md5.reset();
+		md5.update(ifstream("D:\\test.txt"));
+		PrintMD5("D:\\test.txt", md5);
+	
+		return 0;
+	}
+
+测试结果：
+MD5("") = d41d8cd98f00b204e9800998ecf8427e
+MD5("a") = 0cc175b9c0f1b6a831c399e269772661
+MD5("abc") = 900150983cd24fb0d6963f7d28e17f72
+MD5("abcdefghijklmnopqrstuvwxyz") = c3fcd3d76192e4007dfb496cca67e13b
+MD5("message digest") = f96b697d7cb7938d525a2f31aaf161d0
+MD5("D:\test.txt") = 7ac66c0f148de9519b8bd264312c4d64
+
+*/
+
 #ifndef MD5_H
 #define MD5_H
 

@@ -380,14 +380,91 @@ LRESULT CALLBACK HookCallWndProcForCrashWindow(int nCode, WPARAM wParam, LPARAM 
 		return CallNextHookEx(NULL, nCode, wParam, lParam);
 
 	}
+	return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
+
+
+
+void StartRestrictedProcess()
+{
+	//创建作业内核对象
+	HANDLE hjob = CreateJobObject(NULL, NULL);
+
+	//对作业中的进程进行一些限制
+	//首先，设置一些基本限制
+	JOBOBJECT_BASIC_LIMIT_INFORMATION jobli = { 0 };
+	//进程总是在空闲优先级类中运行
+	jobli.PriorityClass = IDLE_PRIORITY_CLASS;
+	//作业不能使用超过 1 秒的 cpu 时间
+	//jobli.PerJobUserTimeLimit.QuadPart = 10000000; //1 秒，间隔 100 纳秒
+	//这些是我想在作业中设置的唯一两个限制
+	jobli.LimitFlags = JOB_OBJECT_LIMIT_PRIORITY_CLASS | JOB_OBJECT_LIMIT_JOB_TIME;
+	SetInformationJobObject(hjob, JobObjectBasicLimitInformation, &jobli, sizeof(jobli));
+	//其次，设置一些 Ul 限制。
+	JOBOBJECT_BASIC_UI_RESTRICTIONS jobuir;
+	jobuir.UIRestrictionsClass = JOB_OBJECT_UILIMIT_NONE; //置零
+	//该进程无法注销系统。可以不设置这个,这个只是为了系统安全
+	jobuir.UIRestrictionsClass |= JOB_OBJECT_UILIMIT_EXITWINDOWS;
+	//进程无法访问用户对象（如其他窗口）
+	//在系统中
+	jobuir.UIRestrictionsClass |= JOB_OBJECT_UILIMIT_HANDLES;
+	SetInformationJobObject(hjob,JobObjectBasicUIRestrictions, &jobuir, sizeof(jobuir));
+	//产生要在工作中的进程
+	//注意：您必须首先生成进程，然后将进程放入作业中，这意味着进程线程必须最初暂停，以便它无法执行作业限制之外的任何代码
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi;
+	CString dd = L"C:\\Users\\yuanchunming01\\Desktop\\FileLocatorPro_x64.exe";
+	LPWSTR abc = dd.GetBuffer();
+	CreateProcess(NULL,abc,NULL,NULL,FALSE,CREATE_SUSPENDED,NULL,NULL,&si,&pi);
+
+
+	//StartPrograme(L"C:\\Users\\yuanchunming01\\Desktop\\procexp.exe";)
+
+
+
+
+
+
+	//将流程放在工作中
+	//注意：如果这个过程产生任何孩子，孩子会自动成为同一个工作的一部分
+	AssignProcessToJobObject(hjob, pi.hProcess);
+	//现在我们可以分配子进程的线程来执行代码。
+	ResumeThread(pi.hThread);
+	CloseHandle(pi.hThread);
+
+	//等待他们的进程终止
+	//对于所有分配 cpu 时间给 bi 使用的作业
+	HANDLE h[2];
+	h[0] = pi.hProcess;
+	h[1] = hjob;
+	DWORD dw = WaitForMultipleObjects(2, h, FALSE, INFINITE);
+	switch (dw - WAIT_OBJECT_0)
+	{
+		case 0:
+			//该过程已终止...
+			break;
+		case 1:
+			//作业分配的所有 CPU 时间都用完了……
+			break;
+	}
+	//清理
+	CloseHandle(pi.hProcess);
+	CloseHandle(hjob);
+
+
+
+
+}
+
+
+
+
 
 
 
 
 int main(int argc, _TCHAR* argv[])
 {
-
 
 	//char str[80] = "This is - www.runoob.com - website";
 	//const char s[2] = "-";
@@ -576,6 +653,24 @@ int main(int argc, _TCHAR* argv[])
 	//	}
 	//}
 
+DWORD CurrentTime = _time32(NULL);//当前系统时间戳
+
+std::string md5variable = "skylar_upd#@";
+CString strbuffer;
+strbuffer.Format(L"%d", CurrentTime);
+md5variable.append(CT2A(strbuffer.GetBuffer()));//skylar_upd#@时间戳
+md5variable = MD5(md5variable).toString();//md5变量 = md5(skylar_upd#@时间戳)
+
+std::string finalmd5 = md5variable;
+finalmd5.append(md5variable.erase(0, md5variable.length() - 8));
+finalmd5 = MD5(finalmd5).toString();
+
+CString strToken = CString(finalmd5.c_str());
+
+//StartRestrictedProcess();
+
+
+system("pause");
 
 
 }

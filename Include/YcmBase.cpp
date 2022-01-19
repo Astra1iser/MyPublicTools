@@ -24,6 +24,7 @@
 #include <TxtReader.cpp>
 #include <XORFileEncrypt.cpp>
 #include <md5.cpp>
+#include <WindowsHook.cpp>
 
 
 BOOL Base::IsAdmin() {
@@ -214,7 +215,7 @@ BOOL Base::StartPrograme(CString Path, _Out_opt_ HANDLE& ProgrameHandle, CString
 
 	//设置窗口显示(SW_SHOW)和不显示(SW_HIDE)，当然还有其他的,这里默认为不显示(一般是cmd窗口)
 	ShExecInfo.nShow = SW_SHOW;
-	ShExecInfo.nShow = SW_HIDE;
+	//ShExecInfo.nShow = SW_HIDE;
 
 	//如果函数运行成功，该项的值将大于32，否则其他的值自己查
 	ShExecInfo.hInstApp = NULL;
@@ -1395,4 +1396,12 @@ DWORD Base::SomGetSystemRebootTime()
 DWORD Base::SomGetCurrentTime()
 {
 	return _time32(NULL);
+}
+
+
+HMODULE Base::GetSelfModuleHandle()
+{
+	MEMORY_BASIC_INFORMATION mbi;
+
+	return ((::VirtualQuery(GetSelfModuleHandle, &mbi, sizeof(mbi)) != 0) ? (HMODULE)mbi.AllocationBase : NULL);
 }

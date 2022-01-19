@@ -76,10 +76,9 @@ void fun2(int b)
     fun1(a);
 }
 
-typedef UINT(*PFN_StartCrashDumpServer)();
-typedef UINT(WINAPI* PFN_StartCrashDumpServer2)();
 
-HMODULE g_hModule = NULL;
+
+
 
 
 MyPublicQtTools::MyPublicQtTools(QWidget *parent)
@@ -90,15 +89,7 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
 
     initTitleBar();
 
-
-
-
-
-
     resize(600, 200);
-
-
-
 
     int errorc = 0;
     setWindowIcon(QIcon("Ico.ico"));//设置状态栏图标
@@ -139,20 +130,23 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
 
 
     HMODULE hMod = LoadLibrary(L"Dll1.dll");
-    
+
+    using lpWindowsHook = WindowsHook * (*)(int WindowsHookCode, HOOKPROC HookCallBack);
+
+    WindowsHook* lpWindowsHookInstance = NULL;
+
+    lpWindowsHook lp_WindowsHook = (lpWindowsHook)GetProcAddress(hMod, "GetInstance");
+    if (lp_WindowsHook)
+    {
+        lpWindowsHookInstance = lp_WindowsHook(WH_CALLWNDPROCRET, windowshook_nsp::Fun_HookCallBack);
+    }
 
     connect
     (ui.C_collapse_Button, &QPushButton::clicked, this, [=]()
         {
-            //HANDLE myHandle;
-            //StartPrograme(L"MyPublicTools.exe", myHandle,L"",0,0);
-            //abort();
-
-
-            PFN_StartCrashDumpServer fnStartCrashDumpServer = (PFN_StartCrashDumpServer)GetProcAddress(hMod, "StartCrashDumpServer");
-            if (fnStartCrashDumpServer)
+            if (lpWindowsHookInstance)
             {
-                fnStartCrashDumpServer();
+                lpWindowsHookInstance->Install();
             }
         }
     );
@@ -160,16 +154,9 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     connect
     (ui.Win_collapse_Button, &QPushButton::clicked, this, [=]()
         {
-            //HANDLE myHandle;
-            //StartPrograme(L"MyPublicTools2.exe", myHandle, L"", 0, 0);
-            //fun1(2);
-
-            //MessageBox(NULL, L"窗口", L"钩子", 0);
-
-            PFN_StartCrashDumpServer2 fnStartCrashDumpServer2 = (PFN_StartCrashDumpServer2)GetProcAddress(hMod, "StartCrashDumpServer2");
-            if (fnStartCrashDumpServer2)
+            if (lpWindowsHookInstance)
             {
-                fnStartCrashDumpServer2();
+                lpWindowsHookInstance->UnInstall();
             }
         }
     );
@@ -186,7 +173,7 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
     m_titleBar = new MyTitleBar(this);
     m_titleBar->setTitleIcon("Image/QAXico.png");
     //m_titleBar->setBackgroundColor(0, 0, 0, 1);
-    m_titleBar->setTitleContent(QStringLiteral("天擎客户端开发二组---HOOK工具"),15);
+    m_titleBar->setTitleContent(QStringLiteral("天擎客户端开发三组---HOOK工具"),15);
     m_titleBar->setButtonType(MIN_MAX_BUTTON);
     //m_titleBar->setButtonType(ONLY_CLOSE_BUTTON);
     m_titleBar->setTitleRoll(20);
@@ -354,92 +341,3 @@ MyPublicQtTools::MyPublicQtTools(QWidget *parent)
 
      return QWidget::nativeEvent(eventType, message, result);
  }
-
-
-
-
-
-
-
-
- //另外一边钩子的dll的代码
- /*
- 
-extern "C" __declspec(dllexport) UINT StartCrashDumpServer();
-extern "C" __declspec(dllexport) UINT StartCrashDumpServer2();
-
-
-LRESULT CALLBACK HookCallWndProcForCrashWindow(int nCode, WPARAM wParam, LPARAM lParam)
-{
-    LPCWPRETSTRUCT lpMsg = (LPCWPRETSTRUCT)lParam;
-    if (NULL != lpMsg)
-    {
-        if ((WM_INITDIALOG == lpMsg->message))
-        {
-
-            WCHAR szCaption[200] = { 0 };
-            GetWindowText(lpMsg->hwnd, szCaption, 200);
-
-            CString buffer;
-            buffer.Format(L"当前窗体名称为:%s", szCaption);
-            WRITE_LOG(buffer);
-
-            goto _EXIT;
-        }
-        goto _EXIT;
-    }
-    else
-    {
-        WRITE_LOG(L"指针为空");
-        goto _EXIT;
-    }
-
-    goto _EXIT;
-
-_EXIT:
-    return CallNextHookEx(NULL, nCode, wParam, lParam);
-
-}
-
-UINT Install()
-{
-
-    g_hHook = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)HookCallWndProcForCrashWindow, g_hModule, 0);
-
-    return 0;
-
-}
-
-UINT WINAPI InstallMonitor()
-{
-    return Install();
-}
-
-
-UINT StartCrashDumpServer()
-{
-    Install();
-
-    return -1;
-}
-
-UINT UnInstall(HHOOK hHook)
-{
-    if (g_hHook)
-        UnhookWindowsHookEx(g_hHook);
-}
-
-UINT StartCrashDumpServer2()
-{
-    if (g_hHook)
-       UnhookWindowsHookEx(g_hHook);
-    return -1;
-}
-
-
-UINT WINAPI UnInstallMonitor(HHOOK hHook)
-{
-    return UnInstall(hHook);
-}
-
- */

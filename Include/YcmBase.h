@@ -59,7 +59,8 @@
 #include <strconv.h>//字符编码类型转换类
 #include <TxtReader.h>//用于按行读写文件文本
 #include <XORFileEncrypt.h>//文件加解密类
-#include <md5.h>
+#include <md5.h>//
+#include <WindowsHook.h>
 
 
 using namespace std;
@@ -459,6 +460,9 @@ namespace Base
 	* 获取当前系统时间(时间戳)
 	*/
 	DWORD SomGetCurrentTime();
+
+	//获取当前模块的句柄,如果是在DLL中使用,则返回DLL自身的句柄,而不是返回加载他的进程的句柄
+	HMODULE GetSelfModuleHandle();
 
 }
 
